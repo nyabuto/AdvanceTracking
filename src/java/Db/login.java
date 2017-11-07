@@ -66,7 +66,7 @@ int status;
           nextPage="Staffs.jsp";
          }
              else{
-             message="Your account is blocked. Contact administrator for help.";
+             message="Your account is blocked. Contact System Administrator for help.";
              nextPage="../AdvanceTracking";
              session.setAttribute("login", message);   
              }

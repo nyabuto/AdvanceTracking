@@ -39,7 +39,22 @@
 	<script type="text/javascript" src="assets/js/pages/datatables_extension_buttons_print.js"></script>
         <script type="text/javascript" src="assets/js/pages/datatables_extension_select.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/ui/ripple.min.js"></script>
+        
+        <!--to manage notifications-->
+        <script type="text/javascript" src="assets/js/plugins/notifications/bootbox.min.js"></script>
+        <script type="text/javascript" src="assets/js/plugins/notifications/noty.min.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/notifications/jgrowl.min.js"></script>
+        <script type="text/javascript" src="assets/js/plugins/forms/selects/bootstrap_select.min.js"></script>
 	<!-- /theme JS files -->
+        <script type="text/javascript" language="en">
+        function numbers(evt){
+             var charCode=(evt.which) ? evt.which : event.keyCode
+             if(charCode > 31 && (charCode < 48 || charCode>57))
+             return false;
+             return true;
+       }
+     //-->
+     </script>
         <script type="text/javascript">
           jQuery(document).ready(function(){
           loadstaffs();    
@@ -56,6 +71,7 @@
            
         var data=raw_data.data;
         var dataSet=[];
+        var accounting="";
         for (var i=0; i<data.length;i++){
             pos=i+1;
             staff_no=fullname=email=phone=status=status_label="";
@@ -66,23 +82,34 @@
             if( data[i].status!=null){status = data[i].status;}
             
             if(status==1){
-           status_label=  '<span class="label label-success">Active</span> ';  
+           status_label=  '<span class="label label-success">Active</span> '; 
+           accounting='<li><a onclick=\"de_activate('+pos+');\" ><i class="icon-plus3 position-left"></i> De-activate</a></li>';
             }
             else{
-            status_label=  '<span class="label label-danger">Inactive</span> ';       
+            status_label=  '<span class="label label-danger">Inactive</span> '; 
+            accounting='<li><a onclick=\"activate('+pos+');\" ><i class="icon-plus3 position-left"></i> Activate</a></li>';
             }
+            <%if(session.getAttribute("level")!=null){if(!session.getAttribute("level").toString().equals("1")){%>
+              accounting="";          
+              <%}}%>          
             // output the values to data table
          output='<div class="text-right"><ul class="icons-list"><li class="dropdown">\n\
            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-menu9"></i></a>\n\
            <ul class="dropdown-menu dropdown-menu-right">\n\
            <li><a href="staff_session?src=Advances&&axn='+staff_no+'"><i class="icon-file-pdf"></i> Manage Advances</a></li>\n\
+           '+accounting+'\
            </ul></li></ul></div>';
+            
+         output+='<input type="hidden" name="'+pos+'" value="'+staff_no+'" id="'+pos+'">';
          
            var minSet = [pos,fullname,email,phone,status_label,output];
            
            dataSet.push(minSet);
             // output the values to data table
         }
+        var table = $('#table').DataTable();
+        table.destroy();
+        
         $('#table').dataTable({
             data: dataSet,
             responsive: true,
@@ -94,6 +121,141 @@
           
         });   
           }
+          
+                function new_staff(){
+               // pop up
+          bootbox.dialog({
+                title: "New Advance.",
+                message: '<div class="row">  ' +
+                    '<div class="col-md-12">' +
+                        '<form id="new_staff" class="form-horizontal">' +
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Staff Name <font color="red">*</font> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="staff_name" required name="staff_name" type="text" placeholder="Enter Staff name" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Staff Email: </label>' +
+                                '<div class="col-md-8">' +
+                                 '<input id="email" required name="email" type="email" placeholder="Enter Email" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Staff Phone No. <font color="red">*</font> : </label>' +
+                                '<div class="col-md-8">' +
+                                 '<input id="phone" required name="phone"  onkeypress="return numbers(event)" type="text" max-length="10" placeholder="Enter Phone Number" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '</div>' +
+                        '</form>' +
+                    '</div>' +
+                    '</div>',
+                buttons: {
+                    success: {
+                        label: "Save",
+                        className: "btn-success",
+                        callback: function () {
+                            var staff_name = $("#staff_name").val();
+                            var email = $("#email").val();
+                            var phone = $("#phone").val();
+                            
+                            var theme="",header="",message="";
+                            
+                            if(staff_name!="" && phone!=""){
+                           var url='save_staff';
+                           var form_data = {"staff_name":staff_name,"email":email,"phone":phone};
+                                $.post(url,form_data , function(output) {
+                                    var response_code=JSON.parse(output).code;
+                                   var response_message=JSON.parse(output).message;
+                                   message=response_message;
+                                    if(response_code==1){
+                                        theme = "bg-success";
+                                        header = "Success";
+                                        message = response_message;
+                                        //reload data in table
+                                       loadstaffs();
+                                    }
+                                    else{
+                                       theme = "bg-danger";
+                                        header = "Error";
+                                        message = response_message; 
+                                        
+                                    }
+                                  $.jGrowl(message, {
+                                    position: 'top-center',
+                                    header: header,
+                                    theme: theme
+                                     });
+                                 });
+                           
+                        }
+                        else{
+                            theme = "bg-danger";
+                            header = "Error";
+                            message = "Enter all required information."; 
+                            $.jGrowl(message, {
+                            position: 'top-center',
+                            header: header,
+                            theme: theme
+                        });
+                        }
+                        
+                        }
+                    }
+                }
+            }
+        ); 
+            }
+            
+       function de_activate(pos){
+        var staff_no=$("#"+pos).val();
+        activator(staff_no,0);
+       }  
+       
+       function activate(pos){
+        var staff_no=$("#"+pos).val();   
+        activator(staff_no,1);
+       }
+       
+       function activator(staff_no,status){
+        var theme="",header="",message="";
+         var url='activate_staff';
+            var form_data = {"staff_no":staff_no,"status":status};
+                 $.post(url,form_data , function(output) {
+                     var response_code=JSON.parse(output).code;
+                    var response_message=JSON.parse(output).message;
+                    message=response_message;
+                     if(response_code==1){
+                         theme = "bg-success";
+                         header = "Success";
+                         message = response_message;
+                         //reload data in table
+                        loadstaffs();
+                        
+                         $.jGrowl(message, {
+                         position: 'top-center',
+                         header: header,
+                         theme: theme
+                    });
+                     }
+                     else{
+                        theme = "bg-danger";
+                         header = "Error";
+                         message = response_message;  
+                          $.jGrowl(message, {
+                         position: 'top-center',
+                         header: header,
+                         theme: theme
+                    });
+                     }
+                    
+                  });
+        
+       }
         </script>
 </head>
 
@@ -224,13 +386,20 @@
 			                		<li><a data-action="reload"></a></li>
 			                		<li><a data-action="close"></a></li>
 			                	</ul>
-		                	</div>
-						</div>
+		                	</div></div>
+                                              <%if(session.getAttribute("level")!=null){
+                                              if(session.getAttribute("level").toString().equals("1")){
+                                            %>
                                             <div>
-                                                <table id='table' class="table ">
+                                                <button type="button" class="btn btn-success btn-raised" onclick="new_staff();" style="margin-left: 1%; margin-bottom: 1%;"><i class="icon-plus3 position-left"></i> New Staff</button>
+                                            </div>
+                                            <%}}%>
+                                            <div>
+                                                <table id='table' class="table" style="height: auto;">
                                                 <thead>
                                                     <tr><th>No.</th><th>Full Name</th><th>Email Address</th><th>Telephone Number</th><th>Status</th><th>Action</th></tr></thead>
-                                                <tbody>    
+                                                 <tbody  style="height: auto;">    
+                                                
                                                 </tbody>
                                                </table> 
                                             </div>

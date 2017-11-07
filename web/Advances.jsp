@@ -236,13 +236,13 @@
                         theme = "bg-danger";
                         header = "Error";
                         message = "Enter amount and date.";   
-                        }
                         
                         $.jGrowl(message, {
                         position: 'top-center',
                         header: header,
                         theme: theme
-                    });
+                         });
+                        }
                         }
                     }
                 }
@@ -425,13 +425,18 @@
                                  });
                            
                         }
-                        
+                        else{
+                            theme = "bg-danger";
+                            header = "Error";
+                            message = "Enter all required information";  
+                                        
                         $.jGrowl(message, {
                             position: 'top-center',
                             header: header,
                             theme: theme
                         });
                         }
+                    }
                     }
                 }
             }
@@ -702,7 +707,7 @@ load_facilities();
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
-                                   var response_message=response.message;
+                                    var response_message=response.message;
                                    message=response_message;
                                     if(response_code==1){
                                         theme = "bg-success";
@@ -726,7 +731,10 @@ load_facilities();
                                  });
                            
                         }
-                        if(counter==0){
+                        else{
+                            theme = "bg-danger";
+                            header = "Error";
+                            message = "Enter all required information.";     
                         $.jGrowl(message, {
                             position: 'top-center',
                             header: header,
@@ -754,7 +762,7 @@ load_facilities();
             </script>
 </head>
 
-<body style="position:relative; z-index:10; font-size: 9px;">
+<body style="position:relative; z-index:10; font-size: 10px;">
     
     <!-- Main navbar -->
 	<div class="navbar navbar-default header-highlight">

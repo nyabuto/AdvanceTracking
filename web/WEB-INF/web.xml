@@ -116,6 +116,14 @@
         <servlet-name>JournalEntries</servlet-name>
         <servlet-class>reports.JournalEntries</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>save_staff</servlet-name>
+        <servlet-class>advancetracking.save_staff</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>activate_staff</servlet-name>
+        <servlet-class>advancetracking.activate_staff</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -231,6 +239,14 @@
     <servlet-mapping>
         <servlet-name>JournalEntries</servlet-name>
         <url-pattern>/JournalEntries</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_staff</servlet-name>
+        <url-pattern>/save_staff</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>activate_staff</servlet-name>
+        <url-pattern>/activate_staff</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
