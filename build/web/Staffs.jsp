@@ -71,7 +71,7 @@
            
         var data=raw_data.data;
         var dataSet=[];
-        var accounting="";
+        var accounting="",edit="";
         for (var i=0; i<data.length;i++){
             pos=i+1;
             staff_no=fullname=email=phone=status=status_label="";
@@ -89,14 +89,17 @@
             status_label=  '<span class="label label-danger">Inactive</span> '; 
             accounting='<li><a onclick=\"activate('+pos+');\" ><i class="icon-plus3 position-left"></i> Activate</a></li>';
             }
+            edit='<li><a onclick=\"edit('+pos+');\" ><i class="icon-pencil3 position-left"></i> Edit</a></li>';
             <%if(session.getAttribute("level")!=null){if(!session.getAttribute("level").toString().equals("1")){%>
-              accounting="";          
+              accounting="";
+              edit="";
               <%}}%>          
             // output the values to data table
          output='<div class="text-right"><ul class="icons-list"><li class="dropdown">\n\
            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-menu9"></i></a>\n\
            <ul class="dropdown-menu dropdown-menu-right">\n\
            <li><a href="staff_session?src=Advances&&axn='+staff_no+'"><i class="icon-file-pdf"></i> Manage Advances</a></li>\n\
+           '+edit+'\
            '+accounting+'\
            </ul></li></ul></div>';
             
@@ -125,7 +128,7 @@
                 function new_staff(){
                // pop up
           bootbox.dialog({
-                title: "New Advance.",
+                title: "New Staff.",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_staff" class="form-horizontal">' +
@@ -256,6 +259,103 @@
                   });
         
        }
+       
+       function edit(pos){
+        var staff_no=$("#"+pos).val();    
+        var url='get_staff_details';
+            var form_data = {"staff_no":staff_no};
+                 $.post(url,form_data , function(output) {
+                    var fullname=JSON.parse(output).fullname;
+                    var email=JSON.parse(output).email;
+                    var phone=JSON.parse(output).phone;
+                    
+                             bootbox.dialog({
+                title: "Edit Staff Details:",
+                message: '<div class="row">  ' +
+                    '<div class="col-md-12">' +
+                        '<form id="new_staff" class="form-horizontal">' +
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Staff Name <font color="red">*</font> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="staff_name" required name="staff_name" value="'+fullname+'" type="text" placeholder="Enter Staff name" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Staff Email: </label>' +
+                                '<div class="col-md-8">' +
+                                 '<input id="email" required name="email" type="email" value="'+email+'" placeholder="Enter Email" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Staff Phone No. <font color="red">*</font> : </label>' +
+                                '<div class="col-md-8">' +
+                                 '<input id="phone" required name="phone" value="'+phone+'"  onkeypress="return numbers(event)" type="text" max-length="10" placeholder="Enter Phone Number" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '</div>' +
+                        '</form>' +
+                    '</div>' +
+                    '</div>',
+                buttons: {
+                    success: {
+                        label: "Update",
+                        className: "btn-success",
+                        callback: function () {
+                            var staff_name = $("#staff_name").val();
+                            var email = $("#email").val();
+                            var phone = $("#phone").val();
+                            
+                            var theme="",header="",message="";
+                            
+                            if(staff_name!="" && phone!=""){
+                           var url='update_staff';
+                           var form_data = {"staff_no":staff_no,"staff_name":staff_name,"email":email,"phone":phone};
+                                $.post(url,form_data , function(output) {
+                                    var response_code=JSON.parse(output).code;
+                                   var response_message=JSON.parse(output).message;
+                                   message=response_message;
+                                    if(response_code==1){
+                                        theme = "bg-success";
+                                        header = "Success";
+                                        message = response_message;
+                                        //reload data in table
+                                       loadstaffs();
+                                    }
+                                    else{
+                                       theme = "bg-danger";
+                                        header = "Error";
+                                        message = response_message; 
+                                        
+                                    }
+                                  $.jGrowl(message, {
+                                    position: 'top-center',
+                                    header: header,
+                                    theme: theme
+                                     });
+                                 });
+                           
+                        }
+                        else{
+                            theme = "bg-danger";
+                            header = "Error";
+                            message = "Enter all required information."; 
+                            $.jGrowl(message, {
+                            position: 'top-center',
+                            header: header,
+                            theme: theme
+                        });
+                        }
+                        
+                        }
+                    }
+                }
+            }
+        ); 
+                  });      
+    }
         </script>
 </head>
 

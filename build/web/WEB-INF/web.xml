@@ -124,6 +124,14 @@
         <servlet-name>activate_staff</servlet-name>
         <servlet-class>advancetracking.activate_staff</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>get_staff_details</servlet-name>
+        <servlet-class>loaders.get_staff_details</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_staff</servlet-name>
+        <servlet-class>advancetracking.update_staff</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -247,6 +255,14 @@
     <servlet-mapping>
         <servlet-name>activate_staff</servlet-name>
         <url-pattern>/activate_staff</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>get_staff_details</servlet-name>
+        <url-pattern>/get_staff_details</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_staff</servlet-name>
+        <url-pattern>/update_staff</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
