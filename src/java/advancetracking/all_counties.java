@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
  */
 public class all_counties extends HttpServlet {
 HttpSession session;
-String id,name;
+String id,name,CHMT,unique_code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -36,15 +36,20 @@ String id,name;
             JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
             
-           String getCounties = "SELECT id,name FROM county ORDER BY name ASC";
+           String getCounties = "SELECT id,name,CHMT,unique_code FROM county ORDER BY name ASC";
            conn.rs = conn.st.executeQuery(getCounties);
            while(conn.rs.next()){
                id = conn.rs.getString(1);
                name = conn.rs.getString(2);
-               
+               CHMT = conn.rs.getString(3);
+               unique_code = conn.rs.getString(4);
+                       
                JSONObject obj = new JSONObject();
                obj.put("id", id);
                obj.put("name", name);
+               obj.put("CHMT", CHMT);
+               obj.put("unique_code", unique_code);
+               
                
                jarray.add(obj);
            }

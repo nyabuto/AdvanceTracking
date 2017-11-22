@@ -6,19 +6,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
+        <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merienda+One" />
+        <style>
+    .title{
+        font-family: Merienda One;
+	font-size: 15px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 26.4px;
+    }    
+    
+    
+</style>
 </head>
 
 <body>
 
-				<div class="sidebar-content">
+    <div class="sidebar-content">
 
 					<!-- User menu -->
 					<div class="sidebar-main-toggle">
                                             <div class="category-content">
                                                     <div class="sidebar-user-material-content">
                                                             <a href="#"><img src="assets/images/aphia/icon.png" class="img-circle img-responsive" alt=""></a>
-                                                            <h6>
+                                                            <h6 class="title">
                                                                 <%
                                                                     if(session.getAttribute("fullname")!=null){
                                                                         out.println(session.getAttribute("fullname").toString());      
@@ -40,13 +52,13 @@
 								<!-- Main -->
 								<li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
 								<li>
-									<a href="#"><i class="icon-grid"></i> <span>Advances</span></a>
+									<a href="#"><i class="icon-copy"></i> <span>Advances</span></a>
 									<ul>
 										<li><a href="Staffs.jsp">Manage Advances</a></li>
 									</ul>
 								</li>
 								<li>
-									<a href="#"><i class="icon-grid"></i> <span>Manage Entries</span></a>
+									<a href="#"><i class="icon-puzzle3"></i> <span>Manage Entries</span></a>
 									<ul>
 										<li><a href="FCO.jsp">FCO</a></li>
 										<li><a href="GLCodes.jsp">GL Codes</a></li>
@@ -56,13 +68,13 @@
 									</ul>
 								</li>
                                                                 <li>
-									<a href="#"><i class="icon-grid"></i> <span>Reports</span></a>
+									<a href="#"><i class="icon-statistics"></i> <span>Reports</span></a>
 									<ul>
 										<li><a href="ComprehensiveReport.jsp">Comprehensive Report</a></li>
-										<li><a href="journalentries.jsp">Journal Entries</a></li>
+										<li><a href="Journalentries.jsp">Journal Entries</a></li>
 									</ul>
 								</li>
-                                                                <li><a href="logout"><i class="icon-grid"></i> <span>Logout</span></a>
+                                                                <li><a href="logout"><i class="icon-lock2"></i> <span>Logout</span></a>
 								</li>
 							</ul>
 						</div>

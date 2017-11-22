@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
  */
 public class load_edit_advance extends HttpServlet {
 HttpSession session;
-String id,cheque_no,fco_id,gl_id,facility_id,fco,gl_code,amount,date,purpose,facility;
+String id,cheque_no,fco_id,gl_id,facility_id,fco,gl_code,amount,date,purpose;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -36,11 +36,11 @@ String id,cheque_no,fco_id,gl_id,facility_id,fco,gl_code,amount,date,purpose,fac
             JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
             
-            id=cheque_no=fco_id=gl_id=facility_id=fco=gl_code=amount=date=purpose=facility="";
+            id=cheque_no=fco_id=gl_id=facility_id=fco=gl_code=amount=date=purpose="";
             id = request.getParameter("id");
             
 //            id="20171002130534436";
-            String getadvance = "SELECT cheque_no,fco,gl_code,amount,date,purpose,facility_id FROM debit WHERE debit_id=?";
+            String getadvance = "SELECT cheque_no,fco,gl_code,amount,date,purpose FROM debit WHERE debit_id=?";
             conn.pst=conn.conn.prepareStatement(getadvance);
             conn.pst.setString(1, id);
             conn.rs = conn.pst.executeQuery();
@@ -51,9 +51,9 @@ String id,cheque_no,fco_id,gl_id,facility_id,fco,gl_code,amount,date,purpose,fac
             amount = conn.rs.getString(4);
             date = conn.rs.getString(5);
             purpose = conn.rs.getString(6);
-            facility_id = conn.rs.getString(7);
+//            facility_id = conn.rs.getString(7);
             
-            String getfco="SELECT fco FROM fco";
+            String getfco="SELECT fco FROM fco WHERE type_id=1";
             conn.rs1 = conn.st1.executeQuery(getfco);
             while(conn.rs1.next()){
                 if(conn.rs1.getString(1).equals(fco_id)){
@@ -64,7 +64,7 @@ String id,cheque_no,fco_id,gl_id,facility_id,fco,gl_code,amount,date,purpose,fac
             }
             }
             
-            String getglcode="SELECT code FROM gl_code";
+            String getglcode="SELECT code FROM gl_code WHERE type_id=1";
             conn.rs1 = conn.st1.executeQuery(getglcode);
             while(conn.rs1.next()){
              if(conn.rs1.getString(1).equals(gl_id)){
@@ -75,22 +75,22 @@ String id,cheque_no,fco_id,gl_id,facility_id,fco,gl_code,amount,date,purpose,fac
              }
             }
             
-            String getfacilities="SELECT id,facility_name FROM facilities";
-            conn.rs1 = conn.st1.executeQuery(getfacilities);
-            while(conn.rs1.next()){
-              if(conn.rs1.getString(1).equals(facility_id)){   
-             facility += "<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
-            }
-            else{
-             facility += "<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(2)+"</option>"; 
-            }
-            }
+//            String getfacilities="SELECT id,facility_name FROM facilities";
+//            conn.rs1 = conn.st1.executeQuery(getfacilities);
+//            while(conn.rs1.next()){
+//              if(conn.rs1.getString(1).equals(facility_id)){   
+//             facility += "<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
+//            }
+//            else{
+//             facility += "<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(2)+"</option>"; 
+//            }
+//            }
              
             JSONObject obj = new JSONObject();
             obj.put("cheque_no", cheque_no);
             obj.put("fco", fco);
             obj.put("gl_code", gl_code);
-            obj.put("facility", facility);
+//            obj.put("facility", facility);
             obj.put("amount", amount);
             obj.put("date", date);
             obj.put("purpose", purpose);

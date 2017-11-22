@@ -84,14 +84,14 @@
         type:"post",
         dataType:"json",
         success:function(raw_data){
-            var debit_id,cheque_no,fco,gl_code,amount,date,output,purpose,facility_name,status,status_id,balance,timestamp,currency;
+            var debit_id,cheque_no,fco,gl_code,amount,date,output,purpose,status,status_id,balance,timestamp,currency;
             output='';
         var data=raw_data.data;
         var pos=0;
         var dataSet=[];
         for (var i=0; i<data.length;i++){
             pos++;
-            debit_id=cheque_no=fco=gl_code=amount=date=purpose=facility_name=status=status_id=balance=currency=timestamp="";
+            debit_id=cheque_no=fco=gl_code=amount=date=purpose=status=status_id=balance=currency=timestamp="";
             if( data[i].debit_id!=null){debit_id = data[i].debit_id;}
             if( data[i].cheque_no!=null){cheque_no = data[i].cheque_no;}
             if( data[i].fco!=null){fco = data[i].fco;}
@@ -100,7 +100,7 @@
             
             if( data[i].date!=null){date = data[i].date;}
             if( data[i].purpose!=null){purpose = data[i].purpose;}
-            if( data[i].facility_name!=null){facility_name = data[i].facility_name;}
+//            if( data[i].facility_name!=null){facility_name = data[i].facility_name;}
             if( data[i].status!=null){status = data[i].status;}
             if( data[i].status_id!=null){status_id = data[i].status_id;}
             if( data[i].timestamp!=null){timestamp = data[i].timestamp;}
@@ -137,7 +137,7 @@
         output+='<input type="hidden" name="'+pos+'" value="'+identifier+'" id="'+pos+'">';
         output+='</ul></li></ul></div>';
          amount=currency+'. '+amount;
-           var minSet = [pos,cheque_no,fco,gl_code,amount,date,purpose,facility_name,status,output];
+           var minSet = [pos,cheque_no,fco,gl_code,amount,date,purpose,status,output];
            
            dataSet.push(minSet);
             // output the values to data table
@@ -157,6 +157,9 @@
           }
           
           function add_credit(pos){
+          $("#health_type").show();
+          load_acc_fcos();load_gl_acc_codes();
+//          load_health_types();load_counties();load_sub_counties();
           var value=$("#"+pos).val().split("X");
           var debit_id,balance;
           debit_id = value[0];
@@ -174,6 +177,23 @@
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form class="form-horizontal">' +
+                           '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Select FCO : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="fco_acc" required name="fco_acc" class="form-control bootstrap-select" data-header="Choose FCO" data-live-search="true" style="max-height:100px;">' +
+                                   '<option value="">Loading FCO</option>'+
+                                    '</select>' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Select GL Code : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="gl_acc_code" required name="gl_acc_code" onChange="gl_changed();" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
+                                      '<option value="">Loading GL Codes</option>'+ 
+                                        '</select>' +
+                                '</div>' +
+                            '</div>' +
                             '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Amount : </label>' +
                                 '<div class="col-md-8">' +
@@ -186,20 +206,63 @@
                                     '<input id="date" name="date" required type="date" placeholder="Select Date" class="form-control pickadate-disable-range">' +
                                     '</div>' +
                             '</div>' +
+                            
+                            '<div class="form-group" id="health_type">' +
+                                '<label class="col-md-4 control-label">Select Facility/Health Mgt Team : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="health_type_id" required name="health_type_id" onchange=\"healths_changed();\" class="form-control bootstrap-select" data-header="Choose Type" data-live-search="true" style="max-height:100px;">'+
+                                      '<option value="">No Type</option>'+ 
+                                        '</select>' +
+                                '</div>' +
+                                '</div>' +
+                            
+                            '<div class="form-group" id="county" hidden>' +
+                                '<label class="col-md-4 control-label">Select CHMT : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="county_id" required name="county_id" class="form-control bootstrap-select" data-header="Choose CHMT" data-live-search="true" style="max-height:100px;">'+
+                                      '<option value="">No CHMT</option>'+ 
+                                        '</select>' +
+                                '</div>' +
+                                '</div>' +
+                            
+                            '<div class="form-group" id="sub_county" hidden>' +
+                                '<label class="col-md-4 control-label">Select SCHMT : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="sub_county_id" required name="sub_county_id" class="form-control bootstrap-select" data-header="Choose SCHMT" data-live-search="true" style="max-height:100px;">'+
+                                      '<option value="">No SCHMT</option>'+ 
+                                        '</select>' +
+                                '</div>' +
+                                '</div>' +
+                            
+                            '<div class="form-group" id="facility_group" hidden>' +
+                                '<label class="col-md-4 control-label">Select Facility : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="facility" required name="facility" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
+                                      '<option value="">No facility</option>'+ 
+                                        '</select>' +
+                                '</div>' +
+                                '</div>' +
+                             
                         '</form>' +
                     '</div>' +
                     '</div>',
                 buttons: {
                     success: {
-                        label: "Update",
+                        label: "Save",
                         className: "btn-success",
                         callback: function () {
+                            var fco = $("#fco_acc").val();
+                            var gl_code = $("#gl_acc_code").val();
                             var amount = $("#amount").val();
                             var date = $("#date").val();
+                            var health_type_id =  $("#health_type_id").val();
+                            var county_id =  $("#county_id").val();
+                            var sub_county_id =  $("#sub_county_id").val();
+                            var facility =  $("#facility").val();
                             var theme="",header="",message="";
                             
-                            if(amount!="" && date!=""){
-                               
+                            if(fco!="" && gl_code!="" && amount!="" && date!=""){
+                            if((gl_code==523 && ((health_type_id==1 && county_id!="") || (health_type_id==2 && sub_county_id!="") || (health_type_id==3 && facility!="")) ) || gl_code!=523){   
                             if(amount>balance){
                             theme = "bg-danger";
                             header = "Error";
@@ -207,7 +270,7 @@
                             }
                             else{
                            var url='save_credit';
-                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date};
+                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"fco":fco,"gl_code":gl_code,"health_type_id":health_type_id,"county_id":county_id,"sub_county_id":sub_county_id,"facility_id":facility};
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
@@ -231,11 +294,23 @@
                                     });  
                                  });
                             }
+                            }
+                        else{
+                          theme = "bg-danger";
+                        header = "Error";
+                        message = "For the selected FCO, ensure you have selected Health management team or facility";   
+                        
+                        $.jGrowl(message, {
+                        position: 'top-center',
+                        header: header,
+                        theme: theme
+                         });  
+                            }
                         }
                         else{
                         theme = "bg-danger";
                         header = "Error";
-                        message = "Enter amount and date.";   
+                        message = "Ensure FCO and GL_Code are selected as well amount and date entered.";   
                         
                         $.jGrowl(message, {
                         position: 'top-center',
@@ -258,12 +333,20 @@
           }
         </script>
         <script type="text/javascript">
+            jQuery(document).ready(function(){
+                
+            });
              jQuery(document).ready(function(){
-//                 $("#facility_group").hide();
+               $("#health_type").show();
+                 $("#county").hide();
+                 $("#sub_county").hide();
+                 $("#facility_group").hide();
+                 
              });
+             // for advance
            function load_fcos(){
                $.ajax({
-                    url:'load_fco',
+                    url:'load_fco?type_id=1',
                     type:"post",
                     dataType:"html",
                     success:function(data){
@@ -271,15 +354,100 @@
                    $("#fco").selectpicker();
                     }
                 });
-           } 
+           }
            function load_gl_codes(){
                $.ajax({
-                    url:'load_glcodes',
+                    url:'load_glcodes?type_id=1',
                     type:"post",
                     dataType:"html",
                     success:function(data){
                     $("#gl_code").html(data);
                      $("#gl_code").selectpicker();
+                    }
+                });
+            }
+//           for accounting 
+
+        function load_health_types(){
+               $.ajax({
+                    url:'load_facility_accounting_types',
+                    type:"post",
+                    dataType:"html",
+                    success:function(output){
+                     var data,res_obj,id,name;
+                     res_obj = JSON.parse(output).data;
+                     data="<option value=\"\">Choose Option</option>";
+                     for(var i=0;i<res_obj.length;i++){
+                         id=res_obj[i].id;
+                         name=res_obj[i].name;
+                         data+="<option value=\""+id+"\">"+name+"</option>";
+                     }
+                        
+                   $("#health_type_id").html(data);
+                   $("#health_type_id").selectpicker();
+                    }
+                });
+           }
+        function load_counties(){
+               $.ajax({
+                    url:'all_counties',
+                    type:"post",
+                    dataType:"html",
+                    success:function(output){
+                    var data,res_obj,id,name;
+                     res_obj = JSON.parse(output).data;
+                     data="<option value=\"\">Choose Option</option>";
+                     for(var i=0;i<res_obj.length;i++){
+                         id=res_obj[i].id;
+                         name=res_obj[i].CHMT;
+                         data+="<option value=\""+id+"\">"+name+"</option>";
+                     }
+                   $("#county_id").html(data);
+                   $("#county_id").selectpicker();
+                    }
+                });
+           }
+        function load_sub_counties(){
+               $.ajax({
+                    url:'load_sub_counties',
+                    type:"post",
+                    dataType:"html",
+                    success:function(output){
+                     var data,res_obj,id,name;
+                     res_obj = JSON.parse(output).data;
+                     data="<option value=\"\">Choose Option</option>";
+                     for(var i=0;i<res_obj.length;i++){
+                         id=res_obj[i].id;
+                         name=res_obj[i].SCHMT;
+                         data+="<option value=\""+id+"\">"+name+"</option>";
+                     }
+                   $("#sub_county_id").html(data);
+                   $("#sub_county_id").selectpicker();
+                    }
+                });
+           }
+           
+            function load_acc_fcos(){
+               $.ajax({
+                    url:'load_fco?type_id=2',
+                    type:"post",
+                    dataType:"html",
+                    success:function(data){
+                   $("#fco_acc").html(data);
+                   $("#fco_acc").selectpicker();
+                    }
+                });
+           }
+         
+           function load_gl_acc_codes(){
+               $.ajax({
+                    url:'load_glcodes?type_id=2',
+                    type:"post",
+                    dataType:"html",
+                    success:function(data){
+                    $("#gl_acc_code").html(data);
+                     $("#gl_acc_code").selectpicker();
+                     gl_changed();
                     }
                 });
     
@@ -299,18 +467,44 @@
            }
            
            function gl_changed(){
-               var gl_code = $("#gl_code").val();
-               if(gl_code==529 || gl_code==528){
+               var gl_code = $("#gl_acc_code").val();
+               if(gl_code==523){
 //               // for facilities, show facilities
-               $("#facility_group").show();
-               load_facilities();
+                 $("#health_type").show();
+                 load_health_types();
+                 load_counties();
+                 load_sub_counties();
+                 load_facilities();
                }
                else{
 ////                   hide facilities
-                $("#facility_group").hide();
+                $("#health_type").hide();
                }
+               
+                 $("#county").hide();
+                 $("#sub_county").hide();
+                 $("#facility_group").hide();
            }
            
+           
+           function healths_changed(){
+                  var health_type_id = $("#health_type_id").val();
+                  if(health_type_id==1){
+                 $("#county").show();
+                 $("#sub_county").hide();
+                 $("#facility_group").hide();   
+                  }
+                  else if(health_type_id==2){
+                  $("#county").hide();
+                 $("#sub_county").show();
+                 $("#facility_group").hide();    
+                  }
+                  else if(health_type_id==3){
+                  $("#county").hide();
+                 $("#sub_county").hide();
+                 $("#facility_group").show();    
+                  }
+           }
             </script>
         <script type="text/javascript">
             function new_advance(){
@@ -344,7 +538,7 @@
                             '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Select GL Code : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<select id="gl_code" required name="gl_code" onChange="gl_changed();" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
+                                    '<select id="gl_code" required name="gl_code" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">Loading GL Codes</option>'+ 
                                         '</select>' +
                                 '</div>' +
@@ -362,16 +556,7 @@
                                 '<div class="col-md-8">' +
                                     '<input id="date2" name="date2" required type="date" placeholder="Select Date" class="form-control pickadate-disable-range">' +
                                 '</div>' +
-                            '</div>' +
-                           
-                            '<div class="form-group" id="facility_group" hidden>' +
-                                '<label class="col-md-4 control-label">Select Facility : </label>' +
-                                '<div class="col-md-8">' +
-                                    '<select id="facility" required name="facility" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
-                                      '<option value="">No facility</option>'+ 
-                                        '</select>' +
-                                '</div>' +
-                                
+                            '</div>' +  
                             '</div>' +
                              '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Purpose : </label>' +
@@ -392,14 +577,13 @@
                             var cheque_no = $("#cheque_no").val();
                             var fco = $("#fco").val();
                             var gl_code = $("#gl_code").val();
-                            var facility =  $("#facility").val();
                             var purpose =  $("#purpose").val();
                             
                             var theme="",header="",message="";
                             
                             if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!=""){
                            var url='save_debit';
-                           var form_data = {"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"facility":facility,"purpose":purpose};
+                           var form_data = {"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"purpose":purpose};
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
@@ -443,7 +627,6 @@
         ); 
 load_gl_codes();
 load_fcos();
-load_facilities();
 
     $('.pickadate-disable-range').pickadate({
         format: 'yyyy-mm-dd',
@@ -455,6 +638,7 @@ load_facilities();
             
             
             function accounting_history(posion){
+          bootbox.hideAll();
           var value=$("#"+posion).val().split("X");
           var debit_id,balance;
           debit_id = value[0];
@@ -473,7 +657,7 @@ load_facilities();
                     success:function(output){
                    var data = output.data;
                    output='<table class="table datatable-button-print-rows datatable-select-basic"><thead>\n\
-                 <tr><th>Position</th><th>Amount</th><th>Date </th>';
+                 <tr><th>Position</th><th>FCO</th><th>GL Code</th><th>Amount</th><th>Date </th><th>HMT/Facility[Optional]</th>';
                     <%if(session.getAttribute("staff_status")!=null){
                     if(session.getAttribute("staff_status").toString().equals("1")){   
                     %> 
@@ -481,24 +665,44 @@ load_facilities();
                     <%}}%>
                 output+='</tr></thead><tbody>';
                 
-                   var credit_id,amount,date,timestamp,pos=0;
+                   var credit_id,amount,date,timestamp,pos=0,gl_code,fco,health_team;
                     for (var i=0; i<data.length;i++){
                         pos++;
                         credit_id = data[i].id;
                         amount = data[i].amount;
                         date = data[i].date;
+                        fco = data[i].fco;
+                        gl_code = data[i].gl_code;
+                        health_team = data[i].health;
                         timestamp = data[i].timestamp;
+//                        if(gl_code!=523){health_team="";}
                          output+='<tr id="row_'+pos+'">\n\
                                 <td><p id="num_'+pos+'">'+pos+'</p></td>\n\
                                 <input type="hidden" value="'+credit_id+'" id="edit_'+pos+'">\n\
+                                <td><select name="edit_fco'+pos+'" id="edit_fco'+pos+'" disabled style=\"min-width:80px;\"  class="form-control">\n\
+                                '+fco+'\n\
+                                </select>\n\
+                                </td>\n\
+                                <td><select name="edit_gl_code'+pos+'" onchange=\"show_hide_health('+pos+')\" id="edit_gl_code'+pos+'" style=\"min-width:80px;\" disabled class="form-control">\n\
+                                '+gl_code+'\n\
+                                </select>\n\
+                                </td>\n\
                                 <td><input type="text" name="edit_amount'+pos+'" id="edit_amount'+pos+'" value="'+amount+'" disabled onkeypress="return numbers(event)" class="form-control"></td>\n\
-                                <td><input type="text" name="edit_date'+pos+'" id="edit_date'+pos+'" value="'+date+'" disabled placeholder="Select Date" class="form-control pickadate-disable-range" ></td>';
+                                <td><input type="text" name="edit_date'+pos+'" id="edit_date'+pos+'" value="'+date+'" disabled style=\"min-width:80px;\" placeholder="Select Date" class="form-control pickadate-disable-range" ></td>\n\
+                                <td><select name="edit_health'+pos+'" id="edit_health'+pos+'" disabled class="form-control">\n\
+                                '+health_team+'\n\
+                                </select>\n\
+                                </td>';
                            <%if(session.getAttribute("staff_status")!=null){
                             if(session.getAttribute("staff_status").toString().equals("1")){   
-                            %>    
-                         output+='<td><img id="editor_'+pos+'" onclick="edit_accounting('+pos+');" src="assets/images/aphia/edit.png"></td>';
+                            %> 
+                          var pager = pos+'_'+posion;
+                         output+='<td><img id="editor_'+pos+'" onclick="edit_accounting(\''+pager+'\');" src="assets/images/aphia/edit.png"></td>';
                          <%}}%>
                          output+='</tr>';
+                         $('#edit_fco'+pos+'').selectpicker();
+                         $('#edit_gl_code'+pos+'').selectpicker();
+                         $('#edit_health'+pos+'').selectpicker();
                     }
                     output+='</tbody></table>';
                     
@@ -512,6 +716,7 @@ load_facilities();
                     bootbox.dialog({
                 title: "View Accounting History.",
                 message: output,
+                size: 'large',
                 buttons: {
                     success: {
                         label: "Close",
@@ -523,24 +728,48 @@ load_facilities();
                 });
                 
             }
+            function show_hide_health(pos){
+            var gl = $("#edit_gl_code"+pos).val();
+            if(gl==523){
+             $("#edit_health"+pos).prop("disabled", false);
+        }
+        else{
+          $("#edit_health"+pos).prop("disabled", true);  
+        }
             
-            function edit_accounting(pos){
+    }
+            
+            
+            function edit_accounting(positions){
+                var arr = positions.split("_");
+               var pos=arr[0];
+               var posion=arr[1];
+               
               var credit_id=$("#edit_"+pos).val();
               var tt=$("#tt").val();
               if(tt=="0"){
                 $("#edit_amount"+pos).prop("disabled", false);
                 $("#edit_date"+pos).prop("disabled", false);
+                $("#edit_health"+pos).prop("disabled", false);
+                $("#edit_fco"+pos).prop("disabled", false);
+                $("#edit_gl_code"+pos).prop("disabled", false);
                 $("#editor_"+pos).prop('src',"assets/images/aphia/upload.png");
                 $("#editor_"+pos).prop('title',"Click to save updates.");
                 $("#tt").val("1");
             }
             else{
-               var amount,credit_id,date; 
+               var amount,credit_id,date,health_id,fco,gl_code; 
                 amount= $("#edit_amount"+pos).val();
                 if(amount==""){amount=0;}
                 date= $("#edit_date"+pos).val();
+                health_id= $("#edit_health"+pos).val();
+                fco = $("#edit_fco"+pos).val();
+                gl_code = $("#edit_gl_code"+pos).val();
+                if(gl_code!=523){
+                health_id="";    
+                }
                 var url='update_credit';
-                var form_data = {"amount":amount,"date":date,"credit_id":credit_id};
+                var form_data = {"amount":amount,"date":date,"credit_id":credit_id,"health_id":health_id,"fco":fco,"gl_code":gl_code};
                     $.post(url,form_data , function(output) {
                     var data = JSON.parse(output).data;
                     var prev_amount=data.prev_amount;
@@ -583,16 +812,20 @@ load_facilities();
                         header: header,
                         theme: theme
                     });
+                    accounting_history(posion);
                     });
                 
                 
                 $("#edit_amount"+pos).prop("disabled", true);
                 $("#edit_date"+pos).prop("disabled", true);
+                $("#edit_health"+pos).prop("disabled", true);
+                $("#edit_fco"+pos).prop("disabled", true);
+                $("#edit_gl_code"+pos).prop("disabled", true);
                 $("#editor_"+pos).prop('src',"assets/images/aphia/edit.png");
                 $("#editor_"+pos).prop('title',"Click to edit values.");
                 $("#tt").val("0");    
             }
-            
+            show_hide_health(pos);
             }
             
              function edit(pos){
@@ -606,7 +839,7 @@ load_facilities();
             var month = currentDate.getMonth();
             var year = currentDate.getFullYear();
             
-            var cheque_no,fco,gl_code,amount,date,facility,purpose;
+            var cheque_no,fco,gl_code,amount,date,purpose;
             $.ajax({
                     url:'load_edit_advance?id='+debit_id,
                     type:"post",
@@ -620,7 +853,7 @@ load_facilities();
                         amount = data.amount;
                         date = data.date;
                         purpose = data.purpose;
-                        facility = data.facility;
+//                        facility = data.facility;
                         
                                // pop up
                    bootbox.dialog({
@@ -647,7 +880,7 @@ load_facilities();
                             '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Select GL Code : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<select id="edit_gl_code" required name="edit_gl_code" onChange="gl_changed();" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
+                                    '<select id="edit_gl_code" required name="edit_gl_code" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
                                       ''+gl_code+''+ 
                                         '</select>' +
                                 '</div>' +
@@ -666,14 +899,14 @@ load_facilities();
                                     '<input id="edit_date2" name="edit_date2" required type="date" value="'+date+'" placeholder="Select Date" class="form-control pickadate-disable-range">' +
                                 '</div>' +
                             '</div>' +
-                           
-                            '<div class="form-group" id="facility_group" hidden>' +
-                                '<label class="col-md-4 control-label">Select Facility : </label>' +
-                                '<div class="col-md-8">' +
-                                    '<select id="edit_facility" required name="edit_facility" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
-                                      ''+facility+''+ 
-                                        '</select>' +
-                                '</div>' +
+//                           
+//                            '<div class="form-group" id="facility_group" hidden>' +
+//                                '<label class="col-md-4 control-label">Select Facility : </label>' +
+//                                '<div class="col-md-8">' +
+//                                    '<select id="edit_facility" required name="edit_facility" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
+//                                      ''+facility+''+ 
+//                                        '</select>' +
+//                                '</div>' +
                                 
                             '</div>' +
                              '<div class="form-group">' +
@@ -696,14 +929,14 @@ load_facilities();
                             var cheque_no = $("#edit_cheque_no").val();
                             var fco = $("#edit_fco").val();
                             var gl_code = $("#edit_gl_code").val();
-                            var facility =  $("#edit_facility").val();
+//                            var facility =  $("#edit_facility").val();
                             var purpose =  $("#edit_purpose").val();
                             
                             var theme="",header="",message="";
                             
                             if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!=""){
                            var url='save_edited_debit';
-                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"facility":facility,"purpose":purpose};
+                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"purpose":purpose};
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
@@ -904,7 +1137,7 @@ load_facilities();
                                             <div  style="height: auto;">
                                                 <table id='table' class="table" style="height: auto;">
                                                 <thead>
-                                                    <tr><th>No.</th><th>Cheque Number</th><th>FCO</th><th>GL Code </th><th>Amount</th><th>Date</th><th>Purpose</th><th>Health Facility</th><th>Status</th><th>Action</th></tr></thead>
+                                                    <tr><th>No.</th><th>Cheque Number</th><th>FCO</th><th>GL Code </th><th>Amount</th><th>Date</th><th>Purpose</th><th>Status</th><th>Action</th></tr></thead>
                                                 
                                                 <tbody  style="height: auto;">    
                                                 

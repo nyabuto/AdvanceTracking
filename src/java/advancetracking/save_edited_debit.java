@@ -42,7 +42,7 @@ String message;
             amount = request.getParameter("amount");
             date = request.getParameter("date");
             purpose = request.getParameter("purpose");
-            facility = request.getParameter("facility");
+//            facility = request.getParameter("facility");
             debit_id = request.getParameter("debit_id");
             
              if(session.getAttribute("staff_status")!=null){
@@ -70,16 +70,16 @@ String message;
             else{     
                 System.out.println("data : "+Integer.parseInt(amount)+" accounted : "+accounted);     
             if(Integer.parseInt(amount)>=accounted){
-            String updator = "UPDATE debit SET amount=?,date=?,fco=?,gl_code=?,cheque_no=?, facility_id=?, purpose=? WHERE debit_id=?";
+            String updator = "UPDATE debit SET amount=?,date=?,fco=?,gl_code=?,cheque_no=?, purpose=? WHERE debit_id=?";
             conn.pst=conn.conn.prepareStatement(updator);
             conn.pst.setString(1, amount);
             conn.pst.setString(2, date);
             conn.pst.setString(3, fco);
             conn.pst.setString(4, gl_code);
             conn.pst.setString(5, cheque_no);
-            conn.pst.setString(6, facility);
-            conn.pst.setString(7, purpose);
-            conn.pst.setString(8, debit_id);
+//            conn.pst.setString(6, facility);
+            conn.pst.setString(6, purpose);
+            conn.pst.setString(7, debit_id);
             
             conn.pst.executeUpdate();
               message = "Advance details updated successfully."; 

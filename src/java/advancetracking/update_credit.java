@@ -24,7 +24,8 @@ import org.json.simple.JSONObject;
  */
 public class update_credit extends HttpServlet {
 HttpSession session;
-String credit_id,amount,date,debit_id;
+String credit_id,amount,date,debit_id,health_type_id,health_id,healths;
+String fco,gl_code;
 int effect,balance;
 String message,prev_date;
 int code,prev_amount;
@@ -35,15 +36,30 @@ int code,prev_amount;
            session = request.getSession();
            dbConn conn = new dbConn();
            
+           fco = request.getParameter("fco");
+           gl_code = request.getParameter("gl_code");
            credit_id=request.getParameter("credit_id");
            amount=request.getParameter("amount");
            date=request.getParameter("date");
+           healths=request.getParameter("health_id");
            
-            System.out.println("credit:"+credit_id+", amount : "+amount+", date : "+date);
+           if(healths.contains("-") && gl_code.equals("523")){
+           String[] health_details = healths.split("-");
+           health_type_id=health_details[0];
+           health_id = health_details[1];
+           }
+           else if(!gl_code.equals("523")){
+           health_type_id = null;
+           health_id = null;  
+           }
+           else{
+           gl_code="";
+           }
+           System.out.println("credit:"+credit_id+", amount : "+amount+", date : "+date);
            effect=balance=code=prev_amount=0;
            debit_id=message=prev_date="";
            
-           
+           if(!gl_code.equals("")){
            String checkEffect="Select "+amount+"-amount AS effect,amount AS prev_amount,debit_id,date AS prev_date FROM credit WHERE credit_id=?";
            conn.pst=conn.conn.prepareStatement(checkEffect);
            conn.pst.setString(1, credit_id);
@@ -69,11 +85,15 @@ int code,prev_amount;
             }
             System.out.println(get_current_balance);
             if(balance>=0){
-                String updator="UPDATE credit SET amount=?,date=? WHERE credit_id=?";
+                String updator="UPDATE credit SET amount=?,date=?,health_id=?,health_type_id=?,fco=?,gl_code=? WHERE credit_id=?";
                 conn.pst=conn.conn.prepareStatement(updator);
                 conn.pst.setString(1, amount);
                 conn.pst.setString(2, date);
-                conn.pst.setString(3, credit_id);
+                conn.pst.setString(3, health_id);
+                conn.pst.setString(4, health_type_id);
+                conn.pst.setString(5, fco);
+                conn.pst.setString(6, gl_code);
+                conn.pst.setString(7, credit_id);
                 
                 conn.pst.executeUpdate();
                 message = "Details updated successfully.";
@@ -105,6 +125,11 @@ int code,prev_amount;
              message="Staff cannot be determined, Go back and reselect the staff who was given this advance.";    
             }
            
+           }
+           else{
+            code=0;
+            message="Not updated. For GL Code 523, a health facility or Health management team must be selected.";       
+           }
             JSONObject obj = new JSONObject();
             obj.put("message", message);
             obj.put("code", code);

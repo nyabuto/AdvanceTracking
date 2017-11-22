@@ -132,6 +132,14 @@
         <servlet-name>update_staff</servlet-name>
         <servlet-class>advancetracking.update_staff</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>load_facility_accounting_types</servlet-name>
+        <servlet-class>loaders.load_facility_accounting_types</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_sub_counties</servlet-name>
+        <servlet-class>loaders.load_sub_counties</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -263,6 +271,14 @@
     <servlet-mapping>
         <servlet-name>update_staff</servlet-name>
         <url-pattern>/update_staff</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_facility_accounting_types</servlet-name>
+        <url-pattern>/load_facility_accounting_types</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_sub_counties</servlet-name>
+        <url-pattern>/load_sub_counties</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

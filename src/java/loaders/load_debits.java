@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
  */
 public class load_debits extends HttpServlet {
 HttpSession session;
-String staff_no,facility_name;
+String staff_no;
 String debit_id,cheque_no,fco,gl_code,amount,date,purpose,timestamp,status;
 int    status_id;
 int total_debit,total_credit,balance;
@@ -49,13 +49,13 @@ String currency;
            }
             if(session.getAttribute("staff_no")!=null){
              staff_no = session.getAttribute("staff_no").toString();
-            String getadvances = "SELECT debit_id,cheque_no,fco,gl_code,amount,date,purpose,timestamp,facility_id FROM debit WHERE staff_no=? ORDER BY timestamp DESC";
+            String getadvances = "SELECT debit_id,cheque_no,fco,gl_code,amount,date,purpose,timestamp FROM debit WHERE staff_no=? ORDER BY timestamp DESC";
             conn.pst=conn.conn.prepareStatement(getadvances);
             conn.pst.setString(1, staff_no);
             conn.rs=conn.pst.executeQuery();
             while(conn.rs.next()){
             //loop through adding the items to array
-             facility_name=status="";
+             status="";
              status_id=0;
              debit_id=cheque_no=fco=gl_code=amount=date=purpose=timestamp="";
               debit_id = conn.rs.getString(1);
@@ -70,14 +70,14 @@ String currency;
               
               JSONObject obj = new JSONObject();
               
-            //get facility supported
-            if(conn.rs.getString("facility_id")!=null){
-                String getfacilityname="SELECT facility_name,unique_code FROM facilities WHERE id='"+conn.rs.getString("facility_id")+"'";
-                conn.rs1=conn.st1.executeQuery(getfacilityname);
-                if(conn.rs1.next()){
-                    facility_name=conn.rs1.getString(1);
-                }
-            }
+//            //get facility supported
+//            if(conn.rs.getString("facility_id")!=null){
+//                String getfacilityname="SELECT facility_name,unique_code FROM facilities WHERE id='"+conn.rs.getString("facility_id")+"'";
+//                conn.rs1=conn.st1.executeQuery(getfacilityname);
+//                if(conn.rs1.next()){
+//                    facility_name=conn.rs1.getString(1);
+//                }
+//            }
             
             //get paid
             String getpaid="SELECT SUM(amount) FROM credit WHERE debit_id='"+debit_id+"'";
@@ -109,7 +109,7 @@ String currency;
               obj.put("date", date);
               obj.put("purpose", purpose);
               obj.put("timestamp", timestamp);
-              obj.put("facility_name", facility_name);
+//              obj.put("facility_name", facility_name);
               obj.put("status", status);
               obj.put("status_id", status_id);
               obj.put("balance", balance);

@@ -25,7 +25,8 @@ import org.json.simple.JSONObject;
 public class save_credit extends HttpServlet {
 HttpSession session;
 String output;
-String amount,date,debit_id,credit_id,message;
+String amount,date,debit_id,credit_id,message,fco,gl_code;
+String health_id,health_type_id;
 int balance,code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -37,7 +38,32 @@ int balance,code;
            amount = request.getParameter("amount");
            date = request.getParameter("date");
            debit_id = request.getParameter("debit_id");
+           fco = request.getParameter("fco");
+           gl_code = request.getParameter("gl_code");
            
+           if(gl_code.equals("523")){
+           health_type_id = request.getParameter("health_type_id");
+           
+           switch(health_type_id){
+               case "1":
+                   health_id = request.getParameter("county_id");
+                   break;
+              
+               case "2":
+                   health_id = request.getParameter("sub_county_id");
+                   break;
+              
+               case "3":
+                   health_id = request.getParameter("facility_id");
+                   break;
+             
+                   default:
+                       
+           }
+         }
+           else{
+               health_type_id=health_id=null;
+           }
             JSONObject obj_final = new JSONObject();
             
             if(session.getAttribute("staff_status")!=null){
@@ -53,12 +79,16 @@ int balance,code;
             if(balance>=0){
                 Manager manager = new Manager();
                credit_id=manager.getdatekey();
-                String insertCredit = "INSERT INTO credit (credit_id,debit_id,amount,date) VALUES (?,?,?,?)";
+                String insertCredit = "INSERT INTO credit (credit_id,debit_id,amount,date,fco,gl_code,health_type_id,health_id) VALUES (?,?,?,?,?,?,?,?)";
                 conn.pst=conn.conn.prepareStatement(insertCredit);
                 conn.pst.setString(1, credit_id);
                 conn.pst.setString(2, debit_id);
                 conn.pst.setString(3, amount);
                 conn.pst.setString(4, date);
+                conn.pst.setString(5, fco);
+                conn.pst.setString(6, gl_code);
+                conn.pst.setString(7, health_type_id);
+                conn.pst.setString(8, health_id);
                 
                 conn.pst.executeUpdate();
                 code=1;

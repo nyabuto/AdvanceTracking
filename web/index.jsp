@@ -19,6 +19,8 @@
 	<link href="assets/css/core.css" rel="stylesheet" type="text/css">
 	<link href="assets/css/components.css" rel="stylesheet" type="text/css">
 	<link href="assets/css/colors.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Dancing+Script" />
+        <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merienda+One" />
 	<!-- /global stylesheets -->
 
 	<!-- Core JS files -->
@@ -38,7 +40,18 @@
 
 	<script type="text/javascript" src="assets/js/plugins/ui/ripple.min.js"></script>
 	<!-- /theme JS files -->
-
+<style>
+    .title{
+        font-family: Merienda One;
+	font-size: 20px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 900;
+	line-height: 26.4px;
+    }    
+    
+    
+</style>
        
 </head>
 
@@ -58,9 +71,12 @@
 
 					<!-- Advanced login -->
                                         <form action="login" style="margin-top: 2%;">
+                                            
 						<div class="panel panel-body login-form">
 							<div class="text-center">
-                                                            <div class="icon-object border-slate-300 text-slate-300"><img style="width: 5opx; height: 50px;" src="assets/images/aphia/aphia.png"></div>
+                                                            <div class="title">Advance Tracking System</div>
+                                                            <br>
+                                                            <div class="icon-object border-slate-300 text-slate-300"><img style="height: 50px;" src="assets/images/aphia/aphia.png"></div>
 								<h5 class="content-group">Login to your account </h5>
 							</div>
 

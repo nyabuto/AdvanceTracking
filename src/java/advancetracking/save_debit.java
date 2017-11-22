@@ -24,7 +24,7 @@ import org.json.simple.JSONObject;
  */
 public class save_debit extends HttpServlet {
 HttpSession session;
-String debit_id,staff_no,cheque_no,fco,gl_code,amount,date,purpose,facility_id;
+String debit_id,staff_no,cheque_no,fco,gl_code,amount,date,purpose;
 String message;
 int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -49,7 +49,7 @@ int code;
             amount = request.getParameter("amount");
             date = request.getParameter("date");
             purpose = request.getParameter("purpose");
-            facility_id = request.getParameter("facility");
+//            facility_id = request.getParameter("facility");
             debit_id = manager.getdatekey();
             
             String checkExistence = "SELECT debit_id FROM debit WHERE cheque_no=? AND staff_no=? AND amount=? AND gl_code=? AND fco=?";
@@ -68,7 +68,7 @@ int code;
             else{
               //add advance
               
-              String inserter = "INSERT INTO debit (debit_id,staff_no,cheque_no,fco,gl_code,amount,date,purpose,facility_id) VALUES(?,?,?,?,?,?,?,?,?)";
+              String inserter = "INSERT INTO debit (debit_id,staff_no,cheque_no,fco,gl_code,amount,date,purpose) VALUES(?,?,?,?,?,?,?,?)";
               conn.pst=conn.conn.prepareStatement(inserter);
               conn.pst.setString(1, debit_id);
               conn.pst.setString(2, staff_no);
@@ -78,7 +78,7 @@ int code;
               conn.pst.setString(6, amount);
               conn.pst.setString(7, date);
               conn.pst.setString(8, purpose);
-              conn.pst.setString(9, facility_id);
+//              conn.pst.setString(9, facility_id);
               
               conn.pst.executeUpdate();
               message = "Advance saved successfully.";

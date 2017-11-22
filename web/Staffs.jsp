@@ -465,7 +465,7 @@
 		<div class="page-content">
 
 			<!-- Main sidebar -->
-			<div class="sidebar sidebar-main">
+                        <div class="sidebar sidebar-main">
 			<%@include file="menu/menu.jsp"%>	
 			</div>
 			<!-- /main sidebar -->

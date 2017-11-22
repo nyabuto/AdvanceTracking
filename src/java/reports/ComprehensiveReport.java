@@ -24,6 +24,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.FontFamily;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -45,7 +46,7 @@ String start_date,end_date,current_date;
 String staff_no,staff_qr;
 String fullname,email,phone,current_status,cheque_no,fco,gl_code,date_given,debited_amount,accounted,balance,facility_name,turnaroundtime,last_date_accounted,purpose;
 int row_pos;
-String report_title;
+String report_title,currency;
 int staff_added;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -153,9 +154,45 @@ int staff_added;
     stborder.setFont(font_cell);
     stborder.setWrapText(true);
     
+    XSSFCellStyle currencyStyle=wb.createCellStyle();
+    currencyStyle.setBorderTop(BorderStyle.THIN);
+    currencyStyle.setBorderBottom(BorderStyle.THIN);
+    currencyStyle.setBorderLeft(BorderStyle.THIN);
+    currencyStyle.setBorderRight(BorderStyle.THIN);
+    currencyStyle.setAlignment(HorizontalAlignment.LEFT);
     
-
-    for (int i=0;i<=15;i++){
+    currencyStyle.setFont(font_cell);
+    currencyStyle.setWrapText(true);
+    
+    XSSFCellStyle totalcurrencyStyle=wb.createCellStyle();
+    totalcurrencyStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+    totalcurrencyStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    totalcurrencyStyle.setBorderTop(BorderStyle.THIN);
+    totalcurrencyStyle.setBorderBottom(BorderStyle.THIN);
+    totalcurrencyStyle.setBorderLeft(BorderStyle.THIN);
+    totalcurrencyStyle.setBorderRight(BorderStyle.THIN);
+    totalcurrencyStyle.setAlignment(HorizontalAlignment.LEFT);
+    
+    totalcurrencyStyle.setFont(fontx);
+    totalcurrencyStyle.setWrapText(true);
+    
+    
+   DataFormat df = wb.createDataFormat();
+   
+   // fetch currency
+   
+   String getcurrency = "SELECT name FROM currency";
+   conn.rs=conn.st.executeQuery(getcurrency);
+   if(conn.rs.next()){
+       currency = conn.rs.getString(1);
+   }
+   else{
+       currency="$";
+   }
+currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"-\"??_);_(@_)"));
+totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"-\"??_);_(@_)"));
+   
+    for (int i=0;i<15;i++){
    shet1.setColumnWidth(i, 5000);
    if(i==0){
   shet1.setColumnWidth(i, 1000);     
@@ -173,12 +210,12 @@ int staff_added;
   shet1.setColumnWidth(i, 6000);     
    }
    if(i==10 || i==11 || i==12 || i==14){
-  shet1.setColumnWidth(i, 2000);     
+  shet1.setColumnWidth(i, 5000);     
    }
    
     }
     
-        shet1.addMergedRegion(new CellRangeAddress(0,0,0,15));
+  shet1.addMergedRegion(new CellRangeAddress(0,0,0,14));
     //Create headers
     XSSFRow rw0=shet1.createRow(row_pos); 
         rw0.setHeightInPoints(25);
@@ -187,7 +224,7 @@ int staff_added;
         S0cell.setCellStyle(styleHeader);  
     row_pos++;
      XSSFRow rw1=shet1.createRow(row_pos);  
-    String []  header = {"No.","Staff Name","Email Address","Phone Number","Current Status","FCO"," GL Code","Cheque Number","Date Issued","Purpose","Debit","Credit","Balance","Facility","Turn Around Time (Days)","Day Last Accounted"} ; 
+    String []  header = {"No.","Staff Name","Email Address","Phone Number","Current Status","FCO"," GL Code","Cheque Number","Date Issued","Purpose","Debit","Credit","Balance","Turn Around Time (Days)","Day Last Accounted"} ; 
         int cell_pos=0;
         for (String header_name : header) {
             // headers
@@ -203,14 +240,13 @@ int staff_added;
 //        end of currency
         row_pos++;
         int num=0;
-        String getReport="SELECT fullname,email,phone,status.name AS current_status,cheque_no,fco,gl_code,debit.date AS date_given, debit.amount AS debited_amount, " +
-            "IFNULL(SUM(credit.amount),0) AS accounted, (debit.amount-IFNULL(SUM(credit.amount),0)) AS balance,facility_name,"+
+        String getReport="SELECT fullname,email,phone,status.name AS current_status,cheque_no,debit.fco AS fco,debit.gl_code AS gl_code,debit.date AS date_given, debit.amount AS debited_amount, " +
+            "IFNULL(SUM(credit.amount),0) AS accounted, (debit.amount-IFNULL(SUM(credit.amount),0)) AS balance,"+
             " DATEDIFF (MAX(credit.date),debit.date) AS turnaroundtime,  MAX(credit.date) AS last_accounted,purpose " +
             "FROM debit LEFT JOIN credit ON debit.debit_id=credit.debit_id " +
 
             "JOIN staff ON staff.staff_no=debit.staff_no " +
             "LEFT JOIN status ON staff.status_id=status.id " +
-            "LEFT JOIN facilities ON debit.facility_id=facilities.id " +
             "WHERE "+staff_qr+" debit.date BETWEEN '"+start_date+"' AND '"+end_date+"' " +
             "GROUP BY debit.debit_id ORDER BY debit.date DESC,debit.timestamp DESC ";
         System.out.println(getReport);
@@ -230,12 +266,11 @@ int staff_added;
          debited_amount = conn.rs.getString(9);
          accounted = conn.rs.getString(10);
          balance = conn.rs.getString(11);
-         facility_name = conn.rs.getString(12);
-         turnaroundtime = conn.rs.getString(13);
-         last_date_accounted = conn.rs.getString(14);
-         purpose = conn.rs.getString(15);
+         turnaroundtime = conn.rs.getString(12);
+         last_date_accounted = conn.rs.getString(13);
+         purpose = conn.rs.getString(14);
          //push to excel
-         String [] data = {""+num,fullname,email,phone,current_status,fco,gl_code,cheque_no,date_given,purpose,debited_amount,accounted,balance,facility_name,turnaroundtime,last_date_accounted};
+         String [] data = {""+num,fullname,email,phone,current_status,fco,gl_code,cheque_no,date_given,purpose,debited_amount,accounted,balance,turnaroundtime,last_date_accounted};
          cell_pos=0;
          for(String value :data){
             XSSFCell  S1cell=rw2.createCell(cell_pos);
@@ -245,17 +280,60 @@ int staff_added;
             else{
                 S1cell.setCellValue(value);
             }
+            if(cell_pos>9 && cell_pos<=12){
+             S1cell.setCellStyle(currencyStyle);    
+            }
+            else{
             S1cell.setCellStyle(stborder); 
+            }
             cell_pos++;   
          }
          row_pos++;
         }
         
-        
+     if(num>0) {  
+       XSSFRow rwtotal=shet1.createRow(row_pos); 
+       rwtotal.setHeightInPoints(28);
        
+       XSSFCell  cell_debit=rwtotal.createCell(10);
+       XSSFCell  cell_credit=rwtotal.createCell(11);
+       XSSFCell  cell_balance=rwtotal.createCell(12);
+       
+      //row totals
+      
+      int data_start=3;
+      int data_end=row_pos;
+      
         
+        for (int i=0;i<=9;i++){
+        XSSFCell  cell_title=rwtotal.createCell(i);
+        cell_title.setCellValue("Totals : ");
+        cell_title.setCellStyle(stylex);
+        }
+        for (int i=13;i<=14;i++){
+        XSSFCell  cell_title=rwtotal.createCell(i);
+        cell_title.setCellStyle(stylex);
+        }
+        shet1.addMergedRegion(new CellRangeAddress(row_pos,row_pos,0,9));
+        shet1.addMergedRegion(new CellRangeAddress(row_pos,row_pos,13,14));
         
-        
+        String formulae_debit= "SUM(K"+data_start+":K"+data_end+")";
+        cell_debit.setCellType(XSSFCell.CELL_TYPE_FORMULA);
+        cell_debit.setCellFormula(formulae_debit);
+
+        String formulae_credit= "SUM(L"+data_start+":L"+data_end+")";
+        cell_credit.setCellType(XSSFCell.CELL_TYPE_FORMULA);
+        cell_credit.setCellFormula(formulae_credit);
+
+        String formulae_balance= "SUM(M"+data_start+":M"+data_end+")";
+        cell_balance.setCellType(XSSFCell.CELL_TYPE_FORMULA);
+        cell_balance.setCellFormula(formulae_balance);
+
+        cell_debit.setCellStyle(totalcurrencyStyle);
+        cell_credit.setCellStyle(totalcurrencyStyle);
+        cell_balance.setCellStyle(totalcurrencyStyle);        
+
+     }
         ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
         wb.write(outByteStream);
         byte [] outArray = outByteStream.toByteArray();

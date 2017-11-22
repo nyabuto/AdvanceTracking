@@ -24,7 +24,7 @@ import javax.servlet.http.HttpSession;
 public class load_glcodes extends HttpServlet {
 
    HttpSession session;
-   String output;
+   String output,type_id;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -33,8 +33,8 @@ public class load_glcodes extends HttpServlet {
            dbConn conn = new dbConn();
            session = request.getSession();
            
-           
-           String get_glcodes="SELECT code FROM gl_code";
+           type_id = request.getParameter("type_id");
+           String get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"'";
            conn.rs=conn.st.executeQuery(get_glcodes);
            while(conn.rs.next()){
                output+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(1)+"</option>";

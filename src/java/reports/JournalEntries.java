@@ -21,9 +21,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.FontFamily;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -37,14 +39,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class JournalEntries extends HttpServlet {
 HttpSession session;
-String debit_id,staffname,cheque_no,fco,id_code,gl_code,gl_account,gl_account_name,id_code_speed_key_reqd,external_doc_no,award_reqd,
-        restriction_reqd,id_code_reqd,sub_award,debit,credit,posting_description,je_description;
-String debit_date,facility_id,cleared;
 int row_pos=0;
 String report_id;
 String date_between;
-String passed_year;
+String passed_year,currency;
 int year;
+String credit_id,credit_fco,credit_gl_code,amount_credited,credit_date,debit_id,staff_no,debit_fco,debit_gl_code,cheque_no,amount_debited,debit_date,purpose,fullname,email,phone,credit_gl_account,credit_gl_account_name,debit_gl_account,debit_gl_account_name;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         dbConn conn = new dbConn();
@@ -59,24 +59,24 @@ int year;
       if(report_id.equals("5")){
           String start_date=request.getParameter("start_date");
           String end_date=request.getParameter("end_date");
-          date_between +=" debit.date BETWEEN '"+start_date+"' AND '"+end_date+"' ";
+          date_between +=" credit.date BETWEEN '"+start_date+"' AND '"+end_date+"' ";
       }
       else{
           passed_year=request.getParameter("years");
           year=Integer.parseInt(passed_year);
             switch (report_id) {
                 case "1":
-                    date_between +=" debit.date BETWEEN '"+(year-1)+"-10-01' AND '"+year+"-09-31' ";
+                    date_between +=" credit.date BETWEEN '"+(year-1)+"-10-01' AND '"+year+"-09-31' ";
                     break;
 //        end of period
                 case "2":
                     String semiannual[] = request.getParameterValues("semi_annual");
                     for (String sannual : semiannual){
                         if(sannual.equals("1")){
-                            date_between +=" debit.date BETWEEN '"+(year-1)+"-10-01' AND '"+year+"-03-31' ";
+                            date_between +=" credit.date BETWEEN '"+(year-1)+"-10-01' AND '"+year+"-03-31' ";
                         }
                         else if(sannual.equals("2")){
-                            date_between +=" OR debit.date BETWEEN '"+year+"-04-01' AND '"+year+"-09-31' ";
+                            date_between +=" OR credit.date BETWEEN '"+year+"-04-01' AND '"+year+"-09-31' ";
                         }
                     }          break;
                 case "3":
@@ -85,7 +85,7 @@ int year;
                     for (String quarter : quarters){
                         if(!quarter.equals("")){
                             int qr=Integer.parseInt(quarter);
-                            date_between +=" debit.date BETWEEN '"+qtrs[(qr*2)-2]+"' AND '"+qtrs[(qr*2)-1]+"' OR ";
+                            date_between +=" credit.date BETWEEN '"+qtrs[(qr*2)-2]+"' AND '"+qtrs[(qr*2)-1]+"' OR ";
                         }
                     }          date_between=removeLastChars(date_between, 3);
                     break;
@@ -95,10 +95,10 @@ int year;
                         if(!month.equals("")){
                             int mn=Integer.parseInt(month);
                             if(mn<10){
-                                date_between +=" debit.date BETWEEN '"+year+"-0"+month+"-01' AND '"+year+"-0"+month+"-31' OR ";
+                                date_between +=" credit.date BETWEEN '"+year+"-0"+month+"-01' AND '"+year+"-0"+month+"-31' OR ";
                             }
                             else{
-                                date_between +=" debit.date BETWEEN '"+(year-1)+"-"+month+"-01' AND '"+(year-1)+"-"+month+"-31' OR ";
+                                date_between +=" credit.date BETWEEN '"+(year-1)+"-"+month+"-01' AND '"+(year-1)+"-"+month+"-31' OR ";
                             }
                             
                         }
@@ -171,8 +171,46 @@ int year;
     font_cell.setFontName("Cambria");
     stborder.setFont(font_cell);
     stborder.setWrapText(true);
+   
+    
+    XSSFCellStyle currencyStyle=wb.createCellStyle();
+    currencyStyle.setBorderTop(BorderStyle.THIN);
+    currencyStyle.setBorderBottom(BorderStyle.THIN);
+    currencyStyle.setBorderLeft(BorderStyle.THIN);
+    currencyStyle.setBorderRight(BorderStyle.THIN);
+    currencyStyle.setAlignment(HorizontalAlignment.LEFT);
+    
+    currencyStyle.setFont(font_cell);
+    currencyStyle.setWrapText(true);
+    
+    XSSFCellStyle totalcurrencyStyle=wb.createCellStyle();
+    totalcurrencyStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+    totalcurrencyStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+    totalcurrencyStyle.setBorderTop(BorderStyle.THIN);
+    totalcurrencyStyle.setBorderBottom(BorderStyle.THIN);
+    totalcurrencyStyle.setBorderLeft(BorderStyle.THIN);
+    totalcurrencyStyle.setBorderRight(BorderStyle.THIN);
+    totalcurrencyStyle.setAlignment(HorizontalAlignment.LEFT);
+    
+    totalcurrencyStyle.setFont(fontx);
+    totalcurrencyStyle.setWrapText(true);
     
     
+   DataFormat df = wb.createDataFormat();
+   
+      // fetch currency
+   
+   String getcurrency = "SELECT name FROM currency";
+   conn.rs=conn.st.executeQuery(getcurrency);
+   if(conn.rs.next()){
+       currency = conn.rs.getString(1);
+   }
+   else{
+       currency="$";
+   }
+currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"-\"??_);_(@_)"));
+totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"-\"??_);_(@_)"));
+ 
 
     for (int i=0;i<=15;i++){
    shet1.setColumnWidth(i, 3000);
@@ -181,6 +219,9 @@ int year;
    }
    if(i==13){
   shet1.setColumnWidth(i, 15000);     
+   }
+   if(i>=11 && i<=12){
+  shet1.setColumnWidth(i, 5000);     
    }
   }
     
@@ -199,57 +240,139 @@ int year;
         
      //        end of currency
         row_pos++;
-        int num=0;
-        String getReport="SELECT debit.debit_id AS debit_id,staff.fullname AS staff_name,cheque_no,fco,code,account,account_name,debit.amount AS debit_amount," +
-                "debit.date AS debit_date,purpose,facility_id,IFNULL(SUM(credit.amount),0) AS credit_amount,IF(debit.amount-IFNULL(SUM(credit.amount),0)=0,'Yes','No') AS cleared " +
-                "FROM debit " +
-                "LEFT JOIN gl_code ON debit.gl_code=gl_code.code " +
-                "LEFT JOIN credit ON debit.debit_id=credit.debit_id " +
+        int num=0;   
+      String getReport="SELECT credit.credit_id AS credit_id,credit.debit_id,credit.fco AS credit_fco,"+
+               "credit.gl_code AS credit_gl_code,credit.amount AS amount_credited,"+
+               "credit.date AS credit_date,debit.debit_id AS debit_id,debit.staff_no AS staff_no,"+
+               "debit.fco AS debit_fco,debit.gl_code AS debit_gl_code,debit.amount AS amount_debited,"+
+                "debit.cheque_no AS cheque_no,debit.date AS debit_date,debit.purpose AS purpose," +
+                "staff.fullname AS fullname,staff.email AS email, staff.phone AS phone," +
+                "gl_code.account AS credit_gl_account,gl_code.account_name AS credit_gl_account_name " +
+                "FROM credit " +
+                "LEFT JOIN debit ON credit.debit_id=debit.debit_id " +
+                "LEFT JOIN gl_code ON credit.gl_code=gl_code.code " +
                 "LEFT JOIN staff ON debit.staff_no=staff.staff_no " +
-                ""+date_between+"" +
-                "GROUP BY debit.debit_id " +
-                "ORDER BY debit.date ";
+                 ""+date_between+" " +
+                "GROUP BY credit.credit_id " +
+                "ORDER BY debit.date ";  
+        
         System.out.println(getReport);
         conn.rs = conn.st.executeQuery(getReport);
         
         while(conn.rs.next()){
          num++;
-         fco=id_code=gl_code=gl_account=gl_account_name=id_code_speed_key_reqd=external_doc_no=award_reqd=restriction_reqd=id_code_reqd=sub_award=debit=credit=posting_description=je_description;
-         XSSFRow rw2=shet1.createRow(row_pos); 
-         debit_id = conn.rs.getString(1);
-         staffname = conn.rs.getString(2);
-         cheque_no = conn.rs.getString(3);
-         fco = conn.rs.getString(4);
-         id_code = conn.rs.getString(5);
-         gl_account = conn.rs.getString(6);
-         gl_account_name = conn.rs.getString(7);
-         debit = conn.rs.getString(8);
-         debit_date = conn.rs.getString(9);
-         posting_description = conn.rs.getString(10);
-         facility_id = conn.rs.getString(11);
-         credit = conn.rs.getString(12);
-         cleared = conn.rs.getString(13);
+         credit_id = conn.rs.getString("credit_id");
+         debit_id = conn.rs.getString("debit_id");
+         credit_fco = conn.rs.getString("credit_fco");
+         credit_gl_code = conn.rs.getString("credit_gl_code");
+         amount_credited = conn.rs.getString("amount_credited");
+         credit_date = conn.rs.getString("credit_date");
+         debit_id = conn.rs.getString("debit_id");
+         staff_no = conn.rs.getString("staff_no");
+         debit_fco = conn.rs.getString("debit_fco");
+         debit_gl_code = conn.rs.getString("debit_gl_code");
+         amount_debited = conn.rs.getString("amount_debited");
+         cheque_no = conn.rs.getString("cheque_no");
+         debit_date = conn.rs.getString("debit_date");
+         purpose = conn.rs.getString("purpose");
+         fullname = conn.rs.getString("fullname");
+         email = conn.rs.getString("email");
+         phone = conn.rs.getString("phone");
+         credit_gl_account = conn.rs.getString("credit_gl_account");
+         credit_gl_account_name = conn.rs.getString("credit_gl_account_name");
+        String getdebitgls="SELECT account,account_name FROM gl_code WHERE code='"+debit_gl_code+"'";
+        conn.rs1=conn.st1.executeQuery(getdebitgls);
+        if(conn.rs1.next()){
+         debit_gl_account = conn.rs1.getString(1);
+         debit_gl_account_name = conn.rs1.getString(2);  
+        }
+         
+        String[] debit_data={debit_fco,"",debit_gl_code,debit_gl_account,debit_gl_account_name,"",cheque_no,"","","","",amount_credited,"0",purpose,""};
+        String[] credit_data={credit_fco,"",credit_gl_code,credit_gl_account,credit_gl_account_name,"",cheque_no,"","","","","0",amount_credited,purpose,""};
+        
+        XSSFRow rw_debit=shet1.createRow(row_pos); 
          //push to excel
-         String [] data = {fco,id_code,gl_code,gl_account,gl_account_name,id_code_speed_key_reqd,external_doc_no,award_reqd,restriction_reqd,id_code_reqd,sub_award,debit,credit,posting_description,je_description};
          cell_pos=0;
-         for(String value :data){
-            XSSFCell  S1cell=rw2.createCell(cell_pos);
+         for(String value :debit_data){
+            XSSFCell  S1cell=rw_debit.createCell(cell_pos);
             if(isNumeric(value)){
                 S1cell.setCellValue(Integer.parseInt(value));
             }
             else{
                 S1cell.setCellValue(value);
             }
+            if(cell_pos>10 && cell_pos<=12){
+             S1cell.setCellStyle(currencyStyle);    
+            }
+            else{
             S1cell.setCellStyle(stborder); 
+            }
             cell_pos++;   
          }
+         row_pos++;
+         
+         cell_pos=0;
+          XSSFRow rw_credit=shet1.createRow(row_pos); 
+         for(String value :credit_data){
+            XSSFCell  S1cell=rw_credit.createCell(cell_pos);
+            if(isNumeric(value)){
+                S1cell.setCellValue(Integer.parseInt(value));
+            }
+            else{
+                S1cell.setCellValue(value);
+            }
+            if(cell_pos>10 && cell_pos<=12){
+             S1cell.setCellStyle(currencyStyle);    
+            }
+            else{
+            S1cell.setCellStyle(stborder); 
+            }
+            cell_pos++;   
+         }
+        
          row_pos++;
         }
         
         
+             
+     if(num>0) {  
+       XSSFRow rwtotal=shet1.createRow(row_pos); 
+       rwtotal.setHeightInPoints(28);
        
+       XSSFCell  cell_debit=rwtotal.createCell(11);
+       XSSFCell  cell_credit=rwtotal.createCell(12);
+       
+      //row totals
+      
+      int data_start=2;
+      int data_end=row_pos;
+      
         
+        for (int i=0;i<=10;i++){
+        XSSFCell  cell_title=rwtotal.createCell(i);
+        cell_title.setCellValue("Totals : ");
+        cell_title.setCellStyle(stylex);
+        }
+        for (int i=13;i<=14;i++){
+        XSSFCell  cell_title=rwtotal.createCell(i);
+        cell_title.setCellStyle(stylex);
+        }
+        shet1.addMergedRegion(new CellRangeAddress(row_pos,row_pos,0,10));
+        shet1.addMergedRegion(new CellRangeAddress(row_pos,row_pos,13,14));
         
+        String formulae_debit= "SUM(L"+data_start+":L"+data_end+")";
+        cell_debit.setCellType(XSSFCell.CELL_TYPE_FORMULA);
+        cell_debit.setCellFormula(formulae_debit);
+
+        String formulae_credit= "SUM(M"+data_start+":M"+data_end+")";
+        cell_credit.setCellType(XSSFCell.CELL_TYPE_FORMULA);
+        cell_credit.setCellFormula(formulae_credit);
+
+
+        cell_debit.setCellStyle(totalcurrencyStyle);
+        cell_credit.setCellStyle(totalcurrencyStyle);        
+
+     }  
         
         ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
         wb.write(outByteStream);
