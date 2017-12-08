@@ -62,27 +62,27 @@
     </servlet>
     <servlet>
         <servlet-name>all_fco</servlet-name>
-        <servlet-class>advancetracking.all_fco</servlet-class>
+        <servlet-class>loaders.all_fco</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>all_glcodes</servlet-name>
-        <servlet-class>advancetracking.all_glcodes</servlet-class>
+        <servlet-class>loaders.all_glcodes</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>all_users</servlet-name>
-        <servlet-class>advancetracking.all_users</servlet-class>
+        <servlet-class>loaders.all_users</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>all_counties</servlet-name>
-        <servlet-class>advancetracking.all_counties</servlet-class>
+        <servlet-class>loaders.all_counties</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>all_facilities</servlet-name>
-        <servlet-class>advancetracking.all_facilities</servlet-class>
+        <servlet-class>loaders.all_facilities</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>load_edit_advance</servlet-name>
-        <servlet-class>advancetracking.load_edit_advance</servlet-class>
+        <servlet-class>loaders.load_edit_advance</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>save_edited_debit</servlet-name>
@@ -139,6 +139,54 @@
     <servlet>
         <servlet-name>load_sub_counties</servlet-name>
         <servlet-class>loaders.load_sub_counties</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_edit_fco</servlet-name>
+        <servlet-class>loaders.load_edit_fco</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>save_edited_fco</servlet-name>
+        <servlet-class>advancetracking.save_edited_fco</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_fco_types</servlet-name>
+        <servlet-class>loaders.load_fco_types</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>save_fco</servlet-name>
+        <servlet-class>advancetracking.save_fco</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>delete_fco</servlet-name>
+        <servlet-class>Deleters.delete_fco</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_fco_status</servlet-name>
+        <servlet-class>advancetracking.update_fco_status</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_gl_code_status</servlet-name>
+        <servlet-class>advancetracking.update_gl_code_status</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>delete_gl_code</servlet-name>
+        <servlet-class>Deleters.delete_gl_code</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_gl_code_types</servlet-name>
+        <servlet-class>loaders.load_gl_code_types</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>save_gl_code</servlet-name>
+        <servlet-class>advancetracking.save_gl_code</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_edit_gl_code</servlet-name>
+        <servlet-class>loaders.load_edit_gl_code</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_gl_code</servlet-name>
+        <servlet-class>advancetracking.update_gl_code</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
@@ -279,6 +327,54 @@
     <servlet-mapping>
         <servlet-name>load_sub_counties</servlet-name>
         <url-pattern>/load_sub_counties</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_edit_fco</servlet-name>
+        <url-pattern>/load_edit_fco</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_edited_fco</servlet-name>
+        <url-pattern>/save_edited_fco</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_fco_types</servlet-name>
+        <url-pattern>/load_fco_types</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_fco</servlet-name>
+        <url-pattern>/save_fco</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>delete_fco</servlet-name>
+        <url-pattern>/delete_fco</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_fco_status</servlet-name>
+        <url-pattern>/update_fco_status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_gl_code_status</servlet-name>
+        <url-pattern>/update_gl_code_status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>delete_gl_code</servlet-name>
+        <url-pattern>/delete_gl_code</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_gl_code_types</servlet-name>
+        <url-pattern>/load_gl_code_types</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_gl_code</servlet-name>
+        <url-pattern>/save_gl_code</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_edit_gl_code</servlet-name>
+        <url-pattern>/load_edit_gl_code</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_gl_code</servlet-name>
+        <url-pattern>/update_gl_code</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

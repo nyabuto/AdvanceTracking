@@ -32,7 +32,7 @@ String facilities="";
             dbConn conn = new dbConn();
             
           facilities="";
-          String getFacilities="SELECT id,facility_name FROM facilities ORDER BY facility_name ASC";
+          String getFacilities="SELECT id,facility_name FROM facilities WHERE finance_name!='' ORDER BY facility_name ASC";
           conn.rs=conn.st.executeQuery(getFacilities);
           while(conn.rs.next()){
               facilities+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(2)+"</option>";

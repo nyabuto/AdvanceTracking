@@ -16,30 +16,44 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class load_glcodes extends HttpServlet {
-
-   HttpSession session;
-   String output,type_id;
+public class all_glcodes extends HttpServlet {
+HttpSession session;
+String code,account,account_name,status;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            output="";
-           dbConn conn = new dbConn();
            session = request.getSession();
+           dbConn conn = new dbConn();
            
-           type_id = request.getParameter("type_id");
-           String get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND status=1";
-           conn.rs=conn.st.executeQuery(get_glcodes);
-           while(conn.rs.next()){
-               output+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(1)+"</option>";
-           }
-            out.println(output);
+            JSONObject obj_final = new JSONObject();
+            JSONArray jarray = new JSONArray();
+            
+            String getglcodes = "SELECT code,account,account_name,status FROM gl_code ORDER by code ASC";
+            conn.rs=conn.st.executeQuery(getglcodes);
+            while(conn.rs.next()){
+           code = conn.rs.getString(1);
+           account = conn.rs.getString(2);
+           account_name = conn.rs.getString(3);
+           status = conn.rs.getString(4);
+           
+           JSONObject obj = new JSONObject();
+           obj.put("code", code);
+           obj.put("account", account);
+           obj.put("account_name", account_name);
+           obj.put("status", status);
+           jarray.add(obj);
+            }
+            
+            obj_final.put("data", jarray);
+            out.println(obj_final);
         }
     }
 
@@ -55,11 +69,11 @@ public class load_glcodes extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-       }
+    try {
+        processRequest(request, response);
+    } catch (SQLException ex) {
+        Logger.getLogger(all_glcodes.class.getName()).log(Level.SEVERE, null, ex);
+    }
     }
 
     /**
@@ -73,11 +87,11 @@ public class load_glcodes extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-       }
+    try {
+        processRequest(request, response);
+    } catch (SQLException ex) {
+        Logger.getLogger(all_glcodes.class.getName()).log(Level.SEVERE, null, ex);
+    }
     }
 
     /**

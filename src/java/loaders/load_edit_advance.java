@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package advancetracking;
+package loaders;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -53,7 +53,7 @@ String id,cheque_no,fco_id,gl_id,facility_id,fco,gl_code,amount,date,purpose;
             purpose = conn.rs.getString(6);
 //            facility_id = conn.rs.getString(7);
             
-            String getfco="SELECT fco FROM fco WHERE type_id=1";
+            String getfco="SELECT fco FROM fco WHERE type_id=1 && status=1";
             conn.rs1 = conn.st1.executeQuery(getfco);
             while(conn.rs1.next()){
                 if(conn.rs1.getString(1).equals(fco_id)){

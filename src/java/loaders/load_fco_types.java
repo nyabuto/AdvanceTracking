@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package advancetracking;
+package loaders;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -23,31 +23,31 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class all_glcodes extends HttpServlet {
-HttpSession session;
-String code,account,account_name;
+public class load_fco_types extends HttpServlet {
+   HttpSession session;
+   String id,name;
+   
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
            session = request.getSession();
-           dbConn conn = new dbConn();
-           
+            dbConn conn = new dbConn();
+            
             JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
             
-            String getglcodes = "SELECT code,account,account_name FROM gl_code ORDER by code ASC";
-            conn.rs=conn.st.executeQuery(getglcodes);
+            String getTypes = "SELECT id,name FROM fco_types order by name";
+            conn.rs = conn.st.executeQuery(getTypes);
             while(conn.rs.next()){
-           code = conn.rs.getString(1);
-           account = conn.rs.getString(2);
-           account_name = conn.rs.getString(3);
-           
-           JSONObject obj = new JSONObject();
-           obj.put("code", code);
-           obj.put("account", account);
-           obj.put("account_name", account_name);
-           jarray.add(obj);
+                id = conn.rs.getString(1);
+                name = conn.rs.getString(2);
+                
+                JSONObject obj = new JSONObject();
+                obj.put("id", id);
+                obj.put("name", name);
+                
+              jarray.add(obj);
             }
             
             obj_final.put("data", jarray);
@@ -67,11 +67,11 @@ String code,account,account_name;
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    try {
-        processRequest(request, response);
-    } catch (SQLException ex) {
-        Logger.getLogger(all_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-    }
+       try {
+           processRequest(request, response);
+       } catch (SQLException ex) {
+           Logger.getLogger(load_fco_types.class.getName()).log(Level.SEVERE, null, ex);
+       }
     }
 
     /**
@@ -85,11 +85,11 @@ String code,account,account_name;
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    try {
-        processRequest(request, response);
-    } catch (SQLException ex) {
-        Logger.getLogger(all_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-    }
+       try {
+           processRequest(request, response);
+       } catch (SQLException ex) {
+           Logger.getLogger(load_fco_types.class.getName()).log(Level.SEVERE, null, ex);
+       }
     }
 
     /**

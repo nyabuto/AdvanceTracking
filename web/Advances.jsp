@@ -136,7 +136,7 @@
           <%}}%>
         output+='<input type="hidden" name="'+pos+'" value="'+identifier+'" id="'+pos+'">';
         output+='</ul></li></ul></div>';
-         amount=currency+'. '+amount;
+         amount=currency+''+amount;
            var minSet = [pos,cheque_no,fco,gl_code,amount,date,purpose,status,output];
            
            dataSet.push(minSet);
@@ -178,7 +178,7 @@
                     '<div class="col-md-12">' +
                         '<form class="form-horizontal">' +
                            '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Select FCO : </label>' +
+                                '<label class="col-md-4 control-label">Select FCO <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="fco_acc" required name="fco_acc" class="form-control bootstrap-select" data-header="Choose FCO" data-live-search="true" style="max-height:100px;">' +
                                    '<option value="">Loading FCO</option>'+
@@ -187,7 +187,7 @@
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Select GL Code : </label>' +
+                                '<label class="col-md-4 control-label">Select GL Code <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="gl_acc_code" required name="gl_acc_code" onChange="gl_changed();" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">Loading GL Codes</option>'+ 
@@ -195,20 +195,20 @@
                                 '</div>' +
                             '</div>' +
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Amount : </label>' +
+                                '<label class="col-md-4 control-label">Amount <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="amount" required name="amount"  onkeypress="return numbers(event)" type="text" placeholder="Enter amount" class="form-control">' +
                                     '</div>' +
                             '</div>' +
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Date : </label>' +
+                                '<label class="col-md-4 control-label">Date <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="date" name="date" required type="date" placeholder="Select Date" class="form-control pickadate-disable-range">' +
                                     '</div>' +
                             '</div>' +
                             
                             '<div class="form-group" id="health_type">' +
-                                '<label class="col-md-4 control-label">Select Facility/Health Mgt Team : </label>' +
+                                '<label class="col-md-4 control-label">Select Facility/Health Mgt Team <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="health_type_id" required name="health_type_id" onchange=\"healths_changed();\" class="form-control bootstrap-select" data-header="Choose Type" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No Type</option>'+ 
@@ -217,7 +217,7 @@
                                 '</div>' +
                             
                             '<div class="form-group" id="county" hidden>' +
-                                '<label class="col-md-4 control-label">Select CHMT : </label>' +
+                                '<label class="col-md-4 control-label">Select CHMT <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="county_id" required name="county_id" class="form-control bootstrap-select" data-header="Choose CHMT" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No CHMT</option>'+ 
@@ -226,7 +226,7 @@
                                 '</div>' +
                             
                             '<div class="form-group" id="sub_county" hidden>' +
-                                '<label class="col-md-4 control-label">Select SCHMT : </label>' +
+                                '<label class="col-md-4 control-label">Select SCHMT <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="sub_county_id" required name="sub_county_id" class="form-control bootstrap-select" data-header="Choose SCHMT" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No SCHMT</option>'+ 
@@ -235,7 +235,7 @@
                                 '</div>' +
                             
                             '<div class="form-group" id="facility_group" hidden>' +
-                                '<label class="col-md-4 control-label">Select Facility : </label>' +
+                                '<label class="col-md-4 control-label">Select Facility <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="facility" required name="facility" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No facility</option>'+ 
@@ -261,8 +261,8 @@
                             var facility =  $("#facility").val();
                             var theme="",header="",message="";
                             
-                            if(fco!="" && gl_code!="" && amount!="" && date!=""){
-                            if((gl_code==523 && ((health_type_id==1 && county_id!="") || (health_type_id==2 && sub_county_id!="") || (health_type_id==3 && facility!="")) ) || gl_code!=523){   
+                            if(fco!="" && gl_code!="" && amount!="" && date!="" && fco!=null && gl_code!=null && amount!=null && date!=null){
+                            if((gl_code==523 && ((health_type_id==1 && county_id!="" && county_id!=null) || (health_type_id==2 && sub_county_id!="" && sub_county_id!=null) || (health_type_id==3 && facility!="" && facility!=null)) ) || gl_code!=523){   
                             if(amount>balance){
                             theme = "bg-danger";
                             header = "Error";
@@ -417,7 +417,7 @@
                      res_obj = JSON.parse(output).data;
                      data="<option value=\"\">Choose Option</option>";
                      for(var i=0;i<res_obj.length;i++){
-                         id=res_obj[i].id;
+                         id=res_obj[i].sub_county_id;
                          name=res_obj[i].SCHMT;
                          data+="<option value=\""+id+"\">"+name+"</option>";
                      }
@@ -520,14 +520,14 @@
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Cheque No : </label>' +
+                                '<label class="col-md-4 control-label">Cheque No <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="cheque_no" required name="cheque_no" type="text" placeholder="Enter Cheque Number" class="form-control">' +
                                 '</div>' +
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Select FCO : </label>' +
+                                '<label class="col-md-4 control-label">Select FCO <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="fco" required name="fco" class="form-control bootstrap-select" data-header="Choose FCO" data-live-search="true" style="max-height:100px;">' +
                                    '<option value="">Loading FCO</option>'+
@@ -536,7 +536,7 @@
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Select GL Code : </label>' +
+                                '<label class="col-md-4 control-label">Select GL Code <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="gl_code" required name="gl_code" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">Loading GL Codes</option>'+ 
@@ -545,14 +545,14 @@
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Amount : </label>' +
+                                '<label class="col-md-4 control-label">Amount <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="amount2" required name="amount2" onkeypress="return numbers(event)" type="text" placeholder="Enter amount" class="form-control">' +
                                 '</div>' +
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Date : </label>' +
+                                '<label class="col-md-4 control-label">Date <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="date2" name="date2" required type="date" placeholder="Select Date" class="form-control pickadate-disable-range">' +
                                 '</div>' +
@@ -580,8 +580,8 @@
                             var purpose =  $("#purpose").val();
                             
                             var theme="",header="",message="";
-                            
-                            if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!=""){
+                            alert("fco : -"+fco+"-");
+                            if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!="" && amount!=null && date!=null && cheque_no!=null && fco!=null && gl_code!=null){
                            var url='save_debit';
                            var form_data = {"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"purpose":purpose};
                                 $.post(url,form_data , function(output) {
@@ -862,14 +862,14 @@ load_fcos();
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Cheque No : </label>' +
+                                '<label class="col-md-4 control-label">Cheque No <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="edit_cheque_no" required name="edit_cheque_no" type="text" value="'+cheque_no+'" placeholder="Enter Cheque Number" class="form-control">' +
                                 '</div>' +
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Select FCO : </label>' +
+                                '<label class="col-md-4 control-label">Select FCO <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="edit_fco" required name="edit_fco" class="form-control bootstrap-select" data-header="Choose FCO" data-live-search="true" style="max-height:100px;">' +
                                    ''+fco+''+
@@ -878,7 +878,7 @@ load_fcos();
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Select GL Code : </label>' +
+                                '<label class="col-md-4 control-label"> <b style=\"color:red\">*</b>Select GL Code : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="edit_gl_code" required name="edit_gl_code" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
                                       ''+gl_code+''+ 
@@ -887,14 +887,14 @@ load_fcos();
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Amount : </label>' +
+                                '<label class="col-md-4 control-label">Amount <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="edit_amount2" required name="edit_amount2" value="'+amount+'" onkeypress="return numbers(event)" type="text" placeholder="Enter amount" class="form-control">' +
                                 '</div>' +
                             '</div>' +
                             
                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Date : </label>' +
+                                '<label class="col-md-4 control-label">Date <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<input id="edit_date2" name="edit_date2" required type="date" value="'+date+'" placeholder="Select Date" class="form-control pickadate-disable-range">' +
                                 '</div>' +
@@ -934,7 +934,7 @@ load_fcos();
                             
                             var theme="",header="",message="";
                             
-                            if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!=""){
+                            if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!="" && amount!=null && date!=null && cheque_no!=null && fco!=null && gl_code!=null){
                            var url='save_edited_debit';
                            var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"purpose":purpose};
                                 $.post(url,form_data , function(output) {

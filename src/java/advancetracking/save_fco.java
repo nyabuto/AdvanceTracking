@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package loaders;
+package advancetracking;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -16,30 +16,58 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class load_glcodes extends HttpServlet {
-
-   HttpSession session;
-   String output,type_id;
+public class save_fco extends HttpServlet {
+    HttpSession session;
+    String message, fco, fco_types;
+    int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            output="";
-           dbConn conn = new dbConn();
            session = request.getSession();
+           dbConn conn = new dbConn();
            
-           type_id = request.getParameter("type_id");
-           String get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND status=1";
-           conn.rs=conn.st.executeQuery(get_glcodes);
-           while(conn.rs.next()){
-               output+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(1)+"</option>";
+           fco = request.getParameter("fco");
+           fco_types = request.getParameter("fco_type");
+           
+           if(!fco.equals("") && !fco_types.equals("")){
+           //check existence 
+           String checker = "SELECT fco FROM fco WHERE fco=?";
+           conn.pst = conn.conn.prepareStatement(checker);
+           conn.pst.setString(1, fco);
+           conn.rs = conn.pst.executeQuery();
+           if(conn.rs.next()){
+            message = "Similar record exist.";
+            code = 0;   
            }
-            out.println(output);
+           else{
+               String inserter = "INSERT INTO fco (fco,type_id) VALUES (?,?)";
+               conn.pst = conn.conn.prepareStatement(inserter);
+               conn.pst.setString(1, fco);
+               conn.pst.setString(2, fco_types);
+               conn.pst.executeUpdate();
+               
+               message = "FCO added successfully.";
+               code = 1;
+           }
+           }
+           else{
+             message = "Enter FCO and FCO Type.";
+             code = 0;  
+           }
+            JSONObject obj = new JSONObject();
+            obj.put("message", message);
+            obj.put("code", code);
+            
+            JSONObject obj_final = new JSONObject();
+            obj_final.put("data",obj);
+            out.println(obj_final);
         }
     }
 
@@ -55,11 +83,11 @@ public class load_glcodes extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-       }
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(save_fco.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -73,11 +101,11 @@ public class load_glcodes extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-       }
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(save_fco.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

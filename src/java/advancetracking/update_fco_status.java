@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package loaders;
+package advancetracking;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -16,30 +16,49 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class load_glcodes extends HttpServlet {
+public class update_fco_status extends HttpServlet {
 
    HttpSession session;
-   String output,type_id;
+   String message,fco,status;
+   int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            output="";
            dbConn conn = new dbConn();
            session = request.getSession();
            
-           type_id = request.getParameter("type_id");
-           String get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND status=1";
-           conn.rs=conn.st.executeQuery(get_glcodes);
-           while(conn.rs.next()){
-               output+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(1)+"</option>";
+           fco = request.getParameter("fco");
+           status = request.getParameter("status");
+           
+           String updator = "UPDATE fco SET status=? WHERE fco=?";
+           conn.pst = conn.conn.prepareStatement(updator);
+           conn.pst.setString(1, status);
+           conn.pst.setString(2, fco);
+          int res = conn.pst.executeUpdate();
+           if(res>0){
+               message = "Update made successfully.";
+               code = 1;
            }
-            out.println(output);
+           else{
+           message = "No changes detected";
+           code = 0;
+        }
+           
+            JSONObject obj = new JSONObject();
+            obj.put("message", message);
+            obj.put("code",code);
+            
+            
+            JSONObject obj_final = new JSONObject();
+            obj_final.put("data",obj);
+            out.println(obj_final);
         }
     }
 
@@ -58,7 +77,7 @@ public class load_glcodes extends HttpServlet {
        try {
            processRequest(request, response);
        } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(update_fco_status.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
 
@@ -76,7 +95,7 @@ public class load_glcodes extends HttpServlet {
        try {
            processRequest(request, response);
        } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(update_fco_status.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
 

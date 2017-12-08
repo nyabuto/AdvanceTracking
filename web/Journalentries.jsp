@@ -309,6 +309,109 @@
          
             </script>
             
+            <script>
+                
+        jQuery(document).ready(function(){
+         load_health_types();  
+          $("#county_row").hide();
+          $("#sub_county_row").hide();
+          $("#facility_row").hide();
+         
+         $("#region_id").change(function(){
+             var region_id= $("#region_id").val();
+//             alert("region id : "+region_id);
+                 $("#county_row").hide();
+                 $("#sub_county_row").hide();
+                 $("#facility_row").hide();
+             if(region_id==1){ //counties
+               load_counties();
+                $("#county_row").show();
+             }
+             else if(region_id==2){ //sub counties
+                load_sub_counties();
+                 $("#sub_county_row").show();
+             }
+             else if(region_id==3){ // facilities
+                 load_facilities();
+                  $("#facility_row").show();
+             }
+         });
+        });
+            function load_health_types(){
+               $.ajax({
+                    url:'load_facility_accounting_types',
+                    type:"post",
+                    dataType:"html",
+                    success:function(output){
+                     var data,res_obj,id,name;
+                     res_obj = JSON.parse(output).data;
+                     data="<option value=\"\">All Types</option>";
+                     for(var i=0;i<res_obj.length;i++){
+                         id=res_obj[i].id;
+                         name=res_obj[i].name;
+                         data+="<option value=\""+id+"\">"+name+"</option>";
+                     }
+                        
+                   $("#region_id").html(data);
+                   $("#region_id").selectpicker();
+                    }
+                });
+           }      
+                
+        function load_counties(){
+               $.ajax({
+                    url:'all_counties',
+                    type:"post",
+                    dataType:"html",
+                    success:function(output){
+                    var data,res_obj,id,name;
+                     res_obj = JSON.parse(output).data;
+                     data="";
+                     for(var i=0;i<res_obj.length;i++){
+                         id=res_obj[i].id;
+                         name=res_obj[i].CHMT;
+                         data+="<option value=\""+id+"\">"+name+"</option>";
+                     }
+                   $("#county_ids").html(data);
+                   $("#county_ids").selectpicker();
+                    }
+                });
+           }
+           
+                   function load_sub_counties(){
+               $.ajax({
+                    url:'load_sub_counties',
+                    type:"post",
+                    dataType:"html",
+                    success:function(output){
+                     var data,res_obj,id,name;
+                     res_obj = JSON.parse(output).data;
+                     data="";
+                     for(var i=0;i<res_obj.length;i++){
+                         id=res_obj[i].sub_county_id;
+                         name=res_obj[i].SCHMT;
+                         data+="<option value=\""+id+"\">"+name+"</option>";
+                     }
+                   $("#sub_county_ids").html(data);
+                   $("#sub_county_ids").selectpicker();
+                    }
+                });
+           }
+           
+        function load_facilities(){
+               $.ajax({
+                    url:'load_facilities',
+                    type:"post",
+                    dataType:"html",
+                    success:function(data){
+                    $("#facility_ids").html(data);
+                    $("#facility_ids").selectpicker();
+                    }
+                });
+     }
+            </script>
+            
+            
             <style type="text/css">
                 table{
                     max-width: 600px;
@@ -499,15 +602,62 @@
                                                         <option value="">Loading Months</option>
                                                 </select>  
                                                 </td>
-                                                   </tr>
+                                                </tr>
+                                                   
                                                <tr id="custom_dates_row">
                                                 <td>
                                                    Custom Dates <font color="red">*</font>:
                                                 </td>
                                                <td> <input id="start_date" name="start_date" type="date" value="" placeholder="Select From Date" class="form-control">   </td>
-                                               <td> <input id="end_date" name="end_date" type="date" value="" placeholder="Select To Date" class="form-control">  </td>
+                                               <td> <input id="end_date" name="end_date" type="date" value="" placeholder="Select To Date" class="form-control">  
                                                 </td>
                                                    </tr>
+                                                 
+                                                 <tr id="region_type_row">
+                                                <td>
+                                                   Select Region Type <font color="red"></font>:
+                                                </td>
+                                                <td colspan="2"> 
+                                               <select id="region_id" name="region_id" class="form-control bootstrap-select" data-header="Choose Region Type" data-live-search="true" >
+                                                        <option value="">Loading Regions</option>
+                                                </select>  
+                                                </td>
+                                                </tr>
+                                                
+                                                <tr id="county_row">
+                                                <td>
+                                                   Select Counties <font color="red"></font>:
+                                                </td>
+                                                <td colspan="2"> 
+                                               <select id="county_ids" multiple="true" name="county_ids" class="form-control bootstrap-select" data-header="Choose County" data-live-search="true" >
+                                                        <option value="">Loading Counties</option>
+                                                </select>  
+                                                </td>
+                                                </tr>
+                                                
+                                                <tr id="sub_county_row">
+                                                <td>
+                                                   Select Sub county <font color="red"></font>:
+                                                </td>
+                                                <td colspan="2"> 
+                                               <select id="sub_county_ids" multiple="true" name="sub_county_ids" class="form-control bootstrap-select" data-header="Choose Sub counties" data-live-search="true" >
+                                                        <option value="">Loading sub counties</option>
+                                                </select>  
+                                                </td>
+                                                </tr>
+                                                
+                                                <tr id="facility_row">
+                                                <td>
+                                                   Select Facilities <font color="red"></font>:
+                                                </td>
+                                                <td colspan="2"> 
+                                               <select id="facility_ids" multiple="true" name="facility_ids" class="form-control bootstrap-select" data-header="Choose Facilities" data-live-search="true" >
+                                                        <option value="">Loading Facilities</option>
+                                                </select>  
+                                                </td>
+                                                </tr>
+                                                
+                                                
                                                    
                                                    <tr style="margin-top: 140px;">
                                                    <td colspan="3" style="text-align: center;"> <input id="generate" style="width: 200px;" name="generate" type="submit" value="Generate Report" class="form-control btn btn-success">  </td>

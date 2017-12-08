@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package advancetracking;
+package loaders;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -23,38 +23,32 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class all_counties extends HttpServlet {
-HttpSession session;
-String id,name,CHMT,unique_code;
+public class load_gl_code_types extends HttpServlet {
+
+    HttpSession session;
+    String id,name;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-           session = request.getSession();
-           dbConn conn = new dbConn();
-           
-            JSONObject obj_final = new JSONObject();
+          session = request.getSession();
+          dbConn conn = new dbConn();
+          
+          JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
-            
-           String getCounties = "SELECT id,name,CHMT,unique_code FROM county ORDER BY name ASC";
-           conn.rs = conn.st.executeQuery(getCounties);
-           while(conn.rs.next()){
-               id = conn.rs.getString(1);
-               name = conn.rs.getString(2);
-               CHMT = conn.rs.getString(3);
-               unique_code = conn.rs.getString(4);
-                       
-               JSONObject obj = new JSONObject();
-               obj.put("id", id);
-               obj.put("name", name);
-               obj.put("CHMT", CHMT);
-               obj.put("unique_code", unique_code);
-               
-               
-               jarray.add(obj);
-           }
-           obj_final.put("data", jarray);
-            
+          String getdata="SELECT id,name FROM gl_code_types ORDER BY name";
+          conn.rs = conn.st.executeQuery(getdata);
+          while(conn.rs.next()){
+              id = conn.rs.getString(1);
+              name = conn.rs.getString(2);
+              
+              JSONObject obj = new JSONObject();
+              obj.put("id", id);
+              obj.put("name", name);
+              jarray.add(obj);
+          }
+          
+          obj_final.put("data", jarray);
             out.println(obj_final);
         }
     }
@@ -71,11 +65,11 @@ String id,name,CHMT,unique_code;
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    try {
-        processRequest(request, response);
-    } catch (SQLException ex) {
-        Logger.getLogger(all_counties.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(load_gl_code_types.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -89,11 +83,11 @@ String id,name,CHMT,unique_code;
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    try {
-        processRequest(request, response);
-    } catch (SQLException ex) {
-        Logger.getLogger(all_counties.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(load_gl_code_types.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

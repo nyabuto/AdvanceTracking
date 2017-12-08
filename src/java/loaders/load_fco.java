@@ -33,7 +33,7 @@ String output,type_id;
           session=request.getSession();
           
           type_id = request.getParameter("type_id");
-          String getfco = "SELECT fco FROM fco WHERE type_id='"+type_id+"'";
+          String getfco = "SELECT fco FROM fco WHERE type_id='"+type_id+"' AND status=1";
           conn.rs=conn.st.executeQuery(getfco);
           while(conn.rs.next()){
               output+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(1)+"</option>";

@@ -8,6 +8,7 @@ package advancetracking;
 import Db.dbConn;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,76 +17,58 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class all_users extends HttpServlet {
+public class save_edited_fco extends HttpServlet {
 HttpSession session;
-String id,username,fullname,phone,email,level,status,level_label,status_name;
+String fco,fco_type;
 int code;
 String message;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-          dbConn conn = new dbConn();
-          session = request.getSession();
-          
-            JSONObject obj_final = new JSONObject();
-            JSONArray jarray = new JSONArray();
+            session = request.getSession();
+            dbConn conn = new dbConn();
             
-            if(session.getAttribute("level")!=null){
-                System.out.println("level : "+session.getAttribute("level").toString());
-                if(session.getAttribute("level").toString().equals("1")){
-            String getUsers="SELECT user.id AS id,username,fullname,phone,email,user_levels.name AS level_label,status.name AS status_name,status_id,level  FROM user LEFT JOIN user_levels ON user.level=user_levels.id LEFT JOIN status ON user.status_id=status.id ORDER BY fullname ASC";
-            conn.rs=conn.st.executeQuery(getUsers);
-            while(conn.rs.next()){
-            id = conn.rs.getString(1);
-            username = conn.rs.getString(2);
-            fullname = conn.rs.getString(3);
-            phone = conn.rs.getString(4);
-            email = conn.rs.getString(5);
-            level_label = conn.rs.getString(6);   
-            status_name = conn.rs.getString(7);   
-            status = conn.rs.getString(8);   
-            level = conn.rs.getString(9);   
+            if(session.getAttribute("fco")!=null){
+            fco = session.getAttribute("fco").toString();
+            
+            fco_type = request.getParameter("fco_type");
+            code=0;
+            message="";
+            String update="UPDATE fco SET type_id=? WHERE fco=?";
+            conn.pst=conn.conn.prepareStatement(update);
+            conn.pst.setString(1, fco_type);
+            conn.pst.setString(2, fco);
+            
+           int rows = conn.pst.executeUpdate();
+            if(rows>0){
+              message = "FCO details updated successfully."; 
+              code = 1;   
+            }
+            else{
+               message = "No changes were detected."; 
+              code = 0;     
+            }
+            }
+            else{
+            message = "No such FCO."; 
+            code = 0;       
+            }
+            JSONObject obj_final = new JSONObject();
             JSONObject obj = new JSONObject();
             
-            obj.put("id", id);
-            obj.put("username", username);
-            obj.put("fullname", fullname);
-            obj.put("phone", phone);
-            obj.put("email", email);
-            obj.put("level_label", level_label);
-            obj.put("status_label",status_name );
-            obj.put("status",status );
-            obj.put("level",level );
+            obj.put("message", message);
+            obj.put("code", code);
             
-            jarray.add(obj);
-            }
-               code =1;   
-               message="Users loaded successfully.";      
-                    }
-                
-                else{
-               code =0;   
-               message="Not allowed to access this module.";
-                }
-                    }
-            else{
-            code =0;   
-            message="Kindly login afresh to determine your access permissions.";     
-            }
-            
-         obj_final.put("data", jarray);
-         obj_final.put("code", code);
-         obj_final.put("message", message);
-           
+            obj_final.put("data", obj);
             out.println(obj_final);
+            System.out.println(obj_final);
         }
     }
 
@@ -104,7 +87,7 @@ String message;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_users.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(save_edited_fco.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -122,7 +105,7 @@ String message;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_users.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(save_edited_fco.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -136,4 +119,22 @@ String message;
         return "Short description";
     }// </editor-fold>
 
+    private int getRowCount(ResultSet resultSet) {
+    if (resultSet == null) {
+        return 0;
+    }
+    try {
+        resultSet.last();
+        return resultSet.getRow();
+    } catch (SQLException exp) {
+        exp.printStackTrace();
+    } finally {
+        try {
+            resultSet.beforeFirst();
+        } catch (SQLException exp) {
+            exp.printStackTrace();
+        }
+    }
+    return 0;
+}
 }

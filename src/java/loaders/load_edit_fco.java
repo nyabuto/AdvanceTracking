@@ -16,30 +16,54 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class load_glcodes extends HttpServlet {
-
-   HttpSession session;
-   String output,type_id;
+public class load_edit_fco extends HttpServlet {
+     String fco,fcos,types;
+     HttpSession session;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            output="";
-           dbConn conn = new dbConn();
-           session = request.getSession();
-           
-           type_id = request.getParameter("type_id");
-           String get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND status=1";
-           conn.rs=conn.st.executeQuery(get_glcodes);
-           while(conn.rs.next()){
-               output+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(1)+"</option>";
-           }
-            out.println(output);
+          session = request.getSession();
+          dbConn conn = new dbConn();
+          
+//          fco = "1";
+          fco = request.getParameter("fco");
+          session.setAttribute("fco", fco);
+          types = "";
+          String gettype="SELECT type_id FROM fco WHERE fco=?";
+          conn.pst = conn.conn.prepareStatement(gettype);
+          conn.pst.setString(1, fco);
+          conn.rs=conn.pst.executeQuery();
+          if(conn.rs.next()){
+              // get all types
+              String gettrtypes = "SELECT id,name FROM fco_types";
+              conn.rs1=conn.st.executeQuery(gettrtypes);
+              while(conn.rs1.next()){
+               if(conn.rs.getInt(1)==conn.rs1.getInt(1)){
+               types+="<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";   
+               }  
+               else{
+              types+="<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(2)+"</option>";        
+               }
+              }
+          }
+          
+        //add to json obj
+            JSONObject obj_final = new JSONObject();
+            JSONObject obj = new JSONObject();
+            
+            obj.put("fco", fco);
+            obj.put("fco_type", types);
+            
+            obj_final.put("data", obj);
+          
+            out.println(obj_final);
         }
     }
 
@@ -55,11 +79,11 @@ public class load_glcodes extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-       }
+         try {
+             processRequest(request, response);
+         } catch (SQLException ex) {
+             Logger.getLogger(load_edit_fco.class.getName()).log(Level.SEVERE, null, ex);
+         }
     }
 
     /**
@@ -73,11 +97,11 @@ public class load_glcodes extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_glcodes.class.getName()).log(Level.SEVERE, null, ex);
-       }
+         try {
+             processRequest(request, response);
+         } catch (SQLException ex) {
+             Logger.getLogger(load_edit_fco.class.getName()).log(Level.SEVERE, null, ex);
+         }
     }
 
     /**

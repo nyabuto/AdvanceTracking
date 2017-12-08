@@ -23,49 +23,69 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class load_sub_counties extends HttpServlet {
+public class all_users extends HttpServlet {
 HttpSession session;
-String sub_county_id,county_id,county_name,CHMT,county_unique_code,sub_county,SCHMT,sub_county_unique_code;
+String id,username,fullname,phone,email,level,status,level_label,status_name;
+int code;
+String message;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-           session = request.getSession();
-           dbConn conn = new dbConn();
-           
+          dbConn conn = new dbConn();
+          session = request.getSession();
+          
             JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
             
-            String getsubcounties = "SELECT sub_county.id AS sub_county_id,county_id,county.name AS county_name,CHMT,sub_county.unique_code AS county_unique_code,"
-                    + "sub_county,SCHMT,sub_county.unique_code AS sub_county_unique_code FROM sub_county LEFT JOIN county ON sub_county.county_id=county.id "
-                    + "WHERE sub_county!=''";
-            conn.rs = conn.st.executeQuery(getsubcounties);
+            if(session.getAttribute("level")!=null){
+                System.out.println("level : "+session.getAttribute("level").toString());
+                if(session.getAttribute("level").toString().equals("1")){
+            String getUsers="SELECT user.id AS id,username,fullname,phone,email,user_levels.name AS level_label,status.name AS status_name,status_id,level  FROM user LEFT JOIN user_levels ON user.level=user_levels.id LEFT JOIN status ON user.status_id=status.id ORDER BY fullname ASC";
+            conn.rs=conn.st.executeQuery(getUsers);
             while(conn.rs.next()){
-             sub_county_id = conn.rs.getString(1);
-             county_id = conn.rs.getString(2);
-             county_name = conn.rs.getString(3);
-             CHMT = conn.rs.getString(4);
-             county_unique_code = conn.rs.getString(5);
-             sub_county = conn.rs.getString(6);
-             SCHMT = conn.rs.getString(7);
-             sub_county_unique_code = conn.rs.getString(8);   
-             
-             JSONObject obj = new JSONObject();
-             obj.put("sub_county_id", sub_county_id);
-             obj.put("county_id", county_id);
-             obj.put("county_name", county_name);
-             obj.put("CHMT", CHMT);
-             obj.put("county_unique_code", county_unique_code);
-             obj.put("sub_county", sub_county);
-             obj.put("SCHMT", SCHMT);
-             obj.put("sub_county_unique_code", sub_county_unique_code);
-             
-             jarray.add(obj);
+            id = conn.rs.getString(1);
+            username = conn.rs.getString(2);
+            fullname = conn.rs.getString(3);
+            phone = conn.rs.getString(4);
+            email = conn.rs.getString(5);
+            level_label = conn.rs.getString(6);   
+            status_name = conn.rs.getString(7);   
+            status = conn.rs.getString(8);   
+            level = conn.rs.getString(9);   
+            JSONObject obj = new JSONObject();
+            
+            obj.put("id", id);
+            obj.put("username", username);
+            obj.put("fullname", fullname);
+            obj.put("phone", phone);
+            obj.put("email", email);
+            obj.put("level_label", level_label);
+            obj.put("status_label",status_name );
+            obj.put("status",status );
+            obj.put("level",level );
+            
+            jarray.add(obj);
             }
-            obj_final.put("data",jarray); 
-            out.println(obj_final);
+               code =1;   
+               message="Users loaded successfully.";      
+                    }
+                
+                else{
+               code =0;   
+               message="Not allowed to access this module.";
+                }
+                    }
+            else{
+            code =0;   
+            message="Kindly login afresh to determine your access permissions.";     
+            }
+            
+         obj_final.put("data", jarray);
+         obj_final.put("code", code);
+         obj_final.put("message", message);
            
+            out.println(obj_final);
         }
     }
 
@@ -84,7 +104,7 @@ String sub_county_id,county_id,county_name,CHMT,county_unique_code,sub_county,SC
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(load_sub_counties.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(all_users.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -102,7 +122,7 @@ String sub_county_id,county_id,county_name,CHMT,county_unique_code,sub_county,SC
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(load_sub_counties.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(all_users.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 

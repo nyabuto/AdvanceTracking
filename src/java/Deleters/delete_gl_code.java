@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package advancetracking;
+package Deleters;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -16,37 +16,58 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class all_fco extends HttpServlet {
+public class delete_gl_code extends HttpServlet {
 HttpSession session;
-String fco;
+String gl_code,message;
+int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            session = request.getSession();
-            dbConn conn = new dbConn();
-            
+           session = request.getSession();
+           dbConn conn = new dbConn();
+           
+           gl_code = request.getParameter("gl_code");
+           
+           //check fco
+           String checker="SELECT count(*) FROM debit LEFT JOIN credit ON debit.debit_id=credit.debit_id "
+                   + "WHERE debit.gl_code=? OR credit.gl_code=?";
+           conn.pst=conn.conn.prepareStatement(checker);
+           conn.pst.setString(1, gl_code);
+           conn.pst.setString(2, gl_code);
+           conn.rs=conn.pst.executeQuery();
+           
+           if(conn.rs.next()){
+           if(conn.rs.getInt(1)>0){
+            message="Failed to delete, Advances and/or Expenses have been associated with GL_Code "+gl_code+" "; 
+            code=0;
+           }
+           else{
+           //delete record
+           String delete = "DELETE FROM gl_code WHERE code=?";
+           conn.pst1=conn.conn.prepareStatement(delete);
+           conn.pst1.setString(1, gl_code);
+           conn.pst1.executeUpdate();
+           message="GL Code "+gl_code+" deleted successfully.";
+           code=1;
+           }
+           }
+           
             JSONObject obj_final = new JSONObject();
-            JSONArray jarray = new JSONArray();
+            JSONObject obj = new JSONObject();
             
-            String getFCO = "SELECT fco FROM fco ORDER by fco";
-            conn.rs = conn.st.executeQuery(getFCO);
-            while(conn.rs.next()){
-             fco = conn.rs.getString(1);
-             JSONObject obj = new JSONObject();
-             obj.put("fco", fco);
-             jarray.add(obj);
-            }
+            obj.put("message", message);
+            obj.put("code", code);
             
-            obj_final.put("data", jarray);
+            obj_final.put("data", obj);
             out.println(obj_final);
+            System.out.println(obj_final);
         }
     }
 
@@ -65,7 +86,7 @@ String fco;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_fco.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(delete_gl_code.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -83,7 +104,7 @@ String fco;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_fco.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(delete_gl_code.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 

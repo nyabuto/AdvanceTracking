@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -43,7 +44,9 @@ int row_pos=0;
 String report_id;
 String date_between;
 String passed_year,currency;
-int year;
+int year,region_counter;
+String region;
+String region_query="";
 String credit_id,credit_fco,credit_gl_code,amount_credited,credit_date,debit_id,staff_no,debit_fco,debit_gl_code,cheque_no,amount_debited,debit_date,purpose,fullname,email,phone,credit_gl_account,credit_gl_account_name,debit_gl_account,debit_gl_account_name;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -108,9 +111,61 @@ String credit_id,credit_fco,credit_gl_code,amount_credited,credit_date,debit_id,
                     break;
             }
       }  
-        
-        
-        
+    // county,subcounty,facilities
+    region = request.getParameter("region_id");
+    if(region.equals("")){
+    region_query = "";    
+    }
+    else if(region.equals("1")){ //county
+     region_query = "";
+     String counties[] = request.getParameterValues("county_ids");
+     if(counties!=null){
+     for(String county:counties){
+         if(!county.equals("")){ // add it to the list
+           region_query+=" health_id="+county+" AND";
+         }
+     }
+     }
+    }
+    
+    else if(region.equals("2")){//sub county
+      region_query = "";
+     String sub_counties[] = request.getParameterValues("sub_county_ids");
+     if(sub_counties!=null){
+     for(String sub_county:sub_counties){
+         if(!sub_county.equals("")){ // add it to the list
+           region_query+= " health_id="+sub_county+" AND";
+         }
+     }   
+     }   
+    }
+    
+    else if(region.equals("3")){//facilities
+           region_query = "";
+     String facilities[] = request.getParameterValues("facility_ids");
+     if(facilities!=null){
+     for(String facility_id:facilities){
+         if(!facility_id.equals("")){ // add it to the list
+           region_query+= " health_id="+facility_id+" AND";
+         }
+     }
+     }
+    }
+    
+//    clean the script
+    if(!region_query.equals("")){ 
+      region_query=removeLastChars(region_query,3);
+      region_query=" AND ("+region_query+") AND health_type_id="+region+" ";
+     }
+    else{
+        if(region.equals("")){
+            region_query="";     
+        }
+        else{
+            region_query=" AND health_type_id="+region+" "; 
+        }
+    }
+   System.out.println("region query:"+region_query); 
         
     XSSFWorkbook wb=new XSSFWorkbook();
     XSSFSheet shet1=wb.createSheet("Comprehensive Report");
@@ -208,8 +263,8 @@ String credit_id,credit_fco,credit_gl_code,amount_credited,credit_date,debit_id,
    else{
        currency="$";
    }
-currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"-\"??_);_(@_)"));
-totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"-\"??_);_(@_)"));
+currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
+totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
  
 
     for (int i=0;i<=15;i++){
@@ -252,7 +307,7 @@ totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(
                 "LEFT JOIN debit ON credit.debit_id=debit.debit_id " +
                 "LEFT JOIN gl_code ON credit.gl_code=gl_code.code " +
                 "LEFT JOIN staff ON debit.staff_no=staff.staff_no " +
-                 ""+date_between+" " +
+                 ""+date_between+" "+region_query+" " +
                 "GROUP BY credit.credit_id " +
                 "ORDER BY debit.date ";  
         
@@ -380,7 +435,7 @@ totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(
         response.setContentType("application/ms-excel");
         response.setContentLength(outArray.length);
         response.setHeader("Expires:", "0"); // eliminates browser caching
-        response.setHeader("Content-Disposition", "attachment; filename=Journal Entries_"+manager.getdatekey()+".xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=JournalEntries_"+manager.getdatekey()+".xlsx");
         OutputStream outStream = response.getOutputStream();
         outStream.write(outArray);
         outStream.flush();   

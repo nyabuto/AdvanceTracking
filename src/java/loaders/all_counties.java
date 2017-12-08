@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package advancetracking;
+package loaders;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -23,35 +23,33 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class all_facilities extends HttpServlet {
-
+public class all_counties extends HttpServlet {
 HttpSession session;
-String facility_id,unique_code,facility_name,county;
+String id,name,CHMT,unique_code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-          session = request.getSession();
-          dbConn conn = new dbConn();
-          
-        JSONObject obj_final = new JSONObject();
+           session = request.getSession();
+           dbConn conn = new dbConn();
+           
+            JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
             
-            
-           String getFacilities = "SELECT facilities.id AS facility_id,unique_code,facility_name,county.name AS county FROM facilities LEFT JOIN county ON facilities.county_id=county.id ORDER BY county ASC, facility_name ASC";
-           conn.rs = conn.st.executeQuery(getFacilities);
+           String getCounties = "SELECT id,name,CHMT,unique_code FROM county ORDER BY name ASC";
+           conn.rs = conn.st.executeQuery(getCounties);
            while(conn.rs.next()){
-            
-               facility_id = conn.rs.getString(1);
-               unique_code = conn.rs.getString(2);
-               facility_name = conn.rs.getString(3);
-               county = conn.rs.getString(4);
-               
+               id = conn.rs.getString(1);
+               name = conn.rs.getString(2);
+               CHMT = conn.rs.getString(3);
+               unique_code = conn.rs.getString(4);
+                       
                JSONObject obj = new JSONObject();
-               obj.put("facility_id", facility_id);
+               obj.put("id", id);
+               obj.put("name", name);
+               obj.put("CHMT", CHMT);
                obj.put("unique_code", unique_code);
-               obj.put("facility_name", facility_name);
-               obj.put("county", county);
+               
                
                jarray.add(obj);
            }
@@ -76,7 +74,7 @@ String facility_id,unique_code,facility_name,county;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_facilities.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(all_counties.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -94,7 +92,7 @@ String facility_id,unique_code,facility_name,county;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_facilities.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(all_counties.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
