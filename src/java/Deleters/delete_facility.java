@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package loaders;
+package Deleters;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -22,51 +22,57 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class load_edit_gl_code extends HttpServlet {
-   HttpSession session;
-   String gl_code;
-   String code,account,account_name,types;
+public class delete_facility extends HttpServlet {
+HttpSession session;
+String facility_id,message;
+int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
            session = request.getSession();
-            dbConn conn = new dbConn();
+           dbConn conn = new dbConn();
+           
+           facility_id = request.getParameter("facility_id");
+           
+           String checker="SELECT COUNT(credit_id) FROM credit WHERE health_type_id=? AND health_id=?";
+           conn.pst = conn.conn.prepareStatement(checker);
+           conn.pst.setString(1, "3");
+           conn.pst.setString(2, facility_id);
+           conn.rs = conn.pst.executeQuery();
+           if(conn.rs.next()){
+               if(conn.rs.getInt(1)>0){
+           message = "Facility cannot be deleted, Some funds have been accounted with this facility.";
+           code=0;
+           }
+           else{
+            String deleter="DELETE FROM facilities WHERE id=?";
+            conn.pst = conn.conn.prepareStatement(deleter);
+            conn.pst.setString(1, facility_id);
+            int res = conn.pst.executeUpdate();
             
-//            gl_code = "523";
-            gl_code = request.getParameter("gl_code");
-            code=account=account_name=types="";
-            String get_gl_data="SELECT code,account,account_name,type_id FROM gl_code WHERE code=?";
-            conn.pst = conn.conn.prepareStatement(get_gl_data);
-            conn.pst.setString(1, gl_code);
-            conn.rs = conn.pst.executeQuery();
-            if(conn.rs.next()){
-              // get types
-               code = conn.rs.getString(1);
-                 account = conn.rs.getString(2);
-                 account_name = conn.rs.getString(3);
-              String gettypes="SELECT id,name FROM gl_code_types ORDER BY name";
-              conn.rs1=conn.st.executeQuery(gettypes);
-              while(conn.rs1.next()){
-                  if(conn.rs.getInt(4)==conn.rs1.getInt(1)){
-                types+="<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
-              }
-                  else{
-                 types+="<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(2)+"</option>";      
-                  }
-              }
+            if(res>0){
+              message="Facility deleted successfully."; 
+              code=1;
             }
+            else{
+              message="No change detected."; 
+              code=0;  
+            }
+                    }
+           }
+           else{
+            message = "Unknown error occured. Try again.";
+           code=0;   
+           }
             JSONObject obj = new JSONObject();
+            obj.put("message", message);
             obj.put("code", code);
-            obj.put("account", account);
-            obj.put("account_name", account_name);
-            obj.put("types", types);
-            
-            JSONObject obj_final = new JSONObject();
-            obj_final.put("data", obj);
-            
-            out.println(obj_final);
+
+            JSONObject final_obj = new JSONObject();
+            final_obj.put("data", obj);
+                    
+            out.println(final_obj);
         }
     }
 
@@ -82,11 +88,11 @@ public class load_edit_gl_code extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_edit_gl_code.class.getName()).log(Level.SEVERE, null, ex);
-       }
+    try {
+        processRequest(request, response);
+    } catch (SQLException ex) {
+        Logger.getLogger(delete_facility.class.getName()).log(Level.SEVERE, null, ex);
+    }
     }
 
     /**
@@ -100,11 +106,11 @@ public class load_edit_gl_code extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_edit_gl_code.class.getName()).log(Level.SEVERE, null, ex);
-       }
+    try {
+        processRequest(request, response);
+    } catch (SQLException ex) {
+        Logger.getLogger(delete_facility.class.getName()).log(Level.SEVERE, null, ex);
+    }
     }
 
     /**

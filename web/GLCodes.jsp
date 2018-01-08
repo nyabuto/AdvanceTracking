@@ -76,18 +76,18 @@
         type:"post",
         dataType:"json",
         success:function(raw_data){
-            var code,account,account_name,position,status,output,status_value;
+            var code,account,account_name,position,status,output,status_value,gl_type;
              var dataSet=[];
         
         var data=raw_data.data;
         for (var i=0; i<data.length;i++){
             position=i+1;
-            code=account=account_name="";
+            code=account=account_name=gl_type=status="";
             if( data[i].code!=null){code = data[i].code;}
             if( data[i].account!=null){account = data[i].account;}
             if( data[i].account_name!=null){account_name = data[i].account_name;}
             if( data[i].status!=null){status = data[i].status;}
-           
+            if( data[i].gl_type!=null){gl_type = data[i].gl_type;}
            if(status==1){
              status_value = "<span style=\"width:150px; height: 30px; text-align:center;\" font-size:10px; class=\"label label-success\">Active</span> ";
             }
@@ -107,7 +107,7 @@
                 output+='<input type="hidden" name="'+position+'" value="'+code+'" id="_'+position+'">';
                 output+='</ul></li></ul></div>';
            
-           var minSet = [position,code,account,account_name,status_value,output];
+           var minSet = [position,code,account,account_name,gl_type,status_value,output];
            
            dataSet.push(minSet);
             // output the values to data table
@@ -220,14 +220,14 @@
           var url='load_edit_gl_code';
             $.post(url,form_data , function(output) {
                var data = JSON.parse(output).data;
-               for (var i=0; i<data.length;i++){   
+               
                var code = data.code;
                var account = data.account;
-               var account_name = data[i].account_name;
-               var gl_code_type = data[i].types;
+               var account_name = data.account_name;
+               var gl_code_type = data.types;
                
                // input them to the respectie elements
-           } 
+            
            // pop up
                    bootbox.dialog({
                 title: "Update GL Code",
@@ -582,7 +582,7 @@
                                             <div>
                                                 <table id='table' class="table ">
                                                 <thead>
-                                                    <tr><th>No.</th><th>GL Code</th><th>GL Account </th><th>GL Account Name</th><th>Status</th><th>Manage</th></tr>
+                                                    <tr><th>No.</th><th>GL Code</th><th>GL Account </th><th>GL Account Name</th><th>GL Type</th><th>Status</th><th>Manage</th></tr>
                                                 </thead>
                                                 <tbody>    
                                                 </tbody>

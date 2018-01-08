@@ -63,6 +63,7 @@
 										<li><a href="FCO.jsp">FCO</a></li>
 										<li><a href="GLCodes.jsp">GL Codes</a></li>
 										<li><a href="Counties.jsp">Counties</a></li>
+										<li><a href="SubCounties.jsp">Sub Counties</a></li>
 										<li><a href="Facilities.jsp">Facilities</a></li>
 										<li><a href="Users.jsp">Users</a></li>
 									</ul>

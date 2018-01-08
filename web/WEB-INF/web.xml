@@ -188,6 +188,42 @@
         <servlet-name>update_gl_code</servlet-name>
         <servlet-class>advancetracking.update_gl_code</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>save_facility</servlet-name>
+        <servlet-class>advancetracking.save_facility</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>delete_facility</servlet-name>
+        <servlet-class>Deleters.delete_facility</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_facility_status</servlet-name>
+        <servlet-class>advancetracking.update_facility_status</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>all_subcounties</servlet-name>
+        <servlet-class>loaders.all_subcounties</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>save_sub_county</servlet-name>
+        <servlet-class>advancetracking.save_sub_county</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_sc_status</servlet-name>
+        <servlet-class>advancetracking.update_sc_status</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>delete_sub_county</servlet-name>
+        <servlet-class>Deleters.delete_sub_county</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_edit_sc</servlet-name>
+        <servlet-class>loaders.load_edit_sc</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_sub_county</servlet-name>
+        <servlet-class>advancetracking.update_sub_county</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -375,6 +411,42 @@
     <servlet-mapping>
         <servlet-name>update_gl_code</servlet-name>
         <url-pattern>/update_gl_code</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_facility</servlet-name>
+        <url-pattern>/save_facility</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>delete_facility</servlet-name>
+        <url-pattern>/delete_facility</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_facility_status</servlet-name>
+        <url-pattern>/update_facility_status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>all_subcounties</servlet-name>
+        <url-pattern>/all_subcounties</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_sub_county</servlet-name>
+        <url-pattern>/save_sub_county</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_sc_status</servlet-name>
+        <url-pattern>/update_sc_status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>delete_sub_county</servlet-name>
+        <url-pattern>/delete_sub_county</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_edit_sc</servlet-name>
+        <url-pattern>/load_edit_sc</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_sub_county</servlet-name>
+        <url-pattern>/update_sub_county</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

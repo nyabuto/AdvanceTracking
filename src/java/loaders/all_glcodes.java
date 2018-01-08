@@ -25,7 +25,7 @@ import org.json.simple.JSONObject;
  */
 public class all_glcodes extends HttpServlet {
 HttpSession session;
-String code,account,account_name,status;
+String code,account,account_name,status,gl_type;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -36,19 +36,21 @@ String code,account,account_name,status;
             JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
             
-            String getglcodes = "SELECT code,account,account_name,status FROM gl_code ORDER by code ASC";
+            String getglcodes = "SELECT code,account,account_name,status,gl_code_types.name AS gl_type FROM gl_code LEFT JOIN gl_code_types ON gl_code.type_id=gl_code_types.id ORDER by code ASC";
             conn.rs=conn.st.executeQuery(getglcodes);
             while(conn.rs.next()){
            code = conn.rs.getString(1);
            account = conn.rs.getString(2);
            account_name = conn.rs.getString(3);
            status = conn.rs.getString(4);
+           gl_type = conn.rs.getString(5);
            
            JSONObject obj = new JSONObject();
            obj.put("code", code);
            obj.put("account", account);
            obj.put("account_name", account_name);
            obj.put("status", status);
+           obj.put("gl_type", gl_type);
            jarray.add(obj);
             }
             

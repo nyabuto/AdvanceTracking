@@ -22,52 +22,55 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class load_edit_gl_code extends HttpServlet {
-   HttpSession session;
-   String gl_code;
-   String code,account,account_name,types;
+public class load_edit_sc extends HttpServlet {
+HttpSession session;
+String id,county,sc_name,SCHMT,unique_id;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
            session = request.getSession();
-            dbConn conn = new dbConn();
-            
-//            gl_code = "523";
-            gl_code = request.getParameter("gl_code");
-            code=account=account_name=types="";
-            String get_gl_data="SELECT code,account,account_name,type_id FROM gl_code WHERE code=?";
-            conn.pst = conn.conn.prepareStatement(get_gl_data);
-            conn.pst.setString(1, gl_code);
+           dbConn conn = new dbConn();
+           
+           id = request.getParameter("sc_id");
+//           id="30";
+            county=sc_name=SCHMT=unique_id="";
+            String getSC="SELECT SCHMT,unique_code,sub_county,county_id FROM sub_county WHERE id=?";
+            conn.pst = conn.conn.prepareStatement(getSC);
+            conn.pst.setString(1, id);
             conn.rs = conn.pst.executeQuery();
             if(conn.rs.next()){
-              // get types
-               code = conn.rs.getString(1);
-                 account = conn.rs.getString(2);
-                 account_name = conn.rs.getString(3);
-              String gettypes="SELECT id,name FROM gl_code_types ORDER BY name";
-              conn.rs1=conn.st.executeQuery(gettypes);
-              while(conn.rs1.next()){
-                  if(conn.rs.getInt(4)==conn.rs1.getInt(1)){
-                types+="<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
-              }
-                  else{
-                 types+="<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(2)+"</option>";      
-                  }
-              }
+             
+                //get all counties
+                String getCounties="SELECT id,name FROM county";
+                conn.rs1=conn.st.executeQuery(getCounties);
+                while(conn.rs1.next()){
+                    if(conn.rs.getString("county_id").equals(conn.rs1.getString("id"))){
+                    county+="<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";    
+                    }
+                    else{
+                   county+="<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(2)+"</option>";         
+                    }
+                }
+                
+                sc_name = conn.rs.getString(3);
+                SCHMT = conn.rs.getString(1);
+                unique_id = conn.rs.getString(2);
+                
+                
             }
-            JSONObject obj = new JSONObject();
-            obj.put("code", code);
-            obj.put("account", account);
-            obj.put("account_name", account_name);
-            obj.put("types", types);
-            
             JSONObject obj_final = new JSONObject();
+            JSONObject obj = new JSONObject();
+            obj.put("id", id);
+            obj.put("sc_name", sc_name);
+            obj.put("SCHMT", SCHMT);
+            obj.put("unique_code", unique_id);
+            obj.put("county", county);
+           
             obj_final.put("data", obj);
-            
-            out.println(obj_final);
+          out.println(obj_final);
         }
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -82,11 +85,11 @@ public class load_edit_gl_code extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_edit_gl_code.class.getName()).log(Level.SEVERE, null, ex);
-       }
+    try {
+        processRequest(request, response);
+    } catch (SQLException ex) {
+        Logger.getLogger(load_edit_sc.class.getName()).log(Level.SEVERE, null, ex);
+    }
     }
 
     /**
@@ -100,11 +103,11 @@ public class load_edit_gl_code extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       try {
-           processRequest(request, response);
-       } catch (SQLException ex) {
-           Logger.getLogger(load_edit_gl_code.class.getName()).log(Level.SEVERE, null, ex);
-       }
+    try {
+        processRequest(request, response);
+    } catch (SQLException ex) {
+        Logger.getLogger(load_edit_sc.class.getName()).log(Level.SEVERE, null, ex);
+    }
     }
 
     /**

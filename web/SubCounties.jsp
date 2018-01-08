@@ -1,9 +1,8 @@
 <%-- 
-    Document   : Facilities
-    Created on : Oct 3, 2017, 2:59:33 PM
+    Document   : SubCounties
+    Created on : Dec 19, 2017, 11:05:07 AM
     Author     : GNyabuto
 --%>
-
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,29 +65,28 @@
 	<!-- /theme JS files -->
         <script type="text/javascript">
           jQuery(document).ready(function(){
-          loadFacilities();    
+          loadSubCounties();    
           }); 
           
           
-          function loadFacilities(){
+          function loadSubCounties(){
             $.ajax({
-        url:'all_facilities',
+        url:'all_subcounties',
         type:"post",
         dataType:"json",
         success:function(raw_data){
-            var facility_id,unique_code,facility_name,sub_county,county,position,mfl_code,status,status_label,output;
+            var id,unique_code,SCHMT,sub_county,county,position,mfl_code,status,status_label,output;
             var dataSet=[];
         
         var data=raw_data.data;
         for (var i=0; i<data.length;i++){
             position=i+1;
-            facility_id=unique_code=facility_name=sub_county=county=status_label="";
-            if( data[i].facility_id!=null){facility_id = data[i].facility_id;}
+            id=unique_code=SCHMT=sub_county=county=status_label="";
+            if( data[i].id!=null){id = data[i].id;}
             if( data[i].unique_code!=null){unique_code = data[i].unique_code;}
-            if( data[i].facility_name!=null){facility_name = data[i].facility_name;}
+            if( data[i].SCHMT!=null){SCHMT = data[i].SCHMT;}
             if( data[i].sub_county!=null){sub_county = data[i].sub_county;}
             if( data[i].county!=null){county = data[i].county;}
-            if( data[i].mfl_code!=null){mfl_code = data[i].mfl_code;}
             if( data[i].status!=null){status = data[i].status;}
           
           if(status==1){
@@ -99,7 +97,7 @@
             }
            
            var  output='<div style="position: absolute; z-index: 0;"><ul class="icons-list"><li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-menu9"></i></a><ul class="dropdown-menu dropdown-menu-right">';
-               // output+='<li><button class="btn btn-link" onclick=\"edit_facility('+position+');\" ><i class="icon-list-unordered position-left"></i> Edit</button></li>'; 
+                output+='<li><button class="btn btn-link" onclick=\"edit_sc('+position+');\" ><i class="icon-list-unordered position-left"></i> Edit</button></li>'; 
                 if(status==1){
                   output+='<li><button class="btn btn-link" onclick=\"de_activate('+position+');\" ><i class="icon-list-unordered position-left"></i> De-activate</button></li>';  
                 }
@@ -107,10 +105,10 @@
                     output+='<li><button class="btn btn-link" onclick=\"activate('+position+');\" ><i class="icon-list-unordered position-left"></i> Activate</button></li>';
                 }
                 output+='<li><button class="btn btn-link" onclick=\"deleter('+position+');\" ><i class="icon-list-unordered position-left"></i> Delete</button></li>';
-                output+='<input type="hidden" name="'+position+'" value="'+facility_id+'" id="_'+position+'">';
+                output+='<input type="hidden" name="'+position+'" value="'+id+'" id="_'+position+'">';
                 output+='</ul></li></ul></div>';
             
-           var minSet = [position,county,sub_county,facility_name,unique_code,mfl_code,status_label,output];
+           var minSet = [position,county,sub_county,SCHMT,unique_code,status_label,output];
            
            dataSet.push(minSet);
             // output the values to data table
@@ -132,105 +130,27 @@
           }
          
              
-        function activate(position){
-            var facility_id = $("#_"+position).val();
-            var status = 1;
-            activation(facility_id,status);
-        }
-        function de_activate(position){
-            var facility_id = $("#_"+position).val();
-            var status = 0;
-            activation(facility_id,status);
-        }
-        function activation(facility_id,status){
-        var url='update_facility_status';
-        
-        var theme="",header="",message="";
-         var form_data = {"facility_id":facility_id,"status":status};
-            $.post(url,form_data , function(output) {
-                var response = JSON.parse(output).data;
-                var response_code=response.code;
-                var response_message=response.message;
-               message=response_message;
-                if(response_code==1){
-                    theme = "bg-success";
-                    header = "Success";
-                    message = response_message;
-                    //reload data in table
-                   loadFacilities();  
-                }
-                else{
-                   theme = "bg-danger";
-                    header = "Error";
-                    message = response_message;  
-                }
-              $.jGrowl(message, {
-                    position: 'top-center',
-                    header: header,
-                    theme: theme
-               });   
-            });
-        }
-        
-        function deleter(position){
-          var facility_id = $("#_"+position).val();
-          var url='delete_facility';
-          var theme="",header="",message="";
-          bootbox.confirm({ 
-            size: "small",
-            message: "Are you sure you want to delete this facility?", 
-            callback: function(result){
-            if(result){
-             var form_data = {"facility_id":facility_id};
-            $.post(url,form_data , function(output) {
-                var response = JSON.parse(output).data;
-                var response_code=response.code;
-                var response_message=response.message;
-               message=response_message;
-                if(response_code==1){
-                    theme = "bg-success";
-                    header = "Success";
-                    message = response_message;
-                    //reload data in table
-                   loadFacilities();  
-                }
-                else{
-                   theme = "bg-danger";
-                    header = "Error";
-                    message = response_message;  
-                }
-              $.jGrowl(message, {
-                    position: 'top-center',
-                    header: header,
-                    theme: theme
-               });   
-            });
-            }
-            else{
-               
-            }
-               }
-           });
-          }   
-           
-          
-          function new_facility(){
-              //load types
-          var url='all_counties';
-            $.post(url,'' , function(output) {
-               var data = JSON.parse(output).data;
-               var counties="";
-               counties+='<option value=\"\">Choose County</option>';
-               for (var i=0; i<data.length;i++){   
-               var id = data[i].id;
-               var name = data[i].name;
-               
-               counties+='<option value=\"'+id+'\">'+name+'</option>';
-               // input them to the respectie elements
-           } 
-           // pop up
-                   bootbox.dialog({
-                title: "New Health Facility",
+        function edit_sc(position){
+        var sc_id = $("#_"+position).val();
+
+        $.ajax({
+        url:'load_edit_sc?sc_id='+sc_id,
+        type:"post",
+        dataType:"json",
+        success:function(raw_data){
+            var data=raw_data.data;
+            var id,county,sc_name,SCHMT,unique_code;
+            id=county=sc_name=SCHMT=unique_code="";
+            if( data.id!=null){id = data.id;}
+            if( data.unique_code!=null){unique_code = data.unique_code;}
+            if( data.SCHMT!=null){SCHMT = data.SCHMT;}
+            if( data.sc_name!=null){sc_name = data.sc_name;}
+            if( data.county!=null){county = data.county;}
+            
+            // load botbox here
+            
+                bootbox.dialog({
+                title: "Update Sub County",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
@@ -239,38 +159,29 @@
                                 '<label class="col-md-4 control-label">County <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
                                     '<select id="county_id" required name="county_id" onchange=\"get_sub_counties();\" class="form-control bootstrap-select" data-header="Choose County" data-live-search="true" style="max-height:100px;">' +
-                                   ''+counties+''+
+                                   ''+county+''+
                                     '</select>' +
                                 '</div>' +
                             '</div>' +
                             
-                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Sub County <b style=\"color:red\">*</b> : </label>' +
-                                '<div class="col-md-8">' +
-                                    '<select id="sub_county_id" required name="sub_county_id" class="form-control bootstrap-select" data-header="Choose Sub County" data-live-search="true" style="max-height:100px;">' +
-                                    '<option value="">Nothing selected</option>'+
-                                    '</select>' +
-                                '</div>' +
-                            '</div>' +
-                    
                               '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Facility Name <b style=\"color:red\">*</b> : </label>' +
+                                '<label class="col-md-4 control-label">Sub County Name <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<input id="facility_name" required name="facility_name" type="text" value="" placeholder="Enter Facility Name" class="form-control">' +
+                                    '<input id="sc_name" required name="sc_name" type="text" onkeyup=\"fillSCHMT();\" onchange=\"fillSCHMT();\" value="'+sc_name+'" placeholder="Enter Sub County Name" class="form-control">' +
                                 '</div>' +
                             '</div>' +
+                            
+                              '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">SCHMT <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="schmt" required name="schmt" type="text" disabled value="'+SCHMT+'" placeholder="Enter Sub County Health Management Team" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
                             '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Unique Code <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<input id="unique_code" required name="unique_code" type="text" value="" placeholder="Enter Unique Code" class="form-control">' +
-                                '</div>' +
-                            '</div>' +
-                            
-                            
-                            '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">MFL Code <b style=\"color:red\">*</b> : </label>' +
-                                '<div class="col-md-8">' +
-                                    '<input id="mfl_code" required name="mfl_code"  onkeypress="return numbers(event)"  type="text" value="" placeholder="Enter MFL Code" class="form-control">' +
+                                    '<input id="unique_code" required name="unique_code" type="text" value="'+unique_code+'" placeholder="Enter Unique Code" class="form-control">' +
                                 '</div>' +
                             '</div>' +
                             
@@ -279,21 +190,20 @@
                     '</div>',
                 buttons: {
                     success: {
-                        label: "Save",
+                        label: "Update",
                         className: "btn-success",
                         callback: function () {
                             
                             var county_id = $("#county_id").val();
-                            var sub_county_id = $("#sub_county_id").val();
-                            var facility_name = $("#facility_name").val();
+                            var sc_name = $("#sc_name").val();
+                            var schmt = $("#schmt").val();
                             var unique_code = $("#unique_code").val();
-                            var mfl_code = $("#mfl_code").val();
                            
                             var theme="",header="",message="";
                             
-                            if(county_id!="" && sub_county_id!="" && facility_name!="" && unique_code!="" && mfl_code!="" && county_id!=null && sub_county_id!=null && facility_name!=null && unique_code!=null && mfl_code!=null){
-                           var url='save_facility';
-                           var form_data = {"county_id":county_id,"sub_county_id":sub_county_id,"facility_name":facility_name,"unique_code":unique_code,"mfl_code":mfl_code};
+                            if(id!="" && county_id!="" && sc_name!="" && schmt!="" && unique_code!="" && id!=null && county_id!=null && sc_name!=null && schmt!=null && unique_code!=null){
+                           var url='update_sub_county';
+                           var form_data = {"id":id,"county_id":county_id,"sc_name":sc_name,"schmt":schmt,"unique_code":unique_code};
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
@@ -304,7 +214,7 @@
                                         header = "Success";
                                         message = response_message;
                                         //reload data in table
-                                       loadFacilities(); 
+                                       loadSubCounties(); 
                                     }
                                     else{
                                        theme = "bg-danger";
@@ -334,30 +244,212 @@
                 }
             }
         );
-        $("#county_id").selectpicker();       
-        $("#sub_county_id").selectpicker();       
+        $("#county_id").selectpicker(); 
+        }
+         });
+        }
+        
+        function activate(position){
+            var sc_id = $("#_"+position).val();
+            var status = 1;
+            activation(sc_id,status);
+        }
+        function de_activate(position){
+            var sc_id = $("#_"+position).val();
+            var status = 0;
+            activation(sc_id,status);
+        }
+        function activation(sc_id,status){
+        var url='update_sc_status';
+        
+        var theme="",header="",message="";
+         var form_data = {"sc_id":sc_id,"status":status};
+            $.post(url,form_data , function(output) {
+                var response = JSON.parse(output).data;
+                var response_code=response.code;
+                var response_message=response.message;
+               message=response_message;
+                if(response_code==1){
+                    theme = "bg-success";
+                    header = "Success";
+                    message = response_message;
+                    //reload data in table
+                   loadSubCounties();  
+                }
+                else{
+                   theme = "bg-danger";
+                    header = "Error";
+                    message = response_message;  
+                }
+              $.jGrowl(message, {
+                    position: 'top-center',
+                    header: header,
+                    theme: theme
+               });   
+            });
+        }
+        
+        function deleter(position){
+          var sc_id = $("#_"+position).val();
+          var url='delete_sub_county';
+          var theme="",header="",message="";
+          bootbox.confirm({ 
+            size: "small",
+            message: "Are you sure you want to delete this Sub county?", 
+            callback: function(result){
+            if(result){
+             var form_data = {"sc_id":sc_id};
+            $.post(url,form_data , function(output) {
+                var response = JSON.parse(output).data;
+                var response_code=response.code;
+                var response_message=response.message;
+               message=response_message;
+                if(response_code==1){
+                    theme = "bg-success";
+                    header = "Success";
+                    message = response_message;
+                    //reload data in table
+                   loadSubCounties();  
+                }
+                else{
+                   theme = "bg-danger";
+                    header = "Error";
+                    message = response_message;  
+                }
+              $.jGrowl(message, {
+                    position: 'top-center',
+                    header: header,
+                    theme: theme
+               });   
+            });
+            }
+            else{
+               
+            }
+               }
+           });
+          }   
+           
+          function fillSCHMT(){
+              var sc_name = $("#sc_name").val();
+              var schmt=sc_name+" SCHMT";
+              $("#schmt").val(schmt);
+          }
+          function new_sub_county(){
+              //load types
+          var url='all_counties';
+            $.post(url,'' , function(output) {
+               var data = JSON.parse(output).data;
+               var counties="";
+               counties+='<option value=\"\">Choose County</option>';
+               for (var i=0; i<data.length;i++){   
+               var id = data[i].id;
+               var name = data[i].name;
+               
+               counties+='<option value=\"'+id+'\">'+name+'</option>';
+               // input them to the respectie elements
+           } 
+           // pop up
+                   bootbox.dialog({
+                title: "New Sub County",
+                message: '<div class="row">  ' +
+                    '<div class="col-md-12">' +
+                        '<form id="new_advance" class="form-horizontal">' +
+                            
+                             '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">County <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="county_id" required name="county_id" onchange=\"get_sub_counties();\" class="form-control bootstrap-select" data-header="Choose County" data-live-search="true" style="max-height:100px;">' +
+                                   ''+counties+''+
+                                    '</select>' +
+                                '</div>' +
+                            '</div>' +
+                            
+                              '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Sub County Name <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="sc_name" required name="sc_name" type="text" onkeyup=\"fillSCHMT();\" onchange=\"fillSCHMT();\" value="" placeholder="Enter Sub County Name" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                              '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">SCHMT <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="schmt" required name="schmt" type="text" disabled value="" placeholder="Enter Sub County Health Management Team" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Unique Code <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="unique_code" required name="unique_code" type="text" value="" placeholder="Enter Unique Code" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                         '</form>' +
+                    '</div>' +
+                    '</div>',
+                buttons: {
+                    success: {
+                        label: "Save",
+                        className: "btn-success",
+                        callback: function () {
+                            
+                            var county_id = $("#county_id").val();
+                            var sc_name = $("#sc_name").val();
+                            var schmt = $("#schmt").val();
+                            var unique_code = $("#unique_code").val();
+                           
+                            var theme="",header="",message="";
+                            
+                            if(county_id!="" && sc_name!="" && schmt!="" && unique_code!="" && county_id!=null && sc_name!=null && schmt!=null && unique_code!=null){
+                           var url='save_sub_county';
+                           var form_data = {"county_id":county_id,"sc_name":sc_name,"schmt":schmt,"unique_code":unique_code};
+                                $.post(url,form_data , function(output) {
+                                    var response = JSON.parse(output).data;
+                                    var response_code=response.code;
+                                    var response_message=response.message;
+                                   message=response_message;
+                                    if(response_code==1){
+                                        theme = "bg-success";
+                                        header = "Success";
+                                        message = response_message;
+                                        //reload data in table
+                                       loadSubCounties(); 
+                                    }
+                                    else{
+                                       theme = "bg-danger";
+                                        header = "Error";
+                                        message = response_message;  
+                                    }
+                                  $.jGrowl(message, {
+                                        position: 'top-center',
+                                        header: header,
+                                        theme: theme
+                                   });  
+                                 });
+                           
+                        }
+                        else{
+                            theme = "bg-danger";
+                            header = "Error";
+                            message = "Enter all required information.";     
+                        $.jGrowl(message, {
+                            position: 'top-center',
+                            header: header,
+                            theme: theme
+                        });
+                    }
+                        }
+                    }
+                }
+            }
+        );
+        $("#county_id").selectpicker();         
             });
           // load data to edit
           }  
-          
-    function get_sub_counties(){
-     var county = $("#county_id").val();
-      var url='load_sub_counties';
-      var form_data={"county_id":county};
-            $.post(url,form_data , function(output) {
-               var data = JSON.parse(output).data;
-               var sub_counties="";
-               for (var i=0; i<data.length;i++){   
-               var id = data[i].sub_county_id;
-               var name = data[i].sub_county;
-             sub_counties+='<option value=\"'+id+'\">'+name+'</option>';  
-        }
-       $("#sub_county_id").html(sub_counties);
-       $("#sub_county_id").selectpicker();
-       $("#sub_county_id").selectpicker('refresh');
-       
-    });
-    }
         </script>
 </head>
 
@@ -481,7 +573,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title">Facility Management Module</h5>
+							<h5 class="panel-title">Sub Counties Management Module</h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>
@@ -494,7 +586,7 @@
                                               if(session.getAttribute("level").toString().equals("1")){
                                             %>
                                             <div>
-                                                <button type="button" class="btn btn-success btn-raised" onclick="new_facility();" style="margin-left: 1%; margin-bottom: 1%;"><i class="icon-plus3 position-left"></i> New Facility</button>
+                                                <button type="button" class="btn btn-success btn-raised" onclick="new_sub_county();" style="margin-left: 1%; margin-bottom: 1%;"><i class="icon-plus3 position-left"></i> New Sub County</button>
                                             </div>
                                             <%}
                                             }
@@ -502,7 +594,7 @@
                                             <div>
                                                 <table id='table' class="table ">
                                                 <thead>
-                                                    <tr><th>No.</th><th>County</th><th>Sub County</th><th>Facility Name </th><th>Unique Code</th><th>MFL Code</th><th>Status</th><th>Manage</th></tr></thead>
+                                                    <tr><th>No.</th><th>County</th><th>Sub County</th><th> SCHMT </th><th>Unique Code</th><th>Status</th><th>Manage</th></tr></thead>
                                                 <tbody>    
                                                 </tbody>
                                                </table> 

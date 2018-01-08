@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package loaders;
+package advancetracking;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -22,51 +22,51 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class load_edit_gl_code extends HttpServlet {
+public class update_facility_status extends HttpServlet {
+
    HttpSession session;
-   String gl_code;
-   String code,account,account_name,types;
+   String facility_id,status,message;
+   int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-           session = request.getSession();
-            dbConn conn = new dbConn();
+          session = request.getSession();
+          dbConn conn = new dbConn();
+          
+          
+          facility_id = request.getParameter("facility_id");
+          status = request.getParameter("status");
+          
+          String updator = "UPDATE facilities SET active=? WHERE id=?";
+          conn.pst = conn.conn.prepareStatement(updator);
+          conn.pst.setString(1, status);
+          conn.pst.setString(2, facility_id);
+          
+         int res = conn.pst.executeUpdate();
             
-//            gl_code = "523";
-            gl_code = request.getParameter("gl_code");
-            code=account=account_name=types="";
-            String get_gl_data="SELECT code,account,account_name,type_id FROM gl_code WHERE code=?";
-            conn.pst = conn.conn.prepareStatement(get_gl_data);
-            conn.pst.setString(1, gl_code);
-            conn.rs = conn.pst.executeQuery();
-            if(conn.rs.next()){
-              // get types
-               code = conn.rs.getString(1);
-                 account = conn.rs.getString(2);
-                 account_name = conn.rs.getString(3);
-              String gettypes="SELECT id,name FROM gl_code_types ORDER BY name";
-              conn.rs1=conn.st.executeQuery(gettypes);
-              while(conn.rs1.next()){
-                  if(conn.rs.getInt(4)==conn.rs1.getInt(1)){
-                types+="<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
-              }
-                  else{
-                 types+="<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(2)+"</option>";      
-                  }
-              }
+            if(res>0){
+                if(status.equals("1")){
+                 message="Facility activated successfully.";   
+                }
+                else{
+                 message="Facility de-activated successfully.";   
+                }
+              code=1;
             }
+            else{
+              message="No change detected."; 
+              code=0;  
+            }
+                
             JSONObject obj = new JSONObject();
+            obj.put("message", message);
             obj.put("code", code);
-            obj.put("account", account);
-            obj.put("account_name", account_name);
-            obj.put("types", types);
-            
-            JSONObject obj_final = new JSONObject();
-            obj_final.put("data", obj);
-            
-            out.println(obj_final);
+
+            JSONObject final_obj = new JSONObject();
+            final_obj.put("data", obj);
+                    
+            out.println(final_obj);
         }
     }
 
@@ -85,7 +85,7 @@ public class load_edit_gl_code extends HttpServlet {
        try {
            processRequest(request, response);
        } catch (SQLException ex) {
-           Logger.getLogger(load_edit_gl_code.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(update_facility_status.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
 
@@ -103,7 +103,7 @@ public class load_edit_gl_code extends HttpServlet {
        try {
            processRequest(request, response);
        } catch (SQLException ex) {
-           Logger.getLogger(load_edit_gl_code.class.getName()).log(Level.SEVERE, null, ex);
+           Logger.getLogger(update_facility_status.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
 

@@ -43,7 +43,7 @@
 <style>
     .title{
         font-family: Merienda One;
-	font-size: 20px;
+	font-size: 15px;
 	font-style: normal;
 	font-variant: normal;
 	font-weight: 900;
@@ -72,9 +72,9 @@
 					<!-- Advanced login -->
                                         <form action="login" style="margin-top: 2%;">
                                             
-						<div class="panel panel-body login-form">
+                                            <div class="panel panel-body login-form">
 							<div class="text-center">
-                                                            <div class="title">Advance Tracking System</div>
+                                                            <div class="title">Advance & Expenses Tracking System</div>
                                                             <br>
                                                             <div class="icon-object border-slate-300 text-slate-300"><img style="height: 50px;" src="assets/images/aphia/aphia.png"></div>
 								<h5 class="content-group">Login to your account </h5>

@@ -26,6 +26,7 @@ import org.json.simple.JSONObject;
 public class load_sub_counties extends HttpServlet {
 HttpSession session;
 String sub_county_id,county_id,county_name,CHMT,county_unique_code,sub_county,SCHMT,sub_county_unique_code;
+String where="";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -36,10 +37,14 @@ String sub_county_id,county_id,county_name,CHMT,county_unique_code,sub_county,SC
            
             JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
-            
+            where="";
+            if(request.getParameter("county_id")!=null){
+                String county = request.getParameter("county_id");
+            where=" AND county_id='"+county+"'";    
+            }
             String getsubcounties = "SELECT sub_county.id AS sub_county_id,county_id,county.name AS county_name,CHMT,sub_county.unique_code AS county_unique_code,"
                     + "sub_county,SCHMT,sub_county.unique_code AS sub_county_unique_code FROM sub_county LEFT JOIN county ON sub_county.county_id=county.id "
-                    + "WHERE sub_county!=''";
+                    + "WHERE is_active=1 "+where+"";
             conn.rs = conn.st.executeQuery(getsubcounties);
             while(conn.rs.next()){
              sub_county_id = conn.rs.getString(1);

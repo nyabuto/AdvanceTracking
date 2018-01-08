@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package loaders;
+package Deleters;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -16,58 +16,77 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class all_facilities extends HttpServlet {
-
+public class delete_sub_county extends HttpServlet {
 HttpSession session;
-String facility_id,unique_code,facility_name,county,sub_county,mfl_code,status;
+String sc_id,message;
+int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-          session = request.getSession();
-          dbConn conn = new dbConn();
-          
-        JSONObject obj_final = new JSONObject();
-            JSONArray jarray = new JSONArray();
-            
-            
-           String getFacilities = "SELECT facilities.id AS facility_id,facilities.unique_code AS unique_code,facility_name,sub_county.sub_county as sub_county, county.name AS county,"
-                   + "mfl_code,active AS status "
-                   + "FROM facilities "
-                   + "LEFT JOIN sub_county ON facilities.sub_county_id=sub_county.id "
-                   + "LEFT JOIN county ON sub_county.county_id=county.id ORDER BY active DESC,county ASC,sub_county ASC, facility_name ASC";
-           conn.rs = conn.st.executeQuery(getFacilities);
-           while(conn.rs.next()){
-            
-               facility_id = conn.rs.getString(1);
-               unique_code = conn.rs.getString(2);
-               facility_name = conn.rs.getString(3);
-               sub_county = conn.rs.getString(4);
-               county = conn.rs.getString(5);
-               mfl_code = conn.rs.getString(6);
-               status = conn.rs.getString(7);
-               
-               JSONObject obj = new JSONObject();
-               obj.put("facility_id", facility_id);
-               obj.put("unique_code", unique_code);
-               obj.put("facility_name", facility_name);
-               obj.put("sub_county", sub_county);
-               obj.put("county", county);
-               obj.put("mfl_code", mfl_code);
-               obj.put("status", status);
-               
-               jarray.add(obj);
+           session = request.getSession();
+           dbConn conn = new dbConn();
+           
+           sc_id = request.getParameter("sc_id");
+           
+           String checker="SELECT COUNT(credit_id) FROM credit WHERE health_type_id=? AND health_id=?";
+           conn.pst = conn.conn.prepareStatement(checker);
+           conn.pst.setString(1, "2");
+           conn.pst.setString(2, sc_id);
+           conn.rs = conn.pst.executeQuery();
+           if(conn.rs.next()){
+               if(conn.rs.getInt(1)>0){
+           message = "Sub County cannot be deleted, Some funds have been accounted with this SCHMT.";
+           code=0;
            }
-           obj_final.put("data", jarray);
+           else{
+             // check faciility registration      
+           String getsc="SELECT id FROM facilities WHERE sub_county_id=?";
+           conn.pst=conn.conn.prepareStatement(getsc);
+           conn.pst.setString(1, sc_id);
+            conn.rs=conn.pst.executeQuery();
+            if(conn.rs.next()){
+             message="Sub county cannot be deleted. Facilities are already associated with this sub county."; 
+             code=0;     
+            }
             
-            out.println(obj_final);
+            else{
+            String deleter="DELETE FROM sub_county WHERE id=?";
+            conn.pst = conn.conn.prepareStatement(deleter);
+            conn.pst.setString(1, sc_id);
+            int res = conn.pst.executeUpdate();
+            
+            if(res>0){
+              message="Sub County deleted successfully."; 
+              code=1;
+            }
+            else{
+              message="No change detected."; 
+              code=0;  
+            }
+           }
+           }
+           }
+           else{
+            message = "Unknown error occured. Try again.";
+           code=0;   
+           }
+        
+           
+            JSONObject obj = new JSONObject();
+            obj.put("message", message);
+            obj.put("code", code);
+
+            JSONObject final_obj = new JSONObject();
+            final_obj.put("data", obj);
+                    
+            out.println(final_obj);
         }
     }
 
@@ -86,7 +105,7 @@ String facility_id,unique_code,facility_name,county,sub_county,mfl_code,status;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_facilities.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(delete_sub_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -104,7 +123,7 @@ String facility_id,unique_code,facility_name,county,sub_county,mfl_code,status;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_facilities.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(delete_sub_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 

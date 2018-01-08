@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package loaders;
+package advancetracking;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -16,17 +16,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class all_facilities extends HttpServlet {
-
+public class save_sub_county extends HttpServlet {
 HttpSession session;
-String facility_id,unique_code,facility_name,county,sub_county,mfl_code,status;
+String county_id,sc_name,schmt,unique_code,finance_name;
+String message;
+int code,is_active;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -34,40 +34,51 @@ String facility_id,unique_code,facility_name,county,sub_county,mfl_code,status;
           session = request.getSession();
           dbConn conn = new dbConn();
           
-        JSONObject obj_final = new JSONObject();
-            JSONArray jarray = new JSONArray();
-            
-            
-           String getFacilities = "SELECT facilities.id AS facility_id,facilities.unique_code AS unique_code,facility_name,sub_county.sub_county as sub_county, county.name AS county,"
-                   + "mfl_code,active AS status "
-                   + "FROM facilities "
-                   + "LEFT JOIN sub_county ON facilities.sub_county_id=sub_county.id "
-                   + "LEFT JOIN county ON sub_county.county_id=county.id ORDER BY active DESC,county ASC,sub_county ASC, facility_name ASC";
-           conn.rs = conn.st.executeQuery(getFacilities);
-           while(conn.rs.next()){
-            
-               facility_id = conn.rs.getString(1);
-               unique_code = conn.rs.getString(2);
-               facility_name = conn.rs.getString(3);
-               sub_county = conn.rs.getString(4);
-               county = conn.rs.getString(5);
-               mfl_code = conn.rs.getString(6);
-               status = conn.rs.getString(7);
-               
-               JSONObject obj = new JSONObject();
-               obj.put("facility_id", facility_id);
-               obj.put("unique_code", unique_code);
-               obj.put("facility_name", facility_name);
-               obj.put("sub_county", sub_county);
-               obj.put("county", county);
-               obj.put("mfl_code", mfl_code);
-               obj.put("status", status);
-               
-               jarray.add(obj);
-           }
-           obj_final.put("data", jarray);
-            
-            out.println(obj_final);
+          county_id = request.getParameter("county_id");
+          sc_name = request.getParameter("sc_name");
+          schmt = request.getParameter("schmt");
+          unique_code = request.getParameter("unique_code");
+          finance_name = request.getParameter("sc_name");
+          is_active=1;
+          
+          String checker="SELECT id FROM sub_county WHERE sub_county=? OR unique_code=?";
+          conn.pst = conn.conn.prepareStatement(checker);
+          conn.pst.setString(1, sc_name);
+          conn.pst.setString(2, unique_code);
+          conn.rs = conn.pst.executeQuery();
+          
+          if(conn.rs.next()){
+              
+          }
+          else{
+              // insert the new record
+              String inserter=" INSERT INTO sub_county (county_id,finance_name,SCHMT,unique_code,sub_county,is_active) VALUES (?,?,?,?,?,?)";
+              conn.pst = conn.conn.prepareStatement(inserter);
+              conn.pst.setString(1, county_id);
+              conn.pst.setString(2, finance_name);
+              conn.pst.setString(3, schmt);
+              conn.pst.setString(4, unique_code);
+              conn.pst.setString(5, sc_name);
+              conn.pst.setInt(6, is_active);
+              
+             int num = conn.pst.executeUpdate();
+            if(num>0){
+                         message="Sub County added successfully."; 
+                         code=1;
+                       }
+                       else{
+                         message="No change detected."; 
+                         code=0;  
+                       }
+                    }
+                   JSONObject obj = new JSONObject();
+                   obj.put("message", message);
+                   obj.put("code", code);
+                   
+                   JSONObject final_obj = new JSONObject();
+                   final_obj.put("data", obj);
+                    
+            out.println(final_obj);
         }
     }
 
@@ -86,7 +97,7 @@ String facility_id,unique_code,facility_name,county,sub_county,mfl_code,status;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_facilities.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(save_sub_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -104,7 +115,7 @@ String facility_id,unique_code,facility_name,county,sub_county,mfl_code,status;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(all_facilities.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(save_sub_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
