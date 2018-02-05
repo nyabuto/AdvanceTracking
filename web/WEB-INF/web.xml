@@ -224,6 +224,26 @@
         <servlet-name>update_sub_county</servlet-name>
         <servlet-class>advancetracking.update_sub_county</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>save_county</servlet-name>
+        <servlet-class>advancetracking.save_county</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_county</servlet-name>
+        <servlet-class>advancetracking.update_county</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_edit_county</servlet-name>
+        <servlet-class>loaders.load_edit_county</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>delete_county</servlet-name>
+        <servlet-class>Deleters.delete_county</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_levels</servlet-name>
+        <servlet-class>loaders.load_levels</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -447,6 +467,26 @@
     <servlet-mapping>
         <servlet-name>update_sub_county</servlet-name>
         <url-pattern>/update_sub_county</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_county</servlet-name>
+        <url-pattern>/save_county</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_county</servlet-name>
+        <url-pattern>/update_county</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_edit_county</servlet-name>
+        <url-pattern>/load_edit_county</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>delete_county</servlet-name>
+        <url-pattern>/delete_county</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_levels</servlet-name>
+        <url-pattern>/load_levels</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -113,7 +113,7 @@ String currency,health,fcos,gl_codes;
                  // for sub_counties
                  i=0;
                  health+="<option value=\"\" disabled>Sub-County HMTs</option>";
-                String get_subcounty="SELECT id,SCHMT FROM sub_county  ORDER BY SCHMT ASC";
+                String get_subcounty="SELECT id,SCHMT FROM sub_county where is_active=1  ORDER BY SCHMT ASC";
                 conn.rs1=conn.st1.executeQuery(get_subcounty);
                 while(conn.rs1.next()){
                     i++;
@@ -127,7 +127,7 @@ String currency,health,fcos,gl_codes;
                  // for health facilities
                  i=0;
                 health+="<option value=\"\" disabled>Health Facilities</option>";    
-                String get_facility="SELECT id,facility_name FROM facilities  ORDER BY facility_name ASC";
+                String get_facility="SELECT id,facility_name FROM facilities where active=1  ORDER BY facility_name ASC";
                 conn.rs1=conn.st1.executeQuery(get_facility);
                 while(conn.rs1.next()){
                     i++;

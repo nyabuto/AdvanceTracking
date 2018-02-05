@@ -580,7 +580,6 @@
                             var purpose =  $("#purpose").val();
                             
                             var theme="",header="",message="";
-                            alert("fco : -"+fco+"-");
                             if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!="" && amount!=null && date!=null && cheque_no!=null && fco!=null && gl_code!=null){
                            var url='save_debit';
                            var form_data = {"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"purpose":purpose};

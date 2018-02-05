@@ -37,11 +37,18 @@
 	<script type="text/javascript" src="assets/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/ui/moment/moment.min.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/pickers/daterangepicker.js"></script>
+        <script type="text/javascript" src="assets/js/plugins/forms/selects/select2.min.js"></script>
 
         <script type="text/javascript" src="assets/js/plugins/forms/styling/uniform.min.js"></script>
 	<script type="text/javascript" src="assets/js/core/app.js"></script>
         <script type="text/javascript" src="assets/js/pages/login.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/ui/ripple.min.js"></script>
+        <script type="text/javascript" src="assets/js/plugins/forms/selects/bootstrap_select.min.js"></script>
+        
+        	<!-- Theme JS files -->
+	<script type="text/javascript" src="assets/js/plugins/forms/styling/uniform.min.js"></script>
+        
+	<script type="text/javascript" src="assets/js/plugins/notifications/jgrowl.min.js"></script>
 	<!-- /theme JS files -->
     <script type="text/javascript">
     
@@ -190,24 +197,33 @@
 							</div>
 
 							<div class="form-group ">
-                                                            <table> <tr><td style="width: 150px;"><b>Full Name : </b></td> <td><input id="fullname" type=text required name="fullname" maxlength="50" placeholder="User fullname" value="" style="margin-left: 20px;" class="form-control" ></td></tr></table>
+                                                            <table> <tr><td style="width: 150px;"><b>Full Name : <font color="red">*</font></b></td> <td><input id="fullname" type=text required name="fullname" maxlength="50" placeholder="User fullname" value="" style="margin-left: 20px;" class="form-control" ></td></tr></table>
 								
 							</div>
 							<div class="form-group has-feedback has-feedback-left">
-                                                            <table> <tr><td style="width: 150px;"><b>Phone </b></td> <td> <input id="phone"  type=number maxlength="10" required name="phone" value=""  class="form-control" placeholder="072133....."></td></tr></table>
+                                                            <table> <tr><td style="width: 150px;"><b>Phone : <font color="red">*</font></b></td> <td> <input id="phone"  type=number maxlength="10" required name="phone" value=""  class="form-control" placeholder="072133....."></td></tr></table>
 							</div>
 							<div class="form-group has-feedback has-feedback-left">
-								<table> <tr><td style="width: 150px;"><b>Email </b></td> <td> <input id="email"  type=text required maxlength="30" name="email" class="form-control" value="" placeholder="email address"  ></td></tr></table>
+								<table> <tr><td style="width: 150px;"><b>Email : <font color="red">*</font></b></td> <td> <input id="email"  type=email required maxlength="30" name="email" class="form-control" value="" placeholder="email address"  ></td></tr></table>
 							</div>
 							<div class="form-group has-feedback has-feedback-left">
-								<table> <tr><td style="width: 150px;"><b>Username </b></td> <td> <input id="username"  type=text required maxlength="30" name="username" class="form-control" value="" placeholder="username"  ></td></tr></table>
+								<table> <tr><td style="width: 150px;"><b>Username : <font color="red">*</font></b></td> <td> <input id="username"  type=text required maxlength="30" name="username" class="form-control" value="" placeholder="username"  ></td></tr></table>
 							</div>
 
 							<div class="form-group has-feedback has-feedback-left">
-								<table> <tr><td style="width: 150px;"><b>Password: </b></td> <td> <input id="password"  type=password maxlength="30"  name="pass" placeholder="Password" oninput="checkPasswords()" class="form-control"></td></tr></table>
+								<table> <tr><td style="width: 150px;"><b>Password : <font color="red">*</font></b></td> <td> <input id="password"  type=password maxlength="30"  name="pass" placeholder="Password" oninput="checkPasswords()" class="form-control"></td></tr></table>
 							</div>
 							<div class="form-group has-feedback has-feedback-left">
-								<table> <tr><td style="width: 150px;"><b>Repeat Password: </b></td> <td> <input id="conf_password" maxlength="30"  type=password  name="pass2" oninput="checkPasswords()" placeholder="Password" class="form-control"></td></tr></table>
+								<table> <tr><td style="width: 150px;"><b>Repeat Password : <font color="red">*</font></b></td> <td> <input id="conf_password" maxlength="30"  type=password  name="pass2" oninput="checkPasswords()" placeholder="Password" class="form-control"></td></tr></table>
+							</div>
+							<div class="form-group has-feedback has-feedback-left">
+								<table>
+                                                                    <tr><td style="width: 150px;"><b>User Type : <font color="red">*</font></b></td> <td> 
+                                                                     <select id="user_level" required name="user_level" class="form-control bootstrap-select" data-header="Choose User Level" data-live-search="true" style="max-height:100px; min-width: 200px;">
+                                                                     <option value="">Loading users  </option>
+                                                                     </select>  
+                                                                        </td></tr>
+                                                                </table>
 							</div>
 
 							<div class="form-group login-options">
@@ -245,6 +261,39 @@
 
 	</div>
 	<!-- /page container -->
-
+                                           
+                                        <%if(session.getAttribute("adduser")!=null){
+                                        String mess =session.getAttribute("adduser").toString();
+                                        %>
+                                        <script type="text/javascript">
+                                           $.jGrowl('<%=mess%>', {
+                                                position: 'center',
+                                                header: 'Register Information.',
+                                                theme: 'bg-info'
+                                            });  
+                                            </script>
+                                            <% session.removeAttribute("adduser");}%>
 </body>
+<script>
+ jQuery(document).ready(function(){
+       var url='load_levels';
+       var user_levels="";
+            $.post(url,'' , function(output) {
+               var data = JSON.parse(output).data;
+               
+               user_levels = '<option value=\"\">Choose Option</option>';
+               for (var i=0; i<data.length;i++){   
+               var id = data[i].id;
+               var name = data[i].name;
+               
+               user_levels+='<option value=\"'+id+'\">'+name+'</option>';
+               // input them to the respectie elements
+           }
+           
+           $("#user_level").html(user_levels);
+           $("#user_level").select2({ width: 'element' });
+           $("#user_level").selectpicker();  
+           });
+          });   
+</script>
 </html>

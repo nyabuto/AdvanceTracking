@@ -22,49 +22,46 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class save_sub_county extends HttpServlet {
+public class update_county extends HttpServlet {
 HttpSession session;
-String county_id,sc_name,schmt,unique_code,finance_name;
+String county_id,county_name,CHMT,unique_code;
 String message;
-int code,is_active;
+int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-          session = request.getSession();
-          dbConn conn = new dbConn();
-          
-          county_id = request.getParameter("county_id");
-          sc_name = request.getParameter("sc_name");
-          schmt = request.getParameter("schmt");
-          unique_code = request.getParameter("unique_code");
-          finance_name = request.getParameter("sc_name");
-          is_active=1;
-          
-          String checker="SELECT id FROM sub_county WHERE sub_county=? OR unique_code=?";
-          conn.pst = conn.conn.prepareStatement(checker);
-          conn.pst.setString(1, sc_name);
-          conn.pst.setString(2, unique_code);
-          conn.rs = conn.pst.executeQuery();
-          
-          if(conn.rs.next()){
-           message="Sub county already exist in the system."; 
-           code=0;     
-          }
-          else{
-              // insert the new record
-              String inserter=" INSERT INTO sub_county (county_id,finance_name,SCHMT,unique_code,sub_county,is_active) VALUES (?,?,?,?,?,?)";
-              conn.pst = conn.conn.prepareStatement(inserter);
-              conn.pst.setString(1, county_id);
-              conn.pst.setString(2, finance_name);
-              conn.pst.setString(3, schmt);
-              conn.pst.setString(4, unique_code);
-              conn.pst.setString(5, sc_name);
-              conn.pst.setInt(6, is_active);
-              
+            /* TODO output your page here. You may use following sample code. */
+            session = request.getSession();
+            dbConn conn = new dbConn();
+            
+            county_id = request.getParameter("county_id");
+            county_name = request.getParameter("county_name");
+            CHMT = county_name+" CHMT";
+            unique_code = request.getParameter("unique_code");
+            
+            String checker = "SELECT id FROM county WHERE (name LIKE ? OR unique_code LIKE ?) AND id!=?";
+            conn.pst = conn. conn.prepareStatement(checker);
+            conn.pst.setString(1, "%"+county_name+"%");
+            conn.pst.setString(2, "%"+unique_code+"%");
+            conn.pst.setString(3, county_id);
+            System.out.println("query update county : "+conn.pst);
+            conn.rs = conn.pst.executeQuery();
+            if(conn.rs.next()){
+                message = "Details already exist with another entry.";
+                code = 0;
+            }
+            else{
+             String inserter = "UPDATE county SET name=?, CHMT=?, unique_code=? WHERE id=?";
+             conn.pst = conn.conn.prepareStatement(inserter);
+             conn.pst.setString(1, county_name);
+             conn.pst.setString(2, CHMT);
+             conn.pst.setString(3, unique_code);
+             conn.pst.setString(4, county_id);
+             
              int num = conn.pst.executeUpdate();
-            if(num>0){
-                         message="Sub County added successfully."; 
+             if(num>0){
+                         message="County details updated successfully."; 
                          code=1;
                        }
                        else{
@@ -98,7 +95,7 @@ int code,is_active;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(save_sub_county.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(update_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -116,7 +113,7 @@ int code,is_active;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(save_sub_county.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(update_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 

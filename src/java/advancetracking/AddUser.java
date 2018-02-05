@@ -27,7 +27,7 @@ import javax.servlet.http.HttpSession;
  */
 public class AddUser extends HttpServlet {
 HttpSession session;
-String username,pass,pass2,password,fullname,email,phone,message;
+String username,pass,pass2,password,fullname,email,phone,message,user_level;
 MessageDigest m;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, NoSuchAlgorithmException {
@@ -42,7 +42,7 @@ MessageDigest m;
             fullname = request.getParameter("fullname");
             email = request.getParameter("email");
             phone = request.getParameter("phone");
-            
+            user_level = request.getParameter("user_level");
             if(pass.equals(pass2)){
             String checker="SELECT id FROM user WHERE username=? OR (phone=? AND phone!=?) or (email=? AND email!=?)";
             conn.pst=conn.conn.prepareStatement(checker);
@@ -59,14 +59,14 @@ MessageDigest m;
             }
             else{
                 Random rand = new Random();
-                int id=rand.nextInt(8)+1;
+                int id=rand.nextInt(536576787)+1;
                 
        m = MessageDigest.getInstance("MD5");
        m.update(pass.getBytes(), 0, pass.length());
        password = new BigInteger(1, m.digest()).toString(16);
 
 //                add as a new user
-            String inserter="INSERT INTO user (id,username,password,fullname,phone,email) VALUES (?,?,?,?,?,?)";
+            String inserter="INSERT INTO user (id,username,password,fullname,phone,email,level) VALUES (?,?,?,?,?,?,?)";
             conn.pst=conn.conn.prepareStatement(inserter);
             conn.pst.setInt(1, id);
             conn.pst.setString(2, username);
@@ -74,16 +74,17 @@ MessageDigest m;
             conn.pst.setString(4, fullname);
             conn.pst.setString(5, phone);
             conn.pst.setString(6, email);
+            conn.pst.setString(7, user_level);
             
             conn.pst.executeUpdate();
 
-           message="<font color=\"green\">User added successfully.</font>";
+           message="<font color=\"black\">User added successfully.</font>";
             }
             
             }
             else{
 //                passwords do not match
-            message="<font color=\"green\">Passwords do not match.</font>";
+            message="<font color=\"red\">Passwords do not match.</font>";
             }
             session.setAttribute("adduser",message);
             System.out.println("message: "+message);

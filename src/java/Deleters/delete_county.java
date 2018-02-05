@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package advancetracking;
+package Deleters;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -22,57 +22,62 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class save_sub_county extends HttpServlet {
+public class delete_county extends HttpServlet {
 HttpSession session;
-String county_id,sc_name,schmt,unique_code,finance_name;
+String county_id;
 String message;
-int code,is_active;
+int code,count_found;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            /* TODO output your page here. You may use following sample code. */
           session = request.getSession();
           dbConn conn = new dbConn();
           
+          
           county_id = request.getParameter("county_id");
-          sc_name = request.getParameter("sc_name");
-          schmt = request.getParameter("schmt");
-          unique_code = request.getParameter("unique_code");
-          finance_name = request.getParameter("sc_name");
-          is_active=1;
           
-          String checker="SELECT id FROM sub_county WHERE sub_county=? OR unique_code=?";
+          count_found = 0;
+          String checker = "SELECT COUNT(id) FROM sub_county WHERE county_id=?";
           conn.pst = conn.conn.prepareStatement(checker);
-          conn.pst.setString(1, sc_name);
-          conn.pst.setString(2, unique_code);
+          conn.pst.setString(1, county_id);
           conn.rs = conn.pst.executeQuery();
-          
           if(conn.rs.next()){
-           message="Sub county already exist in the system."; 
-           code=0;     
+          count_found+=conn.rs.getInt(1);
           }
-          else{
-              // insert the new record
-              String inserter=" INSERT INTO sub_county (county_id,finance_name,SCHMT,unique_code,sub_county,is_active) VALUES (?,?,?,?,?,?)";
-              conn.pst = conn.conn.prepareStatement(inserter);
+          
+          String checker2 = "SELECT COUNT(credit_id) FROM credit WHERE health_type_id=? AND health_id=?";
+          conn.pst = conn.conn.prepareStatement(checker2);
+          conn.pst.setString(1, "1");
+          conn.pst.setString(2, county_id);
+          conn.rs = conn.pst.executeQuery();
+          if(conn.rs.next()){
+           count_found+=conn.rs.getInt(1);   
+          }
+          
+          if(count_found==0){
+              //delete this county. it has no associativity.
+              String deleter = "DELETE FROM county WHERE id=?";
+              conn.pst = conn.conn.prepareStatement(deleter);
               conn.pst.setString(1, county_id);
-              conn.pst.setString(2, finance_name);
-              conn.pst.setString(3, schmt);
-              conn.pst.setString(4, unique_code);
-              conn.pst.setString(5, sc_name);
-              conn.pst.setInt(6, is_active);
-              
-             int num = conn.pst.executeUpdate();
-            if(num>0){
-                         message="Sub County added successfully."; 
+              int num = conn.pst.executeUpdate();
+              if(num>0){
+                         message="County has been deleted successfully."; 
                          code=1;
                        }
                        else{
                          message="No change detected."; 
                          code=0;  
                        }
-                    }
-                   JSONObject obj = new JSONObject();
+                    
+          }
+          else{
+              message = "County cannot be deleted. it has already been linked to districts or used in accounting.";
+              code = 0;
+          }
+          
+          JSONObject obj = new JSONObject();
                    obj.put("message", message);
                    obj.put("code", code);
                    
@@ -98,7 +103,7 @@ int code,is_active;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(save_sub_county.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(delete_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -116,7 +121,7 @@ int code,is_active;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(save_sub_county.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(delete_county.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
