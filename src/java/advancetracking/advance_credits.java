@@ -28,6 +28,8 @@ HttpSession session;
 String debit_id;
 String credit_id,amount, date, timestamp,fco,gl_code,health_type_id,health_id;
 String currency,health,fcos,gl_codes;
+String rebanking,expenses;
+int found_selected=0;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -43,7 +45,19 @@ String currency,health,fcos,gl_codes;
 //           fetch credits under that debit;
            
             currency="";
+            found_selected=0;
             
+            if(session.getAttribute("expenses")!=null){
+             if(session.getAttribute("expenses").toString().equals("1") || session.getAttribute("rebanking").toString().equals("1")) {  
+                
+            if(session.getAttribute("rebanking")!=null){
+             rebanking=session.getAttribute("rebanking").toString();
+           }
+           if(session.getAttribute("expenses")!=null){
+             expenses=session.getAttribute("expenses").toString();
+           }
+           
+           
            String getcurrency="SELECT name FROM currency";
            conn.rs=conn.st.executeQuery(getcurrency);
            if(conn.rs.next()){
@@ -55,6 +69,7 @@ String currency,health,fcos,gl_codes;
            conn.pst.setString(1, debit_id);
            conn.rs=conn.pst.executeQuery();
            while(conn.rs.next()){
+               found_selected=0;
                health=gl_codes=fcos="";
             credit_id = conn.rs.getString(1);
             amount = conn.rs.getString(2); 
@@ -76,18 +91,31 @@ String currency,health,fcos,gl_codes;
                 fcos+="<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(1)+"</option>";       
                 }
             }
-            
-            String getglcodes = "SELECT code FROM gl_code WHERE type_id=2";
-            conn.rs1=conn.st1.executeQuery(getglcodes);
+            String get_glcodes="";
+             if(expenses.equals("1") && rebanking.equals("1")){
+                get_glcodes="SELECT code FROM gl_code WHERE type_id=2 AND status=1";  
+              }
+              else if(expenses.equals("1") && !rebanking.equals("1")){
+                  get_glcodes="SELECT code FROM gl_code WHERE type_id=2 AND code!=608 AND status=1";
+              }
+              else if(!expenses.equals("1") && rebanking.equals("1")){
+                  get_glcodes="SELECT code FROM gl_code WHERE type_id=2 AND code=608 AND status=1";
+              }
+             
+            conn.rs1=conn.st1.executeQuery(get_glcodes);
             while(conn.rs1.next()){
+                
                 if(conn.rs1.getString(1).equals(gl_code)){
-                gl_codes+="<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(1)+"</option>";   
+                gl_codes+="<option value=\""+conn.rs1.getString(1)+"\" selected>"+conn.rs1.getString(1)+"</option>";  
+                found_selected++;
                 }
                 else{
                 gl_codes+="<option value=\""+conn.rs1.getString(1)+"\">"+conn.rs1.getString(1)+"</option>";       
                 }
             }
-            
+            if(found_selected==0){
+            gl_codes="<option value=\"\">No GL Code</option>";    
+            }
             
 //           if(health_type_id!=null && health_id!=null){
                
@@ -141,7 +169,7 @@ String currency,health,fcos,gl_codes;
             //end of htting facility details
 //           }
             
-            
+           
             JSONObject obj = new JSONObject();
             obj.put("id", credit_id);
             obj.put("amount", amount);
@@ -154,6 +182,8 @@ String currency,health,fcos,gl_codes;
             jarray.add(obj);
            }
            
+            }
+            }
            obj_final.put("data", jarray);
            System.out.println("data:"+obj_final);
            out.println(obj_final);

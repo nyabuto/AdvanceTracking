@@ -16,52 +16,52 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
  *
  * @author GNyabuto
  */
-public class get_staff_details extends HttpServlet {
+public class load_activities extends HttpServlet {
 HttpSession session;
-String fullname,email,phone,is_finance;
+String id,code,description,mou_id,amount;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
           session = request.getSession();
           dbConn conn = new dbConn();
-            JSONObject obj = new JSONObject();
+          
+            JSONObject obj_final = new JSONObject();
+            JSONArray jarray = new JSONArray();
             
-            String staff_no = request.getParameter("staff_no");
-            
-            is_finance="";
-            fullname=email=phone="";
-            String get_info = "SELECT fullname,IFNULL(email,''),phone,is_finance FROM staff WHERE staff_no=?";
-            conn.pst = conn.conn.prepareStatement(get_info);
-            conn.pst.setString(1, staff_no);
-            conn.rs = conn.pst.executeQuery();
-            if(conn.rs.next()){
-              fullname = conn.rs.getString(1);
-              email = conn.rs.getString(2);
-              phone = conn.rs.getString(3);
-              if(conn.rs.getInt("is_finance")==1){
-               is_finance="<option value=\"1\" selected>Yes</option>" ;  
-               is_finance+="<option value=\"0\">No</option>" ;  
-              }
-              else{
-               is_finance="<option value=\"1\">Yes</option>" ;  
-               is_finance+="<option value=\"0\" selected>No</option>" ;   
-              }
-              
+            mou_id="";
+            if(session.getAttribute("mou_id")!=null){
+          mou_id = session.getAttribute("mou_id").toString();
             }
-            
-            obj.put("fullname", fullname);
-            obj.put("email", email);
-            obj.put("phone", phone);
-            obj.put("is_finance", is_finance);
-            out.println(obj);
-            System.out.println(obj);
+          String getActivities = "SELECT id,code,description,amount FROM activities WHERE mou_id=?";
+          conn.pst = conn.conn.prepareStatement(getActivities);
+          conn.pst.setString(1, mou_id);
+          conn.rs = conn.pst.executeQuery();
+          while(conn.rs.next()){
+           id = conn.rs.getString(1);
+           code =  conn.rs.getString(2);
+           description =   conn.rs.getString(3); 
+           amount =   conn.rs.getString(4); 
+           
+           JSONObject obj = new JSONObject();
+           obj.put("id", id);
+           obj.put("code", code);
+           obj.put("description", description);
+           obj.put("amount", amount);
+           
+           jarray.add(obj);
+          }
+          
+          obj_final.put("data", jarray);
+          
+            out.println(obj_final);
         }
     }
 
@@ -80,7 +80,7 @@ String fullname,email,phone,is_finance;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(get_staff_details.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(load_activities.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -98,7 +98,7 @@ String fullname,email,phone,is_finance;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(get_staff_details.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(load_activities.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 

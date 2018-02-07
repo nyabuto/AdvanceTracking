@@ -28,6 +28,8 @@ HttpSession session;
 String id,username,fullname,phone,email,level,status,level_label,status_name;
 int code;
 String message;
+int advance,expenses,approve_expenses,rebanking;
+String label_advance,label_expenses,label_approve_expenses,label_rebanking;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -38,12 +40,14 @@ String message;
             JSONObject obj_final = new JSONObject();
             JSONArray jarray = new JSONArray();
             
+            
             if(session.getAttribute("level")!=null){
                 System.out.println("level : "+session.getAttribute("level").toString());
                 if(session.getAttribute("level").toString().equals("1")){
-            String getUsers="SELECT user.id AS id,username,fullname,phone,email,user_levels.name AS level_label,status.name AS status_name,status_id,level  FROM user LEFT JOIN user_levels ON user.level=user_levels.id LEFT JOIN status ON user.status_id=status.id ORDER BY fullname ASC";
+            String getUsers="SELECT user.id AS id,username,fullname,phone,email,user_levels.name AS level_label,status.name AS status_name,status_id,level,advance,expenses,approve_expenses,rebanking  FROM user LEFT JOIN user_levels ON user.level=user_levels.id LEFT JOIN status ON user.status_id=status.id ORDER BY fullname ASC";
             conn.rs=conn.st.executeQuery(getUsers);
             while(conn.rs.next()){
+                label_advance=label_expenses=label_approve_expenses=label_rebanking="";
             id = conn.rs.getString(1);
             username = conn.rs.getString(2);
             fullname = conn.rs.getString(3);
@@ -52,7 +56,46 @@ String message;
             level_label = conn.rs.getString(6);   
             status_name = conn.rs.getString(7);   
             status = conn.rs.getString(8);   
-            level = conn.rs.getString(9);   
+            level = conn.rs.getString(9); 
+            
+            advance = conn.rs.getInt(10);
+            expenses = conn.rs.getInt(11);
+            approve_expenses = conn.rs.getInt(12);
+            rebanking = conn.rs.getInt(13);
+            
+            String get_access = "Select * from user_access order by id";
+            conn.rs1 = conn.st1.executeQuery(get_access);
+            while(conn.rs1.next()){
+               if(advance==conn.rs1.getInt(1)){
+             label_advance+="<option value=\""+conn.rs1.getInt(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
+               }
+               else{
+             label_advance+="<option value=\""+conn.rs1.getInt(1)+"\">"+conn.rs1.getString(2)+"</option>";      
+            }
+               
+               if(expenses==conn.rs1.getInt(1)){
+             label_expenses+="<option value=\""+conn.rs1.getInt(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
+               }
+               else{
+             label_expenses+="<option value=\""+conn.rs1.getInt(1)+"\">"+conn.rs1.getString(2)+"</option>";      
+            }
+               
+               if(approve_expenses==conn.rs1.getInt(1)){
+             label_approve_expenses+="<option value=\""+conn.rs1.getInt(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
+               }
+               else{
+             label_approve_expenses+="<option value=\""+conn.rs1.getInt(1)+"\">"+conn.rs1.getString(2)+"</option>";      
+            }
+               
+               if(rebanking==conn.rs1.getInt(1)){
+             label_rebanking+="<option value=\""+conn.rs1.getInt(1)+"\" selected>"+conn.rs1.getString(2)+"</option>";
+               }
+               else{
+             label_rebanking+="<option value=\""+conn.rs1.getInt(1)+"\">"+conn.rs1.getString(2)+"</option>";      
+            }
+               
+            }
+            
             JSONObject obj = new JSONObject();
             
             obj.put("id", id);
@@ -64,6 +107,10 @@ String message;
             obj.put("status_label",status_name );
             obj.put("status",status );
             obj.put("level",level );
+            obj.put("advance",label_advance );
+            obj.put("expenses",label_expenses );
+            obj.put("approve_expenses",label_approve_expenses );
+            obj.put("rebanking",label_rebanking );
             
             jarray.add(obj);
             }

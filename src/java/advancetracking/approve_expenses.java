@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package loaders;
+package advancetracking;
 
 import Db.dbConn;
 import java.io.IOException;
@@ -22,46 +22,56 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class get_staff_details extends HttpServlet {
-HttpSession session;
-String fullname,email,phone,is_finance;
+public class approve_expenses extends HttpServlet {
+
+    HttpSession session;
+    String credit_id,status;
+    String message;
+    int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-          session = request.getSession();
-          dbConn conn = new dbConn();
-            JSONObject obj = new JSONObject();
+            session = request.getSession();
+            dbConn conn = new dbConn();
             
-            String staff_no = request.getParameter("staff_no");
+            credit_id = request.getParameter("credit_id");
+            status="1";
+            if(session.getAttribute("approve_expenses")!=null){
+            if(session.getAttribute("approve_expenses").toString().equals("1")){
+            String approve = "UPDATE credit SET approved=? WHERE credit_id=?";
+            conn.pst = conn.conn.prepareStatement(approve);
+            conn.pst.setString(1, status);
+            conn.pst.setString(2, credit_id);
             
-            is_finance="";
-            fullname=email=phone="";
-            String get_info = "SELECT fullname,IFNULL(email,''),phone,is_finance FROM staff WHERE staff_no=?";
-            conn.pst = conn.conn.prepareStatement(get_info);
-            conn.pst.setString(1, staff_no);
-            conn.rs = conn.pst.executeQuery();
-            if(conn.rs.next()){
-              fullname = conn.rs.getString(1);
-              email = conn.rs.getString(2);
-              phone = conn.rs.getString(3);
-              if(conn.rs.getInt("is_finance")==1){
-               is_finance="<option value=\"1\" selected>Yes</option>" ;  
-               is_finance+="<option value=\"0\">No</option>" ;  
-              }
-              else{
-               is_finance="<option value=\"1\">Yes</option>" ;  
-               is_finance+="<option value=\"0\" selected>No</option>" ;   
-              }
-              
+            int num = conn.pst.executeUpdate();
+            if(num>0){
+                         message="Expenses approved successfully."; 
+                         code=1;
+                       }
+                       else{
+                         message="No change detected."; 
+                         code=0;  
+                       }
+        }
+            else{
+             message="You are not allowed to do this operation."; 
+             code=0;    
             }
             
-            obj.put("fullname", fullname);
-            obj.put("email", email);
-            obj.put("phone", phone);
-            obj.put("is_finance", is_finance);
-            out.println(obj);
-            System.out.println(obj);
+            }
+            else{
+             message="Login to do this operation."; 
+             code=0;    
+            }
+                   JSONObject obj = new JSONObject();
+                   obj.put("message", message);
+                   obj.put("code", code);
+                   
+                   JSONObject final_obj = new JSONObject();
+                   final_obj.put("data", obj);
+                    
+            out.println(final_obj);
         }
     }
 
@@ -77,11 +87,11 @@ String fullname,email,phone,is_finance;
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    try {
-        processRequest(request, response);
-    } catch (SQLException ex) {
-        Logger.getLogger(get_staff_details.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(approve_expenses.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -95,11 +105,11 @@ String fullname,email,phone,is_finance;
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    try {
-        processRequest(request, response);
-    } catch (SQLException ex) {
-        Logger.getLogger(get_staff_details.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(approve_expenses.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

@@ -95,7 +95,7 @@
               edit="";
               <%}}%>          
             // output the values to data table
-         output='<div class="text-right"><ul class="icons-list"><li class="dropdown">\n\
+         output='<div style="position: absolute; z-index: 0;" class="text-right"><ul class="icons-list"><li class="dropdown">\n\
            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-menu9"></i></a>\n\
            <ul class="dropdown-menu dropdown-menu-right">\n\
            <li><a href="staff_session?src=Advances&&axn='+staff_no+'"><i class="icon-file-pdf"></i> Manage Advances</a></li>\n\
@@ -153,6 +153,16 @@
                                 '</div>' +
                             '</div>' +
                             
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Finance Staff? <font color="red">*</font> : </label>' +
+                                '<div class="col-md-8">' +
+                                 '<select id="is_finance" required name="is_finance" class="form-control bootstrap-select" data-header="Is a finance staff" data-live-search="true" style="max-height:100px; min-width: 300px;">'+
+                                    '<option value="1">Yes</option>'+
+                                    '<option value="0">No</option>'+
+                                    '</select>' +
+                                '</div>' +
+                            '</div>' +
+                            
                             '</div>' +
                         '</form>' +
                     '</div>' +
@@ -165,12 +175,13 @@
                             var staff_name = $("#staff_name").val();
                             var email = $("#email").val();
                             var phone = $("#phone").val();
+                            var is_finance = $("#is_finance").val();
                             
                             var theme="",header="",message="";
                             
                             if(staff_name!="" && phone!=""){
                            var url='save_staff';
-                           var form_data = {"staff_name":staff_name,"email":email,"phone":phone};
+                           var form_data = {"staff_name":staff_name,"email":email,"phone":phone,"is_finance":is_finance};
                                 $.post(url,form_data , function(output) {
                                     var response_code=JSON.parse(output).code;
                                    var response_message=JSON.parse(output).message;
@@ -210,8 +221,11 @@
                         }
                     }
                 }
+                
             }
         ); 
+            $("#is_finance").select2({ width: 'element' });
+           $("#is_finance").selectpicker();  
             }
             
        function de_activate(pos){
@@ -268,6 +282,7 @@
                     var fullname=JSON.parse(output).fullname;
                     var email=JSON.parse(output).email;
                     var phone=JSON.parse(output).phone;
+                    var is_finance=JSON.parse(output).is_finance;
                     
                              bootbox.dialog({
                 title: "Edit Staff Details:",
@@ -295,6 +310,15 @@
                                 '</div>' +
                             '</div>' +
                             
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Finance Staff? <font color="red">*</font> : </label>' +
+                                '<div class="col-md-8">' +
+                                 '<select id="is_finance" required name="is_finance" class="form-control bootstrap-select" data-header="Is a finance staff" data-live-search="true" style="max-height:100px; min-width: 200px;">'+
+                                    '"'+is_finance+'"'+
+                                    '</select>' +
+                                '</div>' +
+                            '</div>' +
+                            
                             '</div>' +
                         '</form>' +
                     '</div>' +
@@ -307,12 +331,13 @@
                             var staff_name = $("#staff_name").val();
                             var email = $("#email").val();
                             var phone = $("#phone").val();
+                            var is_finance = $("#is_finance").val();
                             
                             var theme="",header="",message="";
                             
                             if(staff_name!="" && phone!=""){
                            var url='update_staff';
-                           var form_data = {"staff_no":staff_no,"staff_name":staff_name,"email":email,"phone":phone};
+                           var form_data = {"staff_no":staff_no,"staff_name":staff_name,"email":email,"phone":phone,"is_finance":is_finance};
                                 $.post(url,form_data , function(output) {
                                     var response_code=JSON.parse(output).code;
                                    var response_message=JSON.parse(output).message;
@@ -354,7 +379,9 @@
                 }
             }
         ); 
-                  });      
+                  }); 
+           $("#is_finance").select2({ width: 'element' });
+           $("#is_finance").selectpicker();  
     }
         </script>
 </head>

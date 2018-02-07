@@ -24,17 +24,41 @@ import javax.servlet.http.HttpSession;
 public class load_glcodes extends HttpServlet {
 
    HttpSession session;
-   String output,type_id;
+   String output,type_id,rebanking,expenses;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            output="";
+            output=rebanking=expenses="";
            dbConn conn = new dbConn();
            session = request.getSession();
            
            type_id = request.getParameter("type_id");
-           String get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND status=1";
+           String get_glcodes="";
+           
+           if(session.getAttribute("rebanking")!=null){
+             rebanking=session.getAttribute("rebanking").toString();
+           }
+           if(session.getAttribute("expenses")!=null){
+             expenses=session.getAttribute("expenses").toString();
+           }
+           
+           if(type_id.equals("1")){
+           get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND status=1";
+           }
+           
+           else{
+              if(expenses.equals("1") && rebanking.equals("1")){
+                get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND status=1";  
+              }
+              else if(expenses.equals("1") && !rebanking.equals("1")){
+                  get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND code!=608 AND status=1";
+              }
+              else if(!expenses.equals("1") && rebanking.equals("1")){
+                  get_glcodes="SELECT code FROM gl_code WHERE type_id='"+type_id+"' AND code=608 AND status=1";
+              }
+           }
+           
            conn.rs=conn.st.executeQuery(get_glcodes);
            while(conn.rs.next()){
                output+="<option value=\""+conn.rs.getString(1)+"\">"+conn.rs.getString(1)+"</option>";

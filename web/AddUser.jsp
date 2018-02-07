@@ -225,6 +225,17 @@
                                                                         </td></tr>
                                                                 </table>
 							</div>
+                                                    
+							<div class="form-group has-feedback has-feedback-left">
+								<table>
+                                                                    <tr><td style="width: 150px;"><b>Finance Staff? <font color="red">*</font></b></td> <td> 
+                                                                     <select id="is_finance" required name="is_finance" class="form-control bootstrap-select" data-header="Is a finance staff" data-live-search="true" style="max-height:100px; min-width: 200px;">
+                                                                     <option value="1">Yes</option>
+                                                                     <option value="0">No</option>
+                                                                     </select>  
+                                                                        </td></tr>
+                                                                </table>
+							</div>
 
 							<div class="form-group login-options">
 								
@@ -294,6 +305,9 @@
            $("#user_level").select2({ width: 'element' });
            $("#user_level").selectpicker();  
            });
+           
+           $("#is_finance").select2({ width: 'element' });
+           $("#is_finance").selectpicker();  
           });   
 </script>
 </html>

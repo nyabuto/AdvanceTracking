@@ -26,7 +26,7 @@ import org.json.simple.JSONObject;
 public class loadStaffs extends HttpServlet {
 
 HttpSession session;
-
+String phone;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -36,10 +36,27 @@ HttpSession session;
             JSONObject obj_final = new JSONObject();
             JSONArray arr = new JSONArray();
             
-           String getStaff = "SELECT staff_no,fullname,email,phone,status_id AS status,timestamp FROM staff ORDER BY fullname ASC,timestamp ASC";
+            phone="";
+            if(session.getAttribute("phone")!=null){
+            phone = session.getAttribute("phone").toString();
+            }
+            
+            System.out.println("advances : "+session.getAttribute("advance").toString());
+             String getStaff="";
+             if(session.getAttribute("advance")!=null){
+             if(session.getAttribute("advance").toString().equals("1")){
+           getStaff = "SELECT staff_no,fullname,email,phone,status_id AS status,timestamp FROM staff ORDER BY fullname ASC,timestamp ASC";
+             }
+             else if(session.getAttribute("advance").toString().equals("0")){
+              getStaff = "SELECT staff_no,fullname,email,phone,status_id AS status,timestamp FROM staff WHERE phone='"+phone+"' OR is_finance=0 ORDER BY fullname ASC,timestamp ASC";   
+             }
+             else{
+             getStaff = "";    
+             }
+             
            conn.rs=conn.st.executeQuery(getStaff);
            while(conn.rs.next()){
-               JSONObject obj = new JSONObject();
+           JSONObject obj = new JSONObject();
                
            obj.put("staffno",conn.rs.getString(1));
            obj.put("fullname",conn.rs.getString(2));
@@ -51,6 +68,7 @@ HttpSession session;
            }
             obj_final.put("data", arr);
             out.println(obj_final);
+             }
         }
     }
 

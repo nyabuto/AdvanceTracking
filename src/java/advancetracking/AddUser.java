@@ -29,11 +29,13 @@ public class AddUser extends HttpServlet {
 HttpSession session;
 String username,pass,pass2,password,fullname,email,phone,message,user_level;
 MessageDigest m;
+String status_id,staff_no,is_finance;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, NoSuchAlgorithmException {
         
             dbConn conn = new dbConn();
             session = request.getSession();
+            Manager manager = new Manager();
             
             message="";
             username = request.getParameter("username");
@@ -43,6 +45,7 @@ MessageDigest m;
             email = request.getParameter("email");
             phone = request.getParameter("phone");
             user_level = request.getParameter("user_level");
+            is_finance = request.getParameter("is_finance");
             if(pass.equals(pass2)){
             String checker="SELECT id FROM user WHERE username=? OR (phone=? AND phone!=?) or (email=? AND email!=?)";
             conn.pst=conn.conn.prepareStatement(checker);
@@ -79,8 +82,22 @@ MessageDigest m;
             conn.pst.executeUpdate();
 
            message="<font color=\"black\">User added successfully.</font>";
+           
+           //add as a staff
+           staff_no = manager.getdatekey();
+           status_id = "1";
+           
+           String staff_inserter="INSERT INTO staff (fullname,email,phone,status_id,staff_no,is_finance) VALUES(?,?,?,?,?,?)";
+                    conn.pst=conn.conn.prepareStatement(staff_inserter);
+                    conn.pst.setString(1, fullname);
+                    conn.pst.setString(2, email);
+                    conn.pst.setString(3, phone);
+                    conn.pst.setString(4, status_id);
+                    conn.pst.setString(5, staff_no);
+                    conn.pst.setString(6, is_finance);
+                    
+                    conn.pst.executeUpdate();
             }
-            
             }
             else{
 //                passwords do not match

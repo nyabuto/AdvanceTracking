@@ -189,9 +189,9 @@ int staff_added;
    else{
        currency="$";
    }
-currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
-totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
-   
+//currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
+//totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
+//   
     for (int i=0;i<15;i++){
    shet1.setColumnWidth(i, 5000);
    if(i==0){

@@ -85,6 +85,7 @@
         dataType:"json",
         success:function(raw_data){
             var debit_id,cheque_no,fco,gl_code,amount,date,output,purpose,status,status_id,balance,timestamp,currency;
+            var edit_advance,account_advance,rebanking;
             output='';
         var data=raw_data.data;
         var pos=0;
@@ -92,6 +93,7 @@
         for (var i=0; i<data.length;i++){
             pos++;
             debit_id=cheque_no=fco=gl_code=amount=date=purpose=status=status_id=balance=currency=timestamp="";
+            edit_advance=account_advance=rebanking="";
             if( data[i].debit_id!=null){debit_id = data[i].debit_id;}
             if( data[i].cheque_no!=null){cheque_no = data[i].cheque_no;}
             if( data[i].fco!=null){fco = data[i].fco;}
@@ -106,33 +108,43 @@
             if( data[i].timestamp!=null){timestamp = data[i].timestamp;}
             if( data[i].balance!=null){balance = data[i].balance;}
             if( data[i].currency!=null){currency = data[i].currency;}
+            if( data[i].edit_advance!=null){edit_advance = data[i].edit_advance;}
+            if( data[i].account_advance!=null){account_advance = data[i].account_advance;}
+            if( data[i].rebanking!=null){rebanking = data[i].rebanking;}
             
            var identifier=""+debit_id+"X"+balance;
             // output the values to data table
          output='<div style="position: absolute; z-index: 0;"><ul class="icons-list"><li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-menu9"></i></a><ul class="dropdown-menu dropdown-menu-right">';
-            if(status_id==1){
+            if(status_id==1 && account_advance>0){
                 output+='<li><button class="btn btn-link" onclick=\"accounting_history('+pos+');\" ><i class="icon-list-unordered position-left"></i> Accounting History</button></li>';  
-                
       }
       else if(status_id==2){
           <%if(session.getAttribute("staff_status")!=null){
            if(session.getAttribute("staff_status").toString().equals("1")){   
           %>
+             if(account_advance>0 || rebanking>0){                       
             output+='<li><button class="btn btn-link" onclick=\"add_credit('+pos+');\" ><i class="icon-plus3 position-left"></i> Account</button></li>';
-            <%}}%>
+                }
+          <%}}%>
+             if(account_advance>0 || rebanking>0){   
             output+='<li><button class="btn btn-link" onclick=\"accounting_history('+pos+');\" ><i class="icon-list-unordered position-left"></i>Accounting History</button></li>';   
         }
+       }
       else if(status_id==3){
           <%if(session.getAttribute("staff_status")!=null){
              if(session.getAttribute("staff_status").toString().equals("1")){   
           %>
+        if(account_advance>0 || rebanking>0){   
             output+='<li><button class="btn btn-link" onclick=\"add_credit('+pos+');\" ><i class="icon-plus3 position-left"></i> Account</button></li>';
+        }
        <%}}%>
         }
         <%if(session.getAttribute("staff_status")!=null){
              if(session.getAttribute("staff_status").toString().equals("1")){   
           %>
+          if(edit_advance>0){                       
         output+='<li><button class="btn btn-link" onclick=\"edit('+pos+');\" ><i class="icon-pencil3 position-left"></i> Edit</button></li>'; 
+    }
           <%}}%>
         output+='<input type="hidden" name="'+pos+'" value="'+identifier+'" id="'+pos+'">';
         output+='</ul></li></ul></div>';
@@ -242,7 +254,14 @@
                                         '</select>' +
                                 '</div>' +
                                 '</div>' +
-                             
+                                
+                             '<div class="form-group" id="receipt_group" hidden>' +
+                                '<label class="col-md-4 control-label">Receipt No <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="receipt_no" name="receipt_no" required type="text" placeholder="Receipt Number" class="form-control">' +
+                                    '</div>' +
+                            '</div>' +
+                            
                         '</form>' +
                     '</div>' +
                     '</div>',
@@ -259,18 +278,24 @@
                             var county_id =  $("#county_id").val();
                             var sub_county_id =  $("#sub_county_id").val();
                             var facility =  $("#facility").val();
+                            var receipt_no =  $("#receipt_no").val();
                             var theme="",header="",message="";
                             
                             if(fco!="" && gl_code!="" && amount!="" && date!="" && fco!=null && gl_code!=null && amount!=null && date!=null){
-                            if((gl_code==523 && ((health_type_id==1 && county_id!="" && county_id!=null) || (health_type_id==2 && sub_county_id!="" && sub_county_id!=null) || (health_type_id==3 && facility!="" && facility!=null)) ) || gl_code!=523){   
+                            if((gl_code==523 && ((health_type_id==1 && county_id!="" && county_id!=null) || (health_type_id==2 && sub_county_id!="" && sub_county_id!=null) || (health_type_id==3 && facility!="" && facility!=null) ||  (health_type_id==4)) ) || gl_code!=523){   
                             if(amount>balance){
                             theme = "bg-danger";
                             header = "Error";
                             message = "You have accounted for more than the current balance.";
+                            $.jGrowl(message, {
+                                        position: 'top-center',
+                                        header: header,
+                                        theme: theme
+                                    });
                             }
                             else{
                            var url='save_credit';
-                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"fco":fco,"gl_code":gl_code,"health_type_id":health_type_id,"county_id":county_id,"sub_county_id":sub_county_id,"facility_id":facility};
+                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"fco":fco,"gl_code":gl_code,"health_type_id":health_type_id,"county_id":county_id,"sub_county_id":sub_county_id,"facility_id":facility,"receipt_no":receipt_no};
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
@@ -477,10 +502,17 @@
                  load_facilities();
                }
                else{
+                   
 ////                   hide facilities
                 $("#health_type").hide();
                }
-               
+               if(gl_code==608){
+                    $("#receipt_group").show();   
+                   }
+                   else{
+                   $("#receipt_group").hide();    
+                   }
+                   
                  $("#county").hide();
                  $("#sub_county").hide();
                  $("#facility_group").hide();
@@ -503,6 +535,11 @@
                   $("#county").hide();
                  $("#sub_county").hide();
                  $("#facility_group").show();    
+                  }
+                  else{
+                    $("#county").hide();
+                 $("#sub_county").hide();
+                 $("#facility_group").hide();    
                   }
            }
             </script>
@@ -600,6 +637,9 @@
                                         header = "Error";
                                         message = response_message;   
                                     }
+                                    
+                                    $.jGrowl('close');
+                                    
                                   $.jGrowl(message, {
                                         position: 'top-center',
                                         header: header,
@@ -1125,8 +1165,8 @@ load_fcos();
 			                	</ul>
 		                	</div>
 						</div>
-                                            <%if(session.getAttribute("staff_status")!=null){
-                                              if(session.getAttribute("staff_status").toString().equals("1")){
+                                            <%if(session.getAttribute("staff_status")!=null && session.getAttribute("advance")!=null){
+                                              if(session.getAttribute("staff_status").toString().equals("1") && session.getAttribute("advance").toString().equals("1") ){
                                             %>
                                             <div>
                                                 <button type="button" class="btn btn-success btn-raised" onclick="new_advance();" style="margin-left: 1%; margin-bottom: 1%;"><i class="icon-plus3 position-left"></i> New Advance</button>

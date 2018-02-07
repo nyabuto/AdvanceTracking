@@ -52,11 +52,30 @@
 								<!-- Main -->
 								<li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
 								<li>
-									<a href="#"><i class="icon-copy"></i> <span>Advances</span></a>
+									<a href="#"><i class="icon-copy"></i> <span>Advances & Expenses</span></a>
 									<ul>
 										<li><a href="Staffs.jsp">Manage Advances</a></li>
+                                                                                <%if(session.getAttribute("approve_expenses")!=null){
+                                                                                    if(session.getAttribute("approve_expenses").toString().equals("1")){
+                                                                                %>
+										<li><a href="PendingExpenses.jsp">Approve Expenses</a></li>
+                                                                                <%}}%>
 									</ul>
 								</li>
+                                                                <%if(session.getAttribute("level")!=null){
+                                                                   if(session.getAttribute("level").toString().equals("1")){
+                                                                %>
+								<li>
+									<a href="#"><i class="icon-copy"></i> <span>Joint Work plans</span></a>
+									<ul>
+										<li><a href="JWP.jsp">Manage JWPs</a></li>
+                                                                        </ul>
+								</li>
+                                                                <%}}%>
+                                                                
+								<%if(session.getAttribute("level")!=null){
+                                                                if(session.getAttribute("level").toString().equals("1")){
+                                                                %>
 								<li>
 									<a href="#"><i class="icon-puzzle3"></i> <span>Manage Entries</span></a>
 									<ul>
@@ -68,6 +87,7 @@
 										<li><a href="Users.jsp">Users</a></li>
 									</ul>
 								</li>
+                                                                <%}}%>
                                                                 <li>
 									<a href="#"><i class="icon-statistics"></i> <span>Reports</span></a>
 									<ul>

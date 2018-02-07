@@ -244,6 +244,38 @@
         <servlet-name>load_levels</servlet-name>
         <servlet-class>loaders.load_levels</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>update_access</servlet-name>
+        <servlet-class>advancetracking.update_access</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_expenses</servlet-name>
+        <servlet-class>loaders.load_expenses</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>approve_expenses</servlet-name>
+        <servlet-class>advancetracking.approve_expenses</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>loadMOUs</servlet-name>
+        <servlet-class>loaders.loadMOUs</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_activities</servlet-name>
+        <servlet-class>loaders.load_activities</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>upload_consolidated</servlet-name>
+        <servlet-class>uploads.upload_consolidated</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>activity_sess</servlet-name>
+        <servlet-class>loaders.activity_sess</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>upload_activities</servlet-name>
+        <servlet-class>uploads.upload_activities</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -487,6 +519,38 @@
     <servlet-mapping>
         <servlet-name>load_levels</servlet-name>
         <url-pattern>/load_levels</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_access</servlet-name>
+        <url-pattern>/update_access</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_expenses</servlet-name>
+        <url-pattern>/load_expenses</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>approve_expenses</servlet-name>
+        <url-pattern>/approve_expenses</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>loadMOUs</servlet-name>
+        <url-pattern>/loadMOUs</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_activities</servlet-name>
+        <url-pattern>/load_activities</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>upload_consolidated</servlet-name>
+        <url-pattern>/upload_consolidated</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>activity_sess</servlet-name>
+        <url-pattern>/activity_sess</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>upload_activities</servlet-name>
+        <url-pattern>/upload_activities</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

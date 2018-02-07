@@ -27,6 +27,7 @@ HttpSession session;
 String id,username,password,fullname,email,phone,pass,level,nextPage,message;
 MessageDigest m;
 int status;
+int advance,expenses,approve_expenses,rebanking;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, NoSuchAlgorithmException {
         session=request.getSession();
@@ -42,7 +43,7 @@ int status;
        m.update(pass.getBytes(), 0, pass.length());
        password = new BigInteger(1, m.digest()).toString(16);
         System.out.println("username : "+username+" password : "+password);  
-        String logger="SELECT id,fullname,phone,email,level,status_id FROM user WHERE username=? && password=? " ;
+        String logger="SELECT id,fullname,phone,email,level,status_id,advance,expenses,approve_expenses,rebanking FROM user WHERE username=? && password=? " ;
         conn.pst=conn.conn.prepareStatement(logger);
         conn.pst.setString(1, username);
         conn.pst.setString(2, password);
@@ -55,6 +56,11 @@ int status;
              level=conn.rs.getString(5);
              status = conn.rs.getInt(6);
              
+             advance = conn.rs.getInt(7);
+             expenses = conn.rs.getInt(8);
+             approve_expenses = conn.rs.getInt(9);
+             rebanking = conn.rs.getInt(10);
+             
              if(status==1){
              session.setAttribute("userid", id);
              session.setAttribute("fullname", fullname);
@@ -62,6 +68,11 @@ int status;
              session.setAttribute("phone", phone);
              session.setAttribute("email", email);
              session.setAttribute("username", username);
+             
+             session.setAttribute("advance", advance);
+             session.setAttribute("expenses", expenses);
+             session.setAttribute("approve_expenses", approve_expenses);
+             session.setAttribute("rebanking", rebanking);
               
           nextPage="Staffs.jsp";
          }

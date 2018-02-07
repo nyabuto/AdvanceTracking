@@ -29,6 +29,7 @@ String staff_no;
 String debit_id,cheque_no,fco,gl_code,amount,date,purpose,timestamp,status;
 int    status_id;
 int total_debit,total_credit,balance;
+String account_advance,edit_advance,rebanking;
 String currency;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -42,6 +43,7 @@ String currency;
             JSONArray arr = new JSONArray();
             currency="";
             
+            account_advance=edit_advance="0";
            String getcurrency="SELECT name FROM currency";
            conn.rs=conn.st.executeQuery(getcurrency);
            if(conn.rs.next()){
@@ -101,6 +103,17 @@ String currency;
                 status="<span style=\"width:170px; height: 40px; text-align:center;\" font-size:10px; class=\"label label-success\">Fully Accounted</span> ";
                 status_id=1;
             }
+            account_advance=edit_advance="0";
+            if(session.getAttribute("advance")!=null){
+            edit_advance =  session.getAttribute("advance").toString();
+            }
+            if(session.getAttribute("expenses")!=null){
+             account_advance=  session.getAttribute("expenses").toString();
+            }
+            
+            if(session.getAttribute("rebanking")!=null){
+             rebanking=  session.getAttribute("rebanking").toString();
+            }
               obj.put("debit_id",debit_id );
               obj.put("cheque_no", cheque_no);
               obj.put("fco", fco);
@@ -114,6 +127,10 @@ String currency;
               obj.put("status_id", status_id);
               obj.put("balance", balance);
               obj.put("currency", currency);
+              
+              obj.put("account_advance", account_advance);
+              obj.put("edit_advance", edit_advance);
+              obj.put("rebanking", rebanking);
               
               
             arr.add(obj);

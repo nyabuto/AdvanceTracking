@@ -168,7 +168,7 @@ String credit_id,credit_fco,credit_gl_code,amount_credited,credit_date,debit_id,
    System.out.println("region query:"+region_query); 
         
     XSSFWorkbook wb=new XSSFWorkbook();
-    XSSFSheet shet1=wb.createSheet("Comprehensive Report");
+    XSSFSheet shet1=wb.createSheet("Journal Entry");
     XSSFFont font=wb.createFont();
     font.setFontHeightInPoints((short)18);
     font.setFontName("Cambria");
@@ -263,9 +263,9 @@ String credit_id,credit_fco,credit_gl_code,amount_credited,credit_date,debit_id,
    else{
        currency="$";
    }
-currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
-totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
- 
+//currencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
+//totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(\""+currency+"\"* (#,##0.00);_(\""+currency+"\"* \"0\"??_);_(@_)"));
+// 
 
     for (int i=0;i<=15;i++){
    shet1.setColumnWidth(i, 3000);
@@ -342,29 +342,10 @@ totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(
          debit_gl_account_name = conn.rs1.getString(2);  
         }
          
-        String[] debit_data={debit_fco,"",debit_gl_code,debit_gl_account,debit_gl_account_name,"",cheque_no,"","","","",amount_credited,"0",purpose,""};
-        String[] credit_data={credit_fco,"",credit_gl_code,credit_gl_account,credit_gl_account_name,"",cheque_no,"","","","","0",amount_credited,purpose,""};
-        
-        XSSFRow rw_debit=shet1.createRow(row_pos); 
+        String[] debit_data={debit_fco,"",debit_gl_code,debit_gl_account,debit_gl_account_name,"","chq#"+cheque_no,"","","","","",amount_credited,fullname+"-"+purpose,""};
+        String[] credit_data={credit_fco,"",credit_gl_code,credit_gl_account,credit_gl_account_name,"","chq#"+cheque_no,"","","","",amount_credited,"",fullname+"-"+purpose,""};
+         
          //push to excel
-         cell_pos=0;
-         for(String value :debit_data){
-            XSSFCell  S1cell=rw_debit.createCell(cell_pos);
-            if(isNumeric(value)){
-                S1cell.setCellValue(Integer.parseInt(value));
-            }
-            else{
-                S1cell.setCellValue(value);
-            }
-            if(cell_pos>10 && cell_pos<=12){
-             S1cell.setCellStyle(currencyStyle);    
-            }
-            else{
-            S1cell.setCellStyle(stborder); 
-            }
-            cell_pos++;   
-         }
-         row_pos++;
          
          cell_pos=0;
           XSSFRow rw_credit=shet1.createRow(row_pos); 
@@ -384,8 +365,28 @@ totalcurrencyStyle.setDataFormat(df.getFormat("_(\""+currency+"\"* #,##0.00_);_(
             }
             cell_pos++;   
          }
-        
          row_pos++;
+         
+                 XSSFRow rw_debit=shet1.createRow(row_pos);
+            cell_pos=0;
+         for(String value :debit_data){
+            XSSFCell  S1cell=rw_debit.createCell(cell_pos);
+            if(isNumeric(value)){
+                S1cell.setCellValue(Integer.parseInt(value));
+            }
+            else{
+                S1cell.setCellValue(value);
+            }
+            if(cell_pos>10 && cell_pos<=12){
+             S1cell.setCellStyle(currencyStyle);    
+            }
+            else{
+            S1cell.setCellStyle(stborder); 
+            }
+            cell_pos++;   
+         }
+         row_pos++;
+         
         }
         
         

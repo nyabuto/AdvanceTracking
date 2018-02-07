@@ -22,64 +22,55 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class update_staff extends HttpServlet {
+public class update_access extends HttpServlet {
 HttpSession session;
-String staff_name,email,phone,staff_no,is_finance;
-String user_id,level;
+String user_id,choice,label,message;
+int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
            session = request.getSession();
            dbConn conn = new dbConn();
-            JSONObject obj = new JSONObject();
-            
-            if(session.getAttribute("level")!=null){
-                level=session.getAttribute("level").toString();
-            }
            
-            staff_name = request.getParameter("staff_name");
-            email = request.getParameter("email");
-            phone = request.getParameter("phone");
-            staff_no = request.getParameter("staff_no");
-            is_finance = request.getParameter("is_finance");
+           user_id = request.getParameter("user_id");
+           choice = request.getParameter("choice");
+           label = request.getParameter("label");
             
-            if(level.equals("1")){
-                
-              String checker="SELECT staff_no FROM staff WHERE (fullname=? OR phone=?) AND staff_no!=?";
-                conn.pst=conn.conn.prepareStatement(checker);
-                conn.pst.setString(1, staff_name);
-                conn.pst.setString(2, phone);
-                conn.pst.setString(3, staff_no);
-                conn.rs=conn.pst.executeQuery();
-                if(conn.rs.next()){
-                  obj.put("message", "Staff details [name or phone] already registered with another staff.");
-                obj.put("code", 0);   
-                }
-                
-                else{
-                    String inserter="UPDATE staff SET fullname=?,email=?,phone=?,is_finance=? WHERE staff_no=?";
-                    conn.pst=conn.conn.prepareStatement(inserter);
-                    conn.pst.setString(1, staff_name);
-                    conn.pst.setString(2, email);
-                    conn.pst.setString(3, phone);
-                    conn.pst.setString(4, is_finance);
-                    conn.pst.setString(5, staff_no);
-                    
-                    conn.pst.executeUpdate();
-                    
-                     obj.put("message", "Staff details updated successfully.");
-                     obj.put("code", 1);
-                }
-                
-            }
-            else{
-                obj.put("message", "Error, You do not have enough priviledges to add staffs.");
-                obj.put("code", 0);
-            }
+           if(session.getAttribute("level")!=null){
+             if(session.getAttribute("level").toString().equals("1")){
+           String updator = "UPDATE user SET "+label+"=? WHERE id=? ";
+           conn.pst = conn.conn.prepareStatement(updator);
+           conn.pst.setString(1, choice);
+           conn.pst.setString(2, user_id);
            
-            System.out.println(obj);
+           int num = conn.pst.executeUpdate();
+             if(num>0){
+                         message="Access rights updated successfully."; 
+                         code=1;
+                         session.setAttribute(label, choice);
+                       }
+                       else{
+                         message="No change detected."; 
+                         code=0;  
+                       }
+           }
+             else{
+            message="Access Denied."; 
+            code=0;     
+             }
+           } 
+           else{
+          message="Login to use this module"; 
+          code=0;      
+           }
+                   JSONObject obj = new JSONObject();
+                   obj.put("message", message);
+                   obj.put("code", code);
+                   
+                    
             out.println(obj);
+           
         }
     }
 
@@ -98,7 +89,7 @@ String user_id,level;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(update_staff.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(update_access.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 
@@ -116,7 +107,7 @@ String user_id,level;
     try {
         processRequest(request, response);
     } catch (SQLException ex) {
-        Logger.getLogger(update_staff.class.getName()).log(Level.SEVERE, null, ex);
+        Logger.getLogger(update_access.class.getName()).log(Level.SEVERE, null, ex);
     }
     }
 

@@ -1,8 +1,9 @@
 <%-- 
-    Document   : Users
-    Created on : Oct 3, 2017, 11:34:40 AM
+    Document   : PendingExpenses
+    Created on : Feb 6, 2018, 9:07:09 PM
     Author     : GNyabuto
 --%>
+
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +14,6 @@
 	<title>Advance Tracking System</title>
         <link rel="shortcut icon" href="assets/images/aphia/aphia.png" style="height: 20px;padding: 0px; margin: 0px;"/>
 
-	
 	<!-- Global stylesheets -->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
 	<link href="assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
@@ -30,7 +30,7 @@
 	<script type="text/javascript" src="assets/js/plugins/loaders/blockui.min.js"></script>
 	<!-- /core JS files -->
        
-	 <!--Theme JS files--> 
+		 <!--Theme JS files--> 
 	<script type="text/javascript" src="assets/js/plugins/tables/datatables/datatables.min.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/tables/datatables/extensions/buttons.min.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/tables/datatables/extensions/select.min.js"></script>
@@ -40,98 +40,63 @@
 	<script type="text/javascript" src="assets/js/pages/datatables_extension_buttons_print.js"></script>
         <script type="text/javascript" src="assets/js/pages/datatables_extension_select.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/ui/ripple.min.js"></script>
-        
-        <!--to manage notifications-->
+                
+	         <!--to manage notifications-->
         <script type="text/javascript" src="assets/js/plugins/notifications/bootbox.min.js"></script>
         <script type="text/javascript" src="assets/js/plugins/notifications/noty.min.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/notifications/jgrowl.min.js"></script>
         <script type="text/javascript" src="assets/js/plugins/forms/selects/bootstrap_select.min.js"></script>
+        
+	<script type="text/javascript" src="assets/js/plugins/pickers/daterangepicker.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/pickers/anytime.min.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/pickers/pickadate/picker.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/pickers/pickadate/picker.date.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/pickers/pickadate/picker.time.js"></script>
+	<script type="text/javascript" src="assets/js/plugins/pickers/pickadate/legacy.js"></script>
+
 	<!-- /theme JS files -->
         <script type="text/javascript">
           jQuery(document).ready(function(){
-          loadUsers();    
+          loadPendingExpenses();    
           }); 
           
           
-          function loadUsers(){
+          function loadPendingExpenses(){
             $.ajax({
-        url:'all_users',
+        url:'load_expenses?status=0',
         type:"post",
         dataType:"json",
         success:function(raw_data){
-            var id,fullname,email,phone,status,status_label,level,level_label,username;
-            var advance,expenses,approve_expenses,rebanking,output="";
-            var dataSet=[];
+            var position=0,credit_id,fco,gl_code,amount,date,fullname,staff_no,email,phone,cheque_no,other_details;
+             var dataSet=[];
         
-        var code = raw_data.code;
-        var message = raw_data.message;
-        if(code==1){
         var data=raw_data.data;
         for (var i=0; i<data.length;i++){
-           var pos=i+1;
-            id=fullname=email=phone=status=status_label=level=level_label=username="";
-            advance=expenses=approve_expenses=rebanking=output="";
-            if( data[i].id!=null){id = data[i].id;}
+            position=i+1;
+            credit_id=fco=gl_code=amount=date=staff_no=fullname=email=phone=cheque_no=other_details="";
+            if( data[i].credit_id!=null){credit_id = data[i].credit_id;}
+            if( data[i].fco!=null){fco = data[i].fco;}
+            if( data[i].gl_code!=null){gl_code = data[i].gl_code;}
+            if( data[i].amount!=null){amount = data[i].amount;}
+            if( data[i].date!=null){date = data[i].date;}
+            if( data[i].staff_no!=null){staff_no = data[i].staff_no;}
             if( data[i].fullname!=null){fullname = data[i].fullname;}
             if( data[i].email!=null){email = data[i].email;}
             if( data[i].phone!=null){phone = data[i].phone;}
-            if( data[i].username!=null){username = data[i].username;}
-            if( data[i].status_label!=null){status_label = data[i].status_label;}
-            if( data[i].level_label!=null){level_label = data[i].level_label;}
-            if( data[i].level!=null){level = data[i].level;}
-            if( data[i].status!=null){status = data[i].status;}
-            if( data[i].advance!=null){advance = data[i].advance;}
-            if( data[i].expenses!=null){expenses = data[i].expenses;}
-            if( data[i].approve_expenses!=null){approve_expenses = data[i].approve_expenses;}
-            if( data[i].rebanking!=null){rebanking = data[i].rebanking;}
+            if( data[i].cheque_no!=null){cheque_no = data[i].cheque_no;}
+            if( data[i].other_details!=null){other_details = data[i].other_details;}
             
-            if(level==1){
-           level_label=  '<span class="label label-success">'+level_label+'</span> ';  
-            }
-            else{
-            level_label=  '<span class="label label-warning">'+level_label+'</span> ';      
-            }
-            if(status==1){
-           status_label=  '<span class="label label-success">'+status_label+'</span> ';  
-            }
             
-            else{
-            status_label=  '<span class="label label-danger">'+status_label+'</span> ';       
-            }
-          
-          
-          output='<input type="hidden" name="'+pos+'" value="'+id+'" id="'+pos+'">';
-          
-          var label_advance,label_expenses,label_approve_expenses,label_rebanking;
-          
-          
-          label_advance='<select id="advance_'+pos+'" required name="advance_'+pos+'" onchange=\"advance('+pos+')\" class="form-control" data-header="Advance" data-live-search="true" style="max-height:100px; min-width: 100px;">\n\
-                        "'+advance+'"\n\
-                        </select>';
-          label_expenses='<select id="expenses_'+pos+'" required name="expenses_'+pos+'"  onchange=\"expenses('+pos+')\" class="form-control" data-header="Expenses" data-live-search="true" style="max-height:100px; min-width: 100px;">\n\
-                        "'+expenses+'"\n\
-                        </select>';
-           if(level==1){
-          label_approve_expenses='<select id="approve_expenses_'+pos+'" required name="approve_expenses_'+pos+'"  onchange=\"approve_expenses('+pos+')\" class="form-control" data-header="Approve Expenses" data-live-search="true" style="max-height:100px; min-width: 100px;">\n\
-                        "'+approve_expenses+'"\n\
-                        </select>';
-                }
-                else{
-                label_approve_expenses='<select id="approve_expenses_'+pos+'" required name="approve_expenses_'+pos+'" readonly=\"true\"  onchange=\"approve_expenses('+pos+')\" class="form-control" data-header="Approve Expenses" data-live-search="true" style="max-height:100px; min-width: 100px;">\n\
-                        "'+approve_expenses+'"\n\
-                        </select>';    
-                }
-          label_rebanking='<select id="rebanking_'+pos+'" required name="rebanking_'+pos+'"  onchange=\"rebanking('+pos+')\" class="form-control" data-header="Rebanking" data-live-search="true" style="max-height:100px; min-width: 100px;">\n\
-                        "'+rebanking+'"\n\
-                        </select>';
-            
-           output+=status_label;
-           var minSet = [pos,fullname,email,phone,username,level_label,label_advance,label_expenses,label_approve_expenses,label_rebanking,output];
+            var output='<div style="position: absolute; z-index: 0;"><ul class="icons-list"><li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-menu9"></i></a><ul class="dropdown-menu dropdown-menu-right">';
+                output+='<li><button class="btn btn-link" onclick=\"approve_expenses('+position+');\" ><i class="icon-list-unordered position-left"></i> Approve</button></li>';
+                output+='<input type="hidden" name="'+position+'" value="'+credit_id+'" id="_'+position+'">';
+                output+='</ul></li></ul></div>';
+                
+           var minSet = [position,fullname,phone,fco,gl_code,cheque_no,amount,date,other_details,output];
            
            dataSet.push(minSet);
             // output the values to data table
         }
-        
         var table = $('#table').DataTable();
         table.destroy();
         
@@ -142,85 +107,55 @@
             columnDefs: []
             
         });
-  
-        }
-        else{
-           $.jGrowl(message, {
-            position: 'top-center',
-            header: 'Access Error.',
-            theme: 'bg-danger'
-            });    
-        }
         }
           
-        });   
-          }
-        </script>
-        <script>
-           function advance(pos){
-          var  user_id =  $("#"+pos).val();
-          var choice = $("#advance_"+pos).val();
-          var lable = 'advance';
-          update_access(user_id,choice,lable);
-           } 
-           
-           function expenses(pos){
-           var  user_id =  $("#"+pos).val();
-           var choice = $("#expenses_"+pos).val();
-           var lable = 'expenses';
-           update_access(user_id,choice,lable);
-           } 
-           
-           function approve_expenses(pos){
-            var  user_id =  $("#"+pos).val();
-            var choice = $("#approve_expenses_"+pos).val();
-            var lable = 'approve_expenses';
-            update_access(user_id,choice,lable);
-           } 
-           
-           function rebanking(pos){
-            var  user_id =  $("#"+pos).val();
-            var choice = $("#rebanking_"+pos).val();
-            var lable = 'rebanking';
-            update_access(user_id,choice,lable);
-           } 
-           
-           function update_access(user_id,choice,lable){
+        });
+        
+    }  
+       
+            function approve_expenses(position){
+          var credit_id = $("#_"+position).val();
+          var url='approve_expenses';
+          var theme="",header="",message="";
+          bootbox.confirm({ 
+            size: "small",
+            message: "Do you want to approve this expense?", 
+            callback: function(result){
+            if(result){
+             var form_data = {"credit_id":credit_id};
+            $.post(url,form_data , function(output) {
+                var response = JSON.parse(output).data;
+                var response_code=response.code;
+                var response_message=response.message;
+               message=response_message;
+                if(response_code==1){
+                    theme = "bg-success";
+                    header = "Success";
+                    message = response_message;
+                    //reload data in table
+                   loadPendingExpenses();  
+                }
+                else{
+                   theme = "bg-danger";
+                    header = "Error";
+                    message = response_message;  
+                }
+              $.jGrowl(message, {
+                    position: 'top-center',
+                    header: header,
+                    theme: theme
+               });   
+            });
+            }
+            else{
                
-            var theme="",header="",message="";
-         var url='update_access';
-            var form_data = {"user_id":user_id,"choice":choice,"label":lable};
-                 $.post(url,form_data , function(output) {
-                     var response_code=JSON.parse(output).code;
-                    var response_message=JSON.parse(output).message;
-                    message=response_message;
-                     if(response_code==1){
-                         theme = "bg-success";
-                         header = "Success";
-                         message = response_message;
-                         //reload data in table
-                        loadUsers();
-                        
-                         $.jGrowl(message, {
-                         position: 'top-center',
-                         header: header,
-                         theme: theme
-                    });
-                     }
-                     else{
-                        theme = "bg-danger";
-                         header = "Error";
-                         message = response_message;  
-                          $.jGrowl(message, {
-                         position: 'top-center',
-                         header: header,
-                         theme: theme
-                    });
-                     }
-                    
-                  });
-           }
-            </script>
+            }
+               }
+           });
+          }
+             
+          
+        </script>
 </head>
 
 <body>
@@ -343,7 +278,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title">User Management Module</h5>
+                                                    <h5 class="panel-title"><b style="color:black;">Approve Pending Expenses</b></h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>
@@ -351,20 +286,12 @@
 			                		<li><a data-action="close"></a></li>
 			                	</ul>
 		                	</div>
-                                                        
 						</div>
-                                             <%
-                                        if(session.getAttribute("level")!=null){ 
-                                        if(session.getAttribute("level").toString().equals("1")){    
-                                                            %>
-                                                             <div>
-                                                            <a href="AddUser.jsp" class="form-control btn-success btn-lg" style="width: 120px; margin-left: 20px;">New User</a>  
-                                                            </div>
-                                                                    <% } }%>
+                                            
                                             <div>
                                                 <table id='table' class="table ">
                                                 <thead>
-                                                    <tr><th>No.</th><th>Full Name</th><th>Email Address</th><th>Telephone Number</th><th>Username</th><th>Level</th><th>Issue Advances</th><th>Enter Expenses</th><th>Approve Expenses</th><th>Process Re-banking</th><th>Status</th></tr></thead>
+                                                    <tr><th>No.</th><th>Staff Name</th><th>Phone No</th><th>FCO</th><th>GL Code</th><th>Cheque No</th><th>Amount</th><th>Date</th><th>Other Details</th><th>Action</th></tr></thead>
                                                 <tbody>    
                                                 </tbody>
                                                </table> 

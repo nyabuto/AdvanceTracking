@@ -24,7 +24,7 @@ import org.json.simple.JSONObject;
  */
 public class save_staff extends HttpServlet {
 HttpSession session;
-String staff_name,email,phone,status_id,staff_no;
+String staff_name,email,phone,status_id,staff_no,is_finance;
 String user_id,level;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -43,6 +43,7 @@ String user_id,level;
             staff_name = request.getParameter("staff_name");
             email = request.getParameter("email");
             phone = request.getParameter("phone");
+            is_finance = request.getParameter("is_finance");
             status_id = "1";
             staff_no = manager.getdatekey();
             if(level.equals("1")){
@@ -58,13 +59,14 @@ String user_id,level;
                 }
                 
                 else{
-                    String inserter="INSERT INTO staff (fullname,email,phone,status_id,staff_no) VALUES(?,?,?,?,?)";
+                    String inserter="INSERT INTO staff (fullname,email,phone,status_id,staff_no,is_finance) VALUES(?,?,?,?,?,?)";
                     conn.pst=conn.conn.prepareStatement(inserter);
                     conn.pst.setString(1, staff_name);
                     conn.pst.setString(2, email);
                     conn.pst.setString(3, phone);
                     conn.pst.setString(4, status_id);
                     conn.pst.setString(5, staff_no);
+                    conn.pst.setString(6, is_finance);
                     
                     conn.pst.executeUpdate();
                     
