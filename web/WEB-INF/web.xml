@@ -276,6 +276,30 @@
         <servlet-name>upload_activities</servlet-name>
         <servlet-class>uploads.upload_activities</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>DeleteActivity</servlet-name>
+        <servlet-class>Deleters.DeleteActivity</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_activity</servlet-name>
+        <servlet-class>advancetracking.update_activity</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DeleteMOU</servlet-name>
+        <servlet-class>Deleters.DeleteMOU</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>update_mou</servlet-name>
+        <servlet-class>advancetracking.update_mou</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_edit_mous</servlet-name>
+        <servlet-class>loaders.load_edit_mous</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>load_edit_activity</servlet-name>
+        <servlet-class>loaders.load_edit_activity</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -551,6 +575,30 @@
     <servlet-mapping>
         <servlet-name>upload_activities</servlet-name>
         <url-pattern>/upload_activities</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteActivity</servlet-name>
+        <url-pattern>/DeleteActivity</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_activity</servlet-name>
+        <url-pattern>/update_activity</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DeleteMOU</servlet-name>
+        <url-pattern>/DeleteMOU</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>update_mou</servlet-name>
+        <url-pattern>/update_mou</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_edit_mous</servlet-name>
+        <url-pattern>/load_edit_mous</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>load_edit_activity</servlet-name>
+        <url-pattern>/load_edit_activity</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
