@@ -64,6 +64,12 @@ String message;
              
              message = "Advance deleted successfully.";
              code=1;
+             
+             //delete from advanced activities
+             String deleter2 = "DELETE FROM advanced_activities WHERE debit_id=?";
+             conn.pst=conn.conn.prepareStatement(deleter2);
+             conn.pst.setString(1, debit_id);
+             conn.pst.executeUpdate();
             }
                     
                

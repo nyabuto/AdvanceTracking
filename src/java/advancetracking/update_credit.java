@@ -47,6 +47,9 @@ int code,prev_amount;
            String[] health_details = healths.split("-");
            health_type_id=health_details[0];
            health_id = health_details[1];
+           if(health_id.equals("0")){
+               health_id=null;
+           }
            }
            else if(!gl_code.equals("523")){
            health_type_id = null;
@@ -58,6 +61,7 @@ int code,prev_amount;
            System.out.println("credit:"+credit_id+", amount : "+amount+", date : "+date);
            effect=balance=code=prev_amount=0;
            debit_id=message=prev_date="";
+           
            
            if(!gl_code.equals("")){
            String checkEffect="Select "+amount+"-amount AS effect,amount AS prev_amount,debit_id,date AS prev_date FROM credit WHERE credit_id=?";
@@ -85,7 +89,7 @@ int code,prev_amount;
             }
             System.out.println(get_current_balance);
             if(balance>=0){
-                String updator="UPDATE credit SET amount=?,date=?,health_id=?,health_type_id=?,fco=?,gl_code=? WHERE credit_id=?";
+                String updator="UPDATE credit SET amount=?,date=?,health_id=?,health_type_id=?,fco=?,gl_code=? WHERE credit_id=? AND approved=?";
                 conn.pst=conn.conn.prepareStatement(updator);
                 conn.pst.setString(1, amount);
                 conn.pst.setString(2, date);
@@ -94,10 +98,17 @@ int code,prev_amount;
                 conn.pst.setString(5, fco);
                 conn.pst.setString(6, gl_code);
                 conn.pst.setString(7, credit_id);
+                conn.pst.setString(8, "0");
                 
-                conn.pst.executeUpdate();
+                int num = conn.pst.executeUpdate();
+                if(num>0){
                 message = "Details updated successfully.";
                 code = 1;
+                }
+                else{
+                 message="Operation Failed. This entry has already been approved.";
+               code=0;   
+                }
             }
             else{
              message = "Error encountered while updating. New amount entered is more than the current balance.";
@@ -106,12 +117,19 @@ int code,prev_amount;
            }
            else{
                //delete this entry
-               String deleter="DELETE FROM credit WHERE credit_id=?";
+               String deleter="DELETE FROM credit WHERE credit_id=? AND approved=?";
                conn.pst=conn.conn.prepareStatement(deleter);
                conn.pst.setString(1, credit_id);
-               conn.pst.executeUpdate();
+               conn.pst.setString(2, "0");
+               int num = conn.pst.executeUpdate();
+               if(num>0){
                message="Item removed successfully.";
                code=1;
+               }
+               else{
+               message="Operation Failed. This entry has already been approved.";
+               code=0;    
+               }
            }
            
            }

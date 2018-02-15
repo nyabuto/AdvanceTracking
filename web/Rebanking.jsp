@@ -1,6 +1,6 @@
 <%-- 
-    Document   : ComprehensiveReport
-    Created on : Oct 6, 2017, 11:39:01 AM
+    Document   : Rebanking
+    Created on : Feb 14, 2018, 10:44:40 AM
     Author     : GNyabuto
 --%>
 
@@ -11,7 +11,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>ATS - Comprehensive report</title>
+	<title>Re-banking Report</title>
         <link rel="shortcut icon" href="assets/images/aphia/aphia.png" style="height: 20px;padding: 0px; margin: 0px;"/>
 
 	<!-- Global stylesheets -->
@@ -460,14 +460,6 @@
                 });
      }
             </script>
-            
-            
-            <style type="text/css">
-                table{
-                    max-width: 600px;
-                }  
-                
-                </style>
 </head>
 
 <body>
@@ -590,7 +582,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title"><u>Comprehensive Report</u></h5>
+							<h5 class="panel-title"><u>Re-Banking Report</u></h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>
@@ -600,8 +592,8 @@
 		                	</div>
 						</div>
                                             <div>
-                                                <form action="ComprehensiveReport" class="form-control"  style="min-height: 500px;margin-left: 20%;margin-right: 30%; width: 500px;">
-                                                    <table id='table' class="table">
+                                                <form action="Rebanking" class="form-control"  style="min-height: 500px;margin-left: 20%;margin-right: 30%; width: 500px;">
+                                                     <table id='table' class="table">
                                                <tr>
                                                 <td>
                                                     Select Staff:

@@ -24,7 +24,7 @@ import org.json.simple.JSONObject;
  */
 public class save_debit extends HttpServlet {
 HttpSession session;
-String debit_id,staff_no,cheque_no,fco,gl_code,amount,date,purpose;
+String debit_id,staff_no,cheque_no,fco,gl_code,amount,date,purpose,activities;
 String message;
 int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -48,24 +48,25 @@ int code;
             gl_code = request.getParameter("gl_code");
             amount = request.getParameter("amount");
             date = request.getParameter("date");
+            activities = request.getParameter("activities");
             purpose = request.getParameter("purpose");
 //            facility_id = request.getParameter("facility");
             debit_id = manager.getdatekey();
             
-            String checkExistence = "SELECT debit_id FROM debit WHERE cheque_no=? AND staff_no=? AND amount=? AND gl_code=? AND fco=?";
-            conn.pst=conn.conn.prepareStatement(checkExistence);
-            conn.pst.setString(1, cheque_no);
-            conn.pst.setString(2, staff_no);
-            conn.pst.setString(3, amount);
-            conn.pst.setString(4, gl_code);
-            conn.pst.setString(5, fco);
-            
-            conn.rs=conn.pst.executeQuery();
-            if(conn.rs.next()){
-                message = "Advance already captured in the system.";
-                code=0;
-            }
-            else{
+//            String checkExistence = "SELECT debit_id FROM debit WHERE cheque_no=? AND staff_no=? AND amount=? AND gl_code=? AND fco=?";
+//            conn.pst=conn.conn.prepareStatement(checkExistence);
+//            conn.pst.setString(1, cheque_no);
+//            conn.pst.setString(2, staff_no);
+//            conn.pst.setString(3, amount);
+//            conn.pst.setString(4, gl_code);
+//            conn.pst.setString(5, fco);
+//            
+//            conn.rs=conn.pst.executeQuery();
+//            if(conn.rs.next()){
+//                message = "Advance already captured in the system.";
+//                code=0;
+//            }
+//            else{
               //add advance
               
               String inserter = "INSERT INTO debit (debit_id,staff_no,cheque_no,fco,gl_code,amount,date,purpose) VALUES(?,?,?,?,?,?,?,?)";
@@ -77,13 +78,41 @@ int code;
               conn.pst.setString(5, gl_code);
               conn.pst.setString(6, amount);
               conn.pst.setString(7, date);
-              conn.pst.setString(8, purpose);
+              conn.pst.setString(8, "");
 //              conn.pst.setString(9, facility_id);
               
               conn.pst.executeUpdate();
               message = "Advance saved successfully.";
-              code=1;   
-            }
+              code=1;  
+              
+                System.out.println("activities : "+activities);
+              // save activities and others
+             String activity_ids[] = activities.split("_");
+             String activity_insert;
+             for (String activity:activity_ids){
+               if(!activity.equals("")){
+                 if(activity.equals("0")) {
+                 activity_insert="INSERT INTO advanced_activities(debit_id,activity_id,others) VALUES(?,?,?)";
+                 conn.pst = conn.conn.prepareStatement(activity_insert);
+                 conn.pst.setString(1, debit_id);
+                 conn.pst.setString(2, activity);
+                 conn.pst.setString(3, purpose);
+                 
+                 conn.pst.executeUpdate();
+                 } 
+                 else{
+                 activity_insert="INSERT INTO advanced_activities(debit_id,activity_id) VALUES(?,?)";
+                 conn.pst = conn.conn.prepareStatement(activity_insert);
+                 conn.pst.setString(1, debit_id);
+                 conn.pst.setString(2, activity);
+                 
+                 conn.pst.executeUpdate();    
+                 }  
+               }  
+             }
+               
+              
+//            }
             }
             else {
              message = "Staffs whose accounts are disabled cannot be given any advance.";

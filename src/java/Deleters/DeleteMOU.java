@@ -34,11 +34,11 @@ int code;
            session = request.getSession();
           dbConn conn = new dbConn();
           
-          mou_id = request.getParameter("id");
+          mou_id = request.getParameter("mou_id");
           
           
 //          check existence
-            String checker = "SELECT id DROM activities WHERE mou_id=?";
+            String checker = "SELECT id FROM activities WHERE mou_id=?";
             conn.pst = conn.conn.prepareStatement(checker);
             conn.pst.setString(1, mou_id);
             conn.rs = conn.pst.executeQuery();

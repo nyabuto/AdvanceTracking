@@ -73,7 +73,8 @@
         success:function(staff_name){
         $("#staff_name").html(staff_name);    
         }
-    });     
+    });  
+        load_activities();
         loadAdvances();      
         
           }); 
@@ -201,7 +202,7 @@
                             '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Select GL Code <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<select id="gl_acc_code" required name="gl_acc_code" onChange="gl_changed();" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
+                                    '<select id="gl_acc_code" required name="gl_acc_code" onChange="gl_changed();load_acc_activities('+pos+');" class="form-control bootstrap-select" data-header="Choose GL Code" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">Loading GL Codes</option>'+ 
                                         '</select>' +
                                 '</div>' +
@@ -222,7 +223,7 @@
                             '<div class="form-group" id="health_type">' +
                                 '<label class="col-md-4 control-label">Select Facility/Health Mgt Team <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<select id="health_type_id" required name="health_type_id" onchange=\"healths_changed();\" class="form-control bootstrap-select" data-header="Choose Type" data-live-search="true" style="max-height:100px;">'+
+                                    '<select id="health_type_id" required name="health_type_id" onchange=\"healths_changed();load_acc_activities('+pos+')\" class="form-control bootstrap-select" data-header="Choose Type" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No Type</option>'+ 
                                         '</select>' +
                                 '</div>' +
@@ -231,7 +232,7 @@
                             '<div class="form-group" id="county" hidden>' +
                                 '<label class="col-md-4 control-label">Select CHMT <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<select id="county_id" required name="county_id" class="form-control bootstrap-select" data-header="Choose CHMT" data-live-search="true" style="max-height:100px;">'+
+                                    '<select id="county_id" required name="county_id"  onchange=\"load_acc_activities('+pos+')\" class="form-control bootstrap-select" data-header="Choose CHMT" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No CHMT</option>'+ 
                                         '</select>' +
                                 '</div>' +
@@ -240,7 +241,7 @@
                             '<div class="form-group" id="sub_county" hidden>' +
                                 '<label class="col-md-4 control-label">Select SCHMT <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<select id="sub_county_id" required name="sub_county_id" class="form-control bootstrap-select" data-header="Choose SCHMT" data-live-search="true" style="max-height:100px;">'+
+                                    '<select id="sub_county_id" required name="sub_county_id" onchange=\"load_acc_activities('+pos+')\" class="form-control bootstrap-select" data-header="Choose SCHMT" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No SCHMT</option>'+ 
                                         '</select>' +
                                 '</div>' +
@@ -249,7 +250,7 @@
                             '<div class="form-group" id="facility_group" hidden>' +
                                 '<label class="col-md-4 control-label">Select Facility <b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<select id="facility" required name="facility" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
+                                    '<select id="facility" required name="facility"  onchange=\"load_acc_activities('+pos+')\" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
                                       '<option value="">No facility</option>'+ 
                                         '</select>' +
                                 '</div>' +
@@ -262,6 +263,16 @@
                                     '</div>' +
                             '</div>' +
                             
+                            
+                            '<div class="form-group" id="activities_group" hidden>' +
+                                '<label class="col-md-4 control-label">Select Activities <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<select id="acc_activities" required name="acc_activities" class="form-control bootstrap-select" data-header="Choose Activities" data-live-search="true" style="max-height:100px;">'+
+                                      '<option value="">No Activity</option>'+ 
+                                      '</select>' +
+                                '</div>' +
+                                '</div>' +
+                                
                         '</form>' +
                     '</div>' +
                     '</div>',
@@ -280,9 +291,34 @@
                             var facility =  $("#facility").val();
                             var receipt_no =  $("#receipt_no").val();
                             var theme="",header="",message="";
-                            
+                            var arr_act = null;
+                            var advanced_activities="";
+                            if($("#acc_activities").val()!=null){
+                            arr_act = ($("#acc_activities").val()).toString();
+                             if(arr_act.includes(",")){
+                            advanced_activities = arr_act.replace(/,/g,"_");
+                            }
+                            else{
+                            advanced_activities = arr_act;
+                            }
+                        }
+                        
+                           
                             if(fco!="" && gl_code!="" && amount!="" && date!="" && fco!=null && gl_code!=null && amount!=null && date!=null){
-                            if((gl_code==523 && ((health_type_id==1 && county_id!="" && county_id!=null) || (health_type_id==2 && sub_county_id!="" && sub_county_id!=null) || (health_type_id==3 && facility!="" && facility!=null) ||  (health_type_id==4)) ) || gl_code!=523){   
+                            if((gl_code==523 && ((health_type_id==1 && county_id!="" && county_id!=null) || (health_type_id==2 && sub_county_id!="" && sub_county_id!=null) || (health_type_id==3 && facility!="" && facility!=null) ||  (health_type_id==4)) ) || gl_code!=523){
+                            if((advanced_activities!="" && advanced_activities!=null)){
+                            if((gl_code==608 && (receipt_no=="" && receipt_no==null))){
+                            theme = "bg-danger";
+                            header = "Error";
+                            message = "For GL Code 608, you must enter receipt No.";
+                            $.jGrowl(message, {
+                                        position: 'top-center',
+                                        header: header,
+                                        theme: theme
+                                    }); 
+                        
+                            }
+                            else{
                             if(amount>balance){
                             theme = "bg-danger";
                             header = "Error";
@@ -295,7 +331,7 @@
                             }
                             else{
                            var url='save_credit';
-                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"fco":fco,"gl_code":gl_code,"health_type_id":health_type_id,"county_id":county_id,"sub_county_id":sub_county_id,"facility_id":facility,"receipt_no":receipt_no};
+                           var form_data = {"debit_id":debit_id,"amount":amount,"date":date,"fco":fco,"gl_code":gl_code,"health_type_id":health_type_id,"county_id":county_id,"sub_county_id":sub_county_id,"facility_id":facility,"receipt_no":receipt_no,"advanced_activities":advanced_activities};
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
@@ -319,7 +355,20 @@
                                     });  
                                  });
                             }
-                            }
+                        }
+                        }
+                        else{
+                      theme = "bg-danger";
+                        header = "Error";
+                        message = "Ensure you have selected an activity.";   
+                        
+                        $.jGrowl(message, {
+                        position: 'top-center',
+                        header: header,
+                        theme: theme
+                         });        
+                    }
+                    }
                         else{
                           theme = "bg-danger";
                         header = "Error";
@@ -355,6 +404,10 @@
                     { from: [year, month, day], to: [3017, 9, 25] }
                 ]
             });
+            
+            load_acc_activities(pos);
+            $("#acc_activities").selectpicker();
+           $("#acc_activities").selectpicker('refresh');
           }
         </script>
         <script type="text/javascript">
@@ -508,9 +561,11 @@
                }
                if(gl_code==608){
                     $("#receipt_group").show();   
+                    $("#activities_group").show();   
                    }
                    else{
                    $("#receipt_group").hide();    
+                   $("#activities_group").show();    
                    }
                    
                  $("#county").hide();
@@ -595,12 +650,24 @@
                                 '</div>' +
                             '</div>' +  
                             '</div>' +
-                             '<div class="form-group">' +
-                                '<label class="col-md-4 control-label">Purpose : </label>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Select Activities<b style=\"color:red\">*</b> : </label>' +
                                 '<div class="col-md-8">' +
-                                    '<textarea id="purpose" name="purpose" required placeholder="Enter purpose" class="form-control"></textarea>' +
+                                    '<select id="activities" required name="activities" onchange=\"load_other();\" class="form-control bootstrap-select" data-header="Choose activities" data-live-search="true" style="max-height:100px;">'+
+                                      '<option value="">Loading Activities</option>'+ 
+                                        '</select>' +
+                                '</div>' +
+                            '</div>' +
+                            
+                             '<div class="form-group" id="group_purpose">' +
+                                '<label class="col-md-4 control-label">Other Activity : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<textarea id="purpose" name="purpose" required placeholder="Enter Other activity" class="form-control"></textarea>' +
                                     '</div>' +
                             '</div>' +
+                            
+                            
                         '</form>' +
                     '</div>' +
                     '</div>',
@@ -614,12 +681,21 @@
                             var cheque_no = $("#cheque_no").val();
                             var fco = $("#fco").val();
                             var gl_code = $("#gl_code").val();
+                            var arr_act = ($("#activities").val()).toString();
                             var purpose =  $("#purpose").val();
-                            
+                            var activities = "";
+                            if(arr_act.includes(",")){
+                            activities = arr_act.replace(/,/g,"_");
+                            }
+                            else{
+                            activities = arr_act;    
+                            }
+//                            alert("activities : "+activities);
                             var theme="",header="",message="";
-                            if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!="" && amount!=null && date!=null && cheque_no!=null && fco!=null && gl_code!=null){
+                            if(amount!="" && date!="" && cheque_no!="" && fco!="" && gl_code!="" && amount!=null && date!=null && cheque_no!=null && fco!=null && gl_code!=null && activities!=null && activities!=""){
                            var url='save_debit';
-                           var form_data = {"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"purpose":purpose};
+                           var form_data = {"amount":amount,"date":date,"cheque_no":cheque_no,"fco":fco,"gl_code":gl_code,"purpose":purpose,"activities":activities};
+                           
                                 $.post(url,form_data , function(output) {
                                     var response = JSON.parse(output).data;
                                     var response_code=response.code;
@@ -666,6 +742,8 @@
         ); 
 load_gl_codes();
 load_fcos();
+load_activities();
+$("#group_purpose").hide();
 
     $('.pickadate-disable-range').pickadate({
         format: 'yyyy-mm-dd',
@@ -675,7 +753,15 @@ load_fcos();
     });
             }
             
-            
+           function load_other(){
+           var value = ","+$("#activities").val()+",";
+           if(!value.includes(",0,")){
+           $("#group_purpose").hide();
+            }
+            else{
+                $("#group_purpose").show();
+            }
+           } 
             function accounting_history(posion){
           bootbox.hideAll();
           var value=$("#"+posion).val().split("X");
@@ -696,7 +782,7 @@ load_fcos();
                     success:function(output){
                    var data = output.data;
                    output='<table class="table datatable-button-print-rows datatable-select-basic"><thead>\n\
-                 <tr><th>Position</th><th>FCO</th><th>GL Code</th><th>Amount</th><th>Date </th><th>HMT/Facility[Optional]</th>';
+                 <tr><th>No</th><th>FCO</th><th>GL Code</th><th>Amount</th><th>Date </th><th>HMT/Facility[Optional]</th><th>Approved<br>Status</th>';
                     <%if(session.getAttribute("staff_status")!=null){
                     if(session.getAttribute("staff_status").toString().equals("1")){   
                     %> 
@@ -704,7 +790,7 @@ load_fcos();
                     <%}}%>
                 output+='</tr></thead><tbody>';
                 
-                   var credit_id,amount,date,timestamp,pos=0,gl_code,fco,health_team;
+                   var credit_id,amount,date,timestamp,pos=0,gl_code,fco,health_team,approved,approved_status,expenses,rebanking;
                     for (var i=0; i<data.length;i++){
                         pos++;
                         credit_id = data[i].id;
@@ -714,6 +800,16 @@ load_fcos();
                         gl_code = data[i].gl_code;
                         health_team = data[i].health;
                         timestamp = data[i].timestamp;
+                        approved = data[i].approved;
+                        expenses = data[i].expenses;
+                        rebanking = data[i].rebanking;
+                        
+                        if(approved>0){
+                            approved_status="assets/images/aphia/tick.png";
+                        }
+                        else{
+                          approved_status="assets/images/aphia/cross.png";  
+                        }
 //                        if(gl_code!=523){health_team="";}
                          output+='<tr id="row_'+pos+'">\n\
                                 <td><p id="num_'+pos+'">'+pos+'</p></td>\n\
@@ -732,11 +828,21 @@ load_fcos();
                                 '+health_team+'\n\
                                 </select>\n\
                                 </td>';
+        
+                        output+='<td><img id="approved" style="width:20px; height:20px;" src="'+approved_status+'"></td>';
+                        
                            <%if(session.getAttribute("staff_status")!=null){
                             if(session.getAttribute("staff_status").toString().equals("1")){   
                             %> 
                           var pager = pos+'_'+posion;
+                          
+                          var gl_code = $("#edit_gl_code"+pos).val();
+                          if(approved==0 && (expenses==1 || rebanking==1)){
                          output+='<td><img id="editor_'+pos+'" onclick="edit_accounting(\''+pager+'\');" src="assets/images/aphia/edit.png"></td>';
+                          }
+                          else{
+                         output+='<td></td>';     
+                            }
                          <%}}%>
                          output+='</tr>';
                          $('#edit_fco'+pos+'').selectpicker();
@@ -744,6 +850,7 @@ load_fcos();
                          $('#edit_health'+pos+'').selectpicker();
                     }
                     output+='</tbody></table>';
+                    output+='<hr/>';
                     
                     $('.pickadate-disable-range').pickadate({
                         format: 'yyyy-mm-dd',
@@ -753,7 +860,7 @@ load_fcos();
                     });
                     // show results.
                     bootbox.dialog({
-                title: "View Accounting History.",
+                title: "<b>View Accounting History.</b>",
                 message: output,
                 size: 'large',
                 buttons: {
@@ -937,16 +1044,7 @@ load_fcos();
                                 '<div class="col-md-8">' +
                                     '<input id="edit_date2" name="edit_date2" required type="date" value="'+date+'" placeholder="Select Date" class="form-control pickadate-disable-range">' +
                                 '</div>' +
-                            '</div>' +
-//                           
-//                            '<div class="form-group" id="facility_group" hidden>' +
-//                                '<label class="col-md-4 control-label">Select Facility : </label>' +
-//                                '<div class="col-md-8">' +
-//                                    '<select id="edit_facility" required name="edit_facility" class="form-control bootstrap-select" data-header="Choose Facility" data-live-search="true" style="max-height:100px;">'+
-//                                      ''+facility+''+ 
-//                                        '</select>' +
-//                                '</div>' +
-                                
+                            '</div>' + 
                             '</div>' +
                              '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Purpose : </label>' +
@@ -1032,9 +1130,100 @@ load_fcos();
           }
           
             </script>
+            <script type="text/javascript">
+             function load_activities(){
+  
+        $.ajax({
+            url:'load_to_advance_activities',
+            type:"post",
+            dataType:"json",
+            success:function(raw_data){
+                var id,code,description,amount,status,output,mou,unique_code;
+                output='';
+            var data=raw_data.data;
+            var pos=0;
+            for (var i=0; i<data.length;i++){
+                pos++;
+                id=code=description=amount=status=mou=unique_code="";
+
+                if( data[i].id!=null){id = data[i].id;}
+                if( data[i].code!=null){code = data[i].code;}
+                if( data[i].description!=null){description = data[i].description;}
+                if( data[i].amount!=null){amount = data[i].amount;}
+                if( data[i].status!=null){status = data[i].status;}
+                if( data[i].mou!=null){mou = data[i].mou;}
+                if( data[i].unique_code!=null){unique_code = data[i].unique_code;}
+
+                output +="<option value=\""+id+"\" >"+unique_code+" &nbsp;&nbsp;&nbsp; "+code+" - "+description+"[ "+amount+" ]</option>";
+                } 
+                 output +="<option value=\"0\">Other</option>";
+                //load activities
+                $("#activities").html(output);
+                $("#activities").selectpicker();
+            }
+        });
+     }   
+      
+                 function load_acc_activities(pos){
+                     
+            var value=$("#"+pos).val().split("X");
+            var debit_id;
+            debit_id = value[0];
+          
+            var type_id = $("#health_type_id").val();
+            var health_id = "";
+            if(type_id==1){
+              health_id=$("#county_id").val();  
+            }
+            else if(type_id==1){
+              health_id=$("#sub_county_id").val();  
+            }
+            else if(type_id==1){
+              health_id=$("#facility").val();  
+            }
+            var gl_code = $("#gl_acc_code").val();
+            
+        $.ajax({
+            url:'load_advanced_activities?debit_id='+debit_id+'&&type_id='+type_id+'&&health_id='+health_id+"&&gl_code="+gl_code,
+            type:"post",
+            dataType:"json",
+            success:function(raw_data){
+                var id,code,description,amount,status,output,mou,unique_code;
+                output='';
+            var data=raw_data.data;
+            var pos=0;
+            for (var i=0; i<data.length;i++){
+                pos++;
+                id=code=description=amount=status=mou=unique_code="";
+
+                if( data[i].id!=null){id = data[i].id;}
+                if( data[i].code!=null){code = data[i].code;}
+                if( data[i].description!=null){description = data[i].description;}
+                if( data[i].amount!=null){amount = data[i].amount;}
+                if( data[i].status!=null){status = data[i].status;}
+                if( data[i].mou!=null){mou = data[i].mou;}
+                if( data[i].unique_code!=null){unique_code = data[i].unique_code;}
+                if(unique_code!=""){
+                output +="<option value=\""+id+"\" >"+unique_code+" &nbsp;&nbsp;&nbsp; "+code+" - "+description+"[ "+amount+" ]</option>";
+                }
+                else{
+                output +="<option value=\""+id+"\" >Other - "+description+"</option>";    
+                }
+                }
+                //load activities
+                $("#acc_activities").html(output);
+                $("#acc_activities").selectpicker();
+                $("#acc_activities").selectpicker('refresh');
+            }
+        });
+                $("#acc_activities").selectpicker();
+                $("#acc_activities").selectpicker('refresh');
+//                 alert(output);
+     }
+                </script>
 </head>
 
-<body style="position:relative; z-index:10; font-size: 10px;">
+<body style="position:relative; z-index:10; font-size: 12px;">
     
     <!-- Main navbar -->
 	<div class="navbar navbar-default header-highlight">

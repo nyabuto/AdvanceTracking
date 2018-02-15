@@ -33,10 +33,10 @@ String id,mou_no,mou,unique_code,approved_budget;
            session = request.getSession();
            dbConn conn = new dbConn();
            
-           id = request.getParameter("id");
+           id = request.getParameter("mou_id");
            
            JSONObject obj_final = new JSONObject();
-            JSONArray jarray = new JSONArray();
+           JSONObject obj = new JSONObject();
             
            String getdata = "select mou_id,mou_no,approved_budget,start_date,end_date,type_id,"
 + "CONCAT(CHMT,SCHMT,facility_name) AS mou, "
@@ -51,27 +51,26 @@ String id,mou_no,mou,unique_code,approved_budget;
 "FROM mous " +
 "LEFT JOIN county ON mous.health_id=county.id " +
 "LEFT JOIN sub_county ON mous.health_id=sub_county.id " +
-"LEFT JOIN facilities ON mous.health_id=facilities.id ) AS mou_data WHERE mous.id=? ";
+"LEFT JOIN facilities ON mous.health_id=facilities.id  WHERE mous.id=? ) AS mou_data";
+            System.out.println("mou query:"+getdata);
            conn.pst = conn.conn.prepareStatement(getdata);
            conn.pst.setString(1, id);
            conn.rs = conn.pst.executeQuery();
-           while(conn.rs.next()){
-            id = conn.rs.getString(1);
-            mou_no = conn.rs.getString(2);
-            approved_budget = conn.rs.getString(3);
-            unique_code = conn.rs.getString(4);  
-            mou = conn.rs.getString(5);
+           if(conn.rs.next()){
+            id = conn.rs.getString("mou_id");
+            mou_no = conn.rs.getString("mou_no");
+            approved_budget = conn.rs.getString("approved_budget");
+            unique_code = conn.rs.getString("unique_code");  
+            mou = conn.rs.getString("mou");
             
-               JSONObject obj = new JSONObject();
                obj.put("id", id);
                obj.put("mou_no", mou_no);
                obj.put("mou", mou);
                obj.put("unique_code", unique_code);
                obj.put("approved_budget", approved_budget);
-            jarray.add(obj);
            }
            
-           obj_final.put("data", jarray);
+           obj_final.put("data", obj);
             out.println(obj_final);
         }
     }

@@ -93,6 +93,7 @@
 									<ul>
 										<li><a href="ComprehensiveReport.jsp">Comprehensive Report</a></li>
 										<li><a href="Journalentries.jsp">Journal Entries</a></li>
+										<li><a href="Rebanking.jsp">Rebanking Report</a></li>
 									</ul>
 								</li>
                                                                 <li><a href="logout"><i class="icon-lock2"></i> <span>Logout</span></a>

@@ -26,7 +26,7 @@ public class save_credit extends HttpServlet {
 HttpSession session;
 String output;
 String amount,date,debit_id,credit_id,message,fco,gl_code;
-String health_id,health_type_id,receipt_no;
+String health_id,health_type_id,receipt_no,advanced_activities;
 int balance,code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
@@ -40,7 +40,7 @@ int balance,code;
            debit_id = request.getParameter("debit_id");
            fco = request.getParameter("fco");
            gl_code = request.getParameter("gl_code");
-           
+           advanced_activities = request.getParameter("advanced_activities");
            
            if(gl_code.equals("523")){
            health_type_id = request.getParameter("health_type_id");
@@ -107,6 +107,30 @@ int balance,code;
                 conn.pst.executeUpdate();
                 code=1;
                 message="Accounting data added successfuly.";
+                
+                System.out.println("advancedactivities:"+advanced_activities);
+                // update advances
+             String activity_ids[] = advanced_activities.split("_");
+             String activity_insert;
+             for (String activity:activity_ids){
+               if(!activity.equals("")){
+                 activity_insert="INSERT INTO expensed_activities(credit_id,advanced_activities_id) VALUES(?,?)";
+                 conn.pst = conn.conn.prepareStatement(activity_insert);
+                 conn.pst.setString(1, credit_id);
+                 conn.pst.setString(2, activity);
+                 conn.pst.executeUpdate();
+                
+                //   update debit table
+               
+                 activity_insert="UPDATE advanced_activities SET status=? WHERE id=? ";
+                 conn.pst = conn.conn.prepareStatement(activity_insert);
+                 conn.pst.setString(1, "1");
+                 conn.pst.setString(2, activity);
+                 conn.pst.executeUpdate();
+                
+               }  
+             }
+            
             }
             else{
              code=0;

@@ -36,9 +36,9 @@ String debit_id,fco,gl_code,amount,date,health_type_id,health_id,fullname,email,
            session = request.getSession();
            dbConn conn = new dbConn();
            
-//         approval_status = request.getParameter("status");
+         approval_status = request.getParameter("status");
          
-         approval_status="0";
+//         approval_status="0";
             JSONArray jarray = new JSONArray();
             JSONObject obj_final = new JSONObject();
             
@@ -72,7 +72,7 @@ String debit_id,fco,gl_code,amount,date,health_type_id,health_id,fullname,email,
          phone =  conn.rs.getString(12);
          cheque_no = conn.rs.getString(13);
          
-         if(conn.rs.getString(14)!=null){
+         if(conn.rs.getString(14)!=null && !conn.rs.getString(14).equals("")){
          receipt_no = conn.rs.getString(14);
          health="Receipt no: "+receipt_no;
          }

@@ -54,6 +54,16 @@
 	<script type="text/javascript" src="assets/js/plugins/pickers/pickadate/picker.time.js"></script>
 	<script type="text/javascript" src="assets/js/plugins/pickers/pickadate/legacy.js"></script>
 
+  <script type="text/javascript" language="en">
+   function numbers(evt){
+        var charCode=(evt.which) ? evt.which : event.keyCode
+        if(charCode > 31 && (charCode < 48 || charCode>57))
+        return false;
+        return true;
+  }
+//-->
+</script>
+
 	<!-- /theme JS files -->
         <script type="text/javascript">
           jQuery(document).ready(function(){
@@ -82,7 +92,7 @@
             
             var output='<div style="position: absolute; z-index: 0;"><ul class="icons-list"><li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-menu9"></i></a><ul class="dropdown-menu dropdown-menu-right">';
                 output+='<li><button class="btn btn-link" onclick=\"edit('+position+');\" ><i class="icon-list-unordered position-left"></i> Edit</button></li>';
-                output+='<li><button class="btn btn-link" onclick=\"delete('+position+');\" ><i class="icon-list-unordered position-left"></i> Delete</button></li>';
+                output+='<li><button class="btn btn-link" onclick=\"deleter('+position+');\" ><i class="icon-list-unordered position-left"></i> Delete</button></li>';
                 output+='<input type="hidden" name="'+position+'" value="'+id+'" id="_'+position+'">';
                 output+='</ul></li></ul></div>';
                 
@@ -105,7 +115,161 @@
           
         });
         
-    }  
+    } 
+    
+    function edit(position){
+                var id = $("#_"+position).val();
+        //LOAD DATA
+        $.ajax({
+        url:'load_edit_activity?id='+id,
+        type:"post",
+        dataType:"json",
+        success:function(raw_data){
+            var id,code,description,amount,mou_id;
+       
+        var data=raw_data.data;
+        if( data.id!=null){id = data.id;}
+        if( data.code!=null){code = data.code;}
+        if( data.description!=null){description = data.description;}
+        if( data.amount!=null){amount = data.amount;}
+        if( data.mou_id!=null){mou_id = data.mou_id;}
+           
+                     bootbox.dialog({
+                title: "<b>Edit Activity Data.</b>",
+                message: '<div class="row">' +
+                    '<div class="col-md-12">' +
+                        '<form id="edit" method="post" class="form-horizontal">' +
+                           
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Activity Code <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="edit_code" required name="edit_code" type="text" value="'+code+'" placeholder="Activity Code" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Activity Description <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<textarea id="edit_description" required name="edit_description" placeholder="Activity Decription" class="form-control">'+description+'</textarea>' +
+                                '</div>' +
+                            '</div>' +
+                            
+                            '<div class="form-group">' +
+                                '<label class="col-md-4 control-label">Amount <b style=\"color:red\">*</b> : </label>' +
+                                '<div class="col-md-8">' +
+                                    '<input id="edit_amount" onkeypress="return numbers(event)" required name="edit_amount" type="text" value="'+amount+'" placeholder="Amount" class="form-control">' +
+                                '</div>' +
+                            '</div>' +
+                             
+                         '</form>' +
+                    '</div>' +
+                    '</div>',
+                buttons: {
+                    success: {
+                        label: "Update",
+                        className: "btn-success",
+                        callback: function () {
+                            
+                            var theme="",header="",message="";
+                            
+                            var code = $("#edit_code").val();
+                            var description = $("#edit_description").val();
+                            var amount = $("#edit_amount").val();
+                            
+                            if(code!=null && code!="" && description!=null && description!="" && amount!=null && amount!="" && mou_id!=null && mou_id!=""){
+                            var form_data = {"id":id,"code":code,"description":description,"amount":amount,"mou_id":mou_id};
+                            
+                           var url='update_activity';
+//                           
+                            $.post(url,form_data,function(output){
+                               var response = JSON.parse(output);
+                            var response_code=response.code;
+                            var response_message=response.message;
+                           message=response_message;
+                            if(response_code==1){
+                                theme = "bg-success";
+                                header = "Success";
+                                message = response_message;
+                                //reload data in table
+                               loadactivities(); 
+                            }
+                            else{
+                               theme = "bg-danger";
+                                header = "Error";
+                                message = response_message;  
+                            }
+
+                          $.jGrowl(message, {
+                                position: 'top-center',
+                                header: header,
+                                theme: theme,
+                                life: 3000
+                           });   
+                             }
+                         
+                         );
+                        }
+                        else{
+                         theme = "bg-danger";
+                                header = "Error";
+                                message = "Ensure all input fields are entered.";  
+                          $.jGrowl(message, {
+                                position: 'top-center',
+                                header: header,
+                                theme: theme,
+                                life: 3000
+                           });       
+                        }
+                        }
+                    }
+                }
+            }
+        );
+        }
+        });
+    }
+    
+    function deleter(position){
+              var id = $("#_"+position).val();
+          var url='DeleteActivity';
+          var theme="",header="",message="";
+          bootbox.confirm({ 
+            size: "small",
+            message: "Do you want to delete this Activity?", 
+            callback: function(result){
+            if(result){
+             var form_data = {"id":id};
+            $.post(url,form_data , function(output) {
+                var response = JSON.parse(output).data;
+                var response_code=response.code;
+                var response_message=response.message;
+               message=response_message;
+                if(response_code==1){
+                    theme = "bg-success";
+                    header = "Success";
+                    message = response_message;
+                    //reload data in table
+                   loadactivities();  
+                }
+                else{
+                   theme = "bg-danger";
+                    header = "Error";
+                    message = response_message;  
+                }
+              $.jGrowl(message, {
+                    position: 'top-center',
+                    header: header,
+                    theme: theme
+               });   
+            });
+            }
+            else{
+               
+            }
+               }
+           });    
+    }
+    
     function view_activities(position){
           var credit_id = $("#_"+position).val();
           var url='approve_expenses';
@@ -149,10 +313,22 @@
    
           function new_activities(){
                 bootbox.dialog({
-                title: "Load Activities",
+                title: "<b>Load Activities</b>",
                 message: '<div class="row">' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" method="post" enctype="multipart/form-data" class="form-horizontal">' +
+                            
+                             '<b>Upload Guide: Sample Data</b>'+
+                              '<div class="form-group">' +
+                                '<img src="assets/images/sample_activity.PNG">' +
+                            '</div>' +
+                            '<b>Note</b><br>'+
+                            '1. The file extension MUST be .xlsx<br>'+
+                            '2. Ensure you have added borders on the excel data before uploading.<br>'+
+                            '3. The order of columns must be as shown above.<br>'+
+                            '4. The first column contains headers followed by data. This must be adhered to.<br>'+
+                            '5. These activities belongs to the MoU earlier selected.'+
+                           '<hr/>'+
                            
                               '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Select Excel file <b style=\"color:red\">*</b> : </label>' +

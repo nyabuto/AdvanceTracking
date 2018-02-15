@@ -38,9 +38,9 @@ int code;
           
           
 //          check existence
-            String checker = "SELECT debit_id DROM debit WHERE activities_ids LIKE ?";
+            String checker = "SELECT id FROM advanced_activities WHERE activity_id=?";
             conn.pst = conn.conn.prepareStatement(checker);
-            conn.pst.setString(1, "%,"+activity_id+",%");
+            conn.pst.setString(1, activity_id);
             conn.rs = conn.pst.executeQuery();
             if(conn.rs.next()){
                 message = "Activity cannot be deleted. Advance has been given on this activity.";

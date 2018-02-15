@@ -30,8 +30,8 @@ import org.json.simple.JSONObject;
  *
  * @author GNyabuto
  */
-public class upload_activities extends HttpServlet {
-    String output;
+public class upload_all_activities extends HttpServlet {
+ String output;
     HttpSession session;
     String full_path="";
     String fileName="";
@@ -41,9 +41,10 @@ public class upload_activities extends HttpServlet {
     
     String activity_code,activity_description,amount;
     String id,type_id,health_id;
-    String message,mou_id,userid;
+    String message,userid;
     int counter,added,updated,missing,code;
-
+    String unique_code;
+    int mou_id;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -51,16 +52,12 @@ public class upload_activities extends HttpServlet {
            session = request.getSession();
            dbConn conn = new dbConn();
            added=updated=missing=0;
+           output = "Wrong Unique codes entered or mous have not been loaded for the following facilities:<br>";
            
-           mou_id=userid="";
-            if(session.getAttribute("mou_id")!=null){
-                System.out.println("mou id upload file : "+session.getAttribute("mou_id").toString());
-          mou_id = session.getAttribute("mou_id").toString();
-            }
             if(session.getAttribute("userid")!=null){
           userid = session.getAttribute("userid").toString();
             }
-           if(!mou_id.equals("")){
+         
            String applicationPath = request.getServletContext().getRealPath("");
          String uploadFilePath = applicationPath + File.separator + UPLOAD_DIR;
          session=request.getSession();
@@ -139,10 +136,28 @@ public class upload_activities extends HttpServlet {
            amount = cellAmount.getStringCellValue();
             }
             
-
+            
+            
+            
+        
+//        3_______________________UNIQUE CODE__________________________
+            XSSFCell cellUniqueCode = rowi.getCell((short) 3);
+            if(cellUniqueCode.getCellType()==0){
+                //numeric
+           unique_code = ""+(int)cellUniqueCode.getNumericCellValue();
+            } 
+            else if(cellUniqueCode.getCellType()==1){
+           unique_code = cellUniqueCode.getStringCellValue();
+            } 
+            mou_id=0;
+         JSONObject health_res = gethealthinfo(conn,unique_code);  
+         if(health_res.containsKey("type_id")){  
+         mou_id = getMOU_id(health_res,conn); 
+         }
+         if(mou_id!=0){
          String checker = "SELECT id FROM activities WHERE mou_id=? && code=?" ;
          conn.pst=conn.conn.prepareStatement(checker);
-         conn.pst.setString(1, mou_id);
+         conn.pst.setInt(1, mou_id);
          conn.pst.setString(2, activity_code);
          
            
@@ -169,7 +184,7 @@ public class upload_activities extends HttpServlet {
           String inserter = "INSERT INTO activities (mou_id,code,description,amount,user_id,is_active) VALUES(?,?,?,?,?,?)"; 
            
            conn.pst1 = conn.conn.prepareStatement(inserter);
-           conn.pst1.setString(1, mou_id);
+           conn.pst1.setInt(1, mou_id);
            conn.pst1.setString(2, activity_code);
            conn.pst1.setString(3, activity_description);
            conn.pst1.setString(4, amount);
@@ -180,14 +195,24 @@ public class upload_activities extends HttpServlet {
            
            
          }
-              
+         }
+         else{
+  missing++;           
+//         missing mou
+output+=missing+". "+unique_code+" "+activity_code+"-"+activity_description+"</br>";
+         }
             i++;
         }
         
         j++;
         }
         
-        message="Activities: Excel data has been uploaded and <b>"+added+"</b> New entries were loaded, <b>"+updated+"</b> records were updated and <b>"+missing+"</b> records were skipped." ;
+        if(missing>0){
+            message="Activities: Excel data has been uploaded and :<br><b>"+added+"</b> New entries were loaded :<br><b>"+updated+"</b> records were updated and :<br><b>"+missing+"</b> records were skipped:<br><br>"+output;
+        }
+        else{
+            message="Activities: Excel data has been uploaded and <b>"+added+"</b> New entries were loaded, <b>"+updated+"</b> records were updated and <b>"+missing+"</b> records were skipped." ;
+        }
         if(added>missing){
             code=1;
         }
@@ -195,11 +220,7 @@ public class upload_activities extends HttpServlet {
             code=2;
         }
         }
-           }
-           else{
-               message="Error while uploading. No Mou was found. Kindly select MOU again to load activities.";
-               code=0;
-           }
+         
         JSONObject obj = new JSONObject();
         obj.put("message", message);
         obj.put("code", code);
@@ -220,11 +241,11 @@ public class upload_activities extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(upload_activities.class.getName()).log(Level.SEVERE, null, ex);
-        }
+     try {
+         processRequest(request, response);
+     } catch (SQLException ex) {
+         Logger.getLogger(upload_all_activities.class.getName()).log(Level.SEVERE, null, ex);
+     }
     }
 
     /**
@@ -238,11 +259,11 @@ public class upload_activities extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(upload_activities.class.getName()).log(Level.SEVERE, null, ex);
-        }
+     try {
+         processRequest(request, response);
+     } catch (SQLException ex) {
+         Logger.getLogger(upload_all_activities.class.getName()).log(Level.SEVERE, null, ex);
+     }
     }
 
     /**
@@ -255,7 +276,7 @@ public class upload_activities extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private String getFileName(Part part) {
+        private String getFileName(Part part) {
             String file_name="";
         String contentDisp = part.getHeader("content-disposition");
         System.out.println("content-disposition header= "+contentDisp);
@@ -271,5 +292,54 @@ public class upload_activities extends HttpServlet {
          System.out.println("content-disposition final : "+file_name);
         return file_name;
     }
-         
+        
+    private JSONObject gethealthinfo(dbConn conn,String unique_code) throws SQLException{
+     JSONObject obj = new JSONObject();
+     String getcounty="SELECT id FROM county WHERE unique_code=?";
+     obj = getonehealthinfo(conn,"1",getcounty,unique_code);
+     
+     if(!obj.containsKey("type_id")){
+     String getsubcounty="SELECT id FROM sub_county WHERE unique_code=?";
+     obj = getonehealthinfo(conn,"2",getsubcounty,unique_code);
+     }
+     if(!obj.containsKey("type_id")){
+     String getfacility="SELECT id FROM facilities WHERE unique_code=?";
+     obj = getonehealthinfo(conn,"3",getfacility,unique_code);
+     }
+     return obj;
+    }    
+    
+public JSONObject getonehealthinfo(dbConn conn,String type_id,String query,String unique_code) throws SQLException{
+  JSONObject obj = new JSONObject();
+   conn.pst = conn.conn.prepareStatement(query);
+     conn.pst.setString(1, unique_code);
+     System.out.println("facility checker "+conn.pst);
+     conn.rs = conn.pst.executeQuery();
+     if(conn.rs.next()){
+         System.out.println("type id : "+type_id+" health id : "+conn.rs.getString(1));
+         obj.put("type_id", type_id);
+         obj.put("health_id", conn.rs.getString(1));
+     } 
+ 
+  return obj;
+}
+
+public int getMOU_id(JSONObject obj, dbConn conn) throws SQLException{
+ int mouid=0;
+ String typeid = obj.get("type_id").toString();
+ String healthid = obj.get("health_id").toString();
+ 
+ String getmou_id ="SELECT id FROM mous WHERE type_id=? AND health_id=? AND is_active=?";
+ conn.pst = conn.conn.prepareStatement(getmou_id);
+ conn.pst.setString(1, typeid);
+ conn.pst.setString(2, healthid);
+ conn.pst.setString(3, "1");
+ 
+ conn.rs = conn.pst.executeQuery();
+ if(conn.rs.next()){
+     mouid=conn.rs.getInt(1);
+ }
+ 
+ return mouid;
+}
 }

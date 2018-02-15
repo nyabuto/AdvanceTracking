@@ -27,7 +27,7 @@ public class advance_credits extends HttpServlet {
 HttpSession session;
 String debit_id;
 String credit_id,amount, date, timestamp,fco,gl_code,health_type_id,health_id;
-String currency,health,fcos,gl_codes;
+String currency,health,fcos,gl_codes,approved;
 String rebanking,expenses;
 int found_selected=0;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -64,7 +64,7 @@ int found_selected=0;
                currency = conn.rs.getString(1);
            }
            
-           String fetchCredits="SELECT credit_id,amount,date,timestamp,fco,gl_code,health_type_id,health_id FROM credit WHERE debit_id=? ORDER BY timestamp DESC";
+           String fetchCredits="SELECT credit_id,amount,date,timestamp,fco,gl_code,health_type_id,health_id,approved FROM credit WHERE debit_id=? ORDER BY timestamp DESC";
            conn.pst=conn.conn.prepareStatement(fetchCredits);
            conn.pst.setString(1, debit_id);
            conn.rs=conn.pst.executeQuery();
@@ -79,7 +79,7 @@ int found_selected=0;
             gl_code = conn.rs.getString(6);
             health_type_id = conn.rs.getString(7);
             health_id = conn.rs.getString(8);
-            
+            approved=conn.rs.getString(9);
             
             String getfcos = "SELECT fco FROM fco WHERE type_id=2";
             conn.rs1=conn.st1.executeQuery(getfcos);
@@ -166,6 +166,16 @@ int found_selected=0;
                 health+="<option value=\"3-"+conn.rs1.getString(1)+"\">"+i+". "+conn.rs1.getString(2)+"</option>";       
                 }
             }
+               if(health_type_id!=null){
+                if(health_type_id.equals("4")){
+                health+="<option value=\"\" disabled>Others</option>";
+                health+="<option value=\"4-0\" selected>General MOH Activities</option>";       
+                }
+                else{
+                health+="<option value=\"\" disabled>Others</option>";
+                 health+="<option value=\"4-0\">General MOH Activities</option>";      
+                }
+               }
             //end of htting facility details
 //           }
             
@@ -178,6 +188,9 @@ int found_selected=0;
             obj.put("fco", fcos);
             obj.put("gl_code", gl_codes);
             obj.put("health", health);
+            obj.put("approved", approved);
+            obj.put("expenses", expenses);
+            obj.put("rebanking", rebanking);
             
             jarray.add(obj);
            }

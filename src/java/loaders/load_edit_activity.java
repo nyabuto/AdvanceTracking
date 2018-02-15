@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -25,7 +24,7 @@ import org.json.simple.JSONObject;
  */
 public class load_edit_activity extends HttpServlet {
 HttpSession session;
-String id,code,description,amount;
+String id,code,description,amount,mou_id;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
@@ -34,11 +33,11 @@ String id,code,description,amount;
             dbConn conn = new dbConn();
             
             JSONObject obj_final = new JSONObject();
-            JSONArray jarray = new JSONArray();
+            JSONObject obj = new JSONObject();
             
             id = request.getParameter("id");
                     
-            String getdata = "SELECT id,code,description,amount FROM activities WHERE id=?";
+            String getdata = "SELECT id,code,description,amount,mou_id FROM activities WHERE id=?";
             conn.pst = conn.conn.prepareStatement(getdata);
             conn.pst.setString(1, id);
             
@@ -48,16 +47,16 @@ String id,code,description,amount;
              code = conn.rs.getString(2);
              description = conn.rs.getString(3);
              amount = conn.rs.getString(4); 
+             mou_id = conn.rs.getString(5); 
              
-             JSONObject obj = new JSONObject();
              obj.put("id", id);
              obj.put("code", code);
              obj.put("description", description);
              obj.put("amount", amount);
-             jarray.add(obj);
+             obj.put("mou_id", mou_id);
             }
             
-            obj_final.put("data", jarray);
+            obj_final.put("data", obj);
             out.println(obj_final);
         }
     }

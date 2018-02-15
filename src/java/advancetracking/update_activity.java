@@ -24,7 +24,7 @@ import org.json.simple.JSONObject;
  */
 public class update_activity extends HttpServlet {
 HttpSession session;
-String id,act_code,description,amount,userid;
+String id,act_code,description,amount,userid,mou_id;
 String message;
 int code;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -44,8 +44,32 @@ int code;
             act_code = request.getParameter("code");
             description = request.getParameter("description");
             amount = request.getParameter("amount");
+            mou_id = request.getParameter("mou_id");
             
-            String updator = "UPDATE activities SET code=?, description=?, amount=?, uer_id=? WHERE id=? ";
+            String checker = "SELECT id FROM activities WHERE code=? AND mou_id=? AND id!=?";
+            conn.pst = conn.conn.prepareStatement(checker);
+            conn.pst.setString(1, act_code);
+            conn.pst.setString(2, mou_id);
+            conn.pst.setString(3, id);
+            
+            conn.rs = conn.pst.executeQuery();
+            if(conn.rs.next()){
+            message="Another activity exist with the same code."; 
+            code=0;     
+            }
+            else{
+            String checker2 = "SELECT id FROM advanced_activities WHERE activity_id=?";
+            conn.pst = conn.conn.prepareStatement(checker2);
+            conn.pst.setString(1, id);
+            
+            conn.rs = conn.pst.executeQuery();
+            if(conn.rs.next()){
+             message="This activity has already been given advance."; 
+             code=0;    
+            }
+            else{
+              
+            String updator = "UPDATE activities SET code=?, description=?, amount=?, user_id=? WHERE id=? ";
             conn.pst = conn.conn.prepareStatement(updator);
             conn.pst.setString(1, act_code);
             conn.pst.setString(2, description);
@@ -63,7 +87,8 @@ int code;
                          code=0;  
                        }
             
-            
+            }
+            }
              JSONObject obj = new JSONObject();
                    obj.put("message", message);
                    obj.put("code", code);
@@ -71,7 +96,7 @@ int code;
                    JSONObject final_obj = new JSONObject();
                    final_obj.put("data", obj);
                     
-            out.println(final_obj);
+            out.println(obj);
         }
     }
 

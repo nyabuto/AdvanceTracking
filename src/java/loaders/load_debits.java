@@ -60,6 +60,8 @@ String currency;
              status="";
              status_id=0;
              debit_id=cheque_no=fco=gl_code=amount=date=purpose=timestamp="";
+             int pos=0;
+                           
               debit_id = conn.rs.getString(1);
               cheque_no = conn.rs.getString(2);
               fco = conn.rs.getString(3);
@@ -70,17 +72,44 @@ String currency;
               purpose = conn.rs.getString(7);
               timestamp = conn.rs.getString(8);
               
+              if(!conn.rs.getString(7).equals("")){
+                   pos++;
+              purpose = pos+". "+conn.rs.getString(7)+"\n";   
+              
+              }
+//              purpose="";
               JSONObject obj = new JSONObject();
               
-//            //get facility supported
-//            if(conn.rs.getString("facility_id")!=null){
-//                String getfacilityname="SELECT facility_name,unique_code FROM facilities WHERE id='"+conn.rs.getString("facility_id")+"'";
-//                conn.rs1=conn.st1.executeQuery(getfacilityname);
-//                if(conn.rs1.next()){
-//                    facility_name=conn.rs1.getString(1);
-//                }
-//            }
+                  String get_data = "SELECT id,code,CONCAT(description,others) AS description,amount,CONCAT(CHMT,SCHMT,facility_name) AS mou,  " +
+                        "CONCAT(unique_code,sc_unique_code,fac_unique_code) AS unique_code,status FROM( " +
+                        "SELECT advanced_activities.id AS id," +
+                        "IFNULL(code,\"\") AS code," +
+                        "IFNULL(description,\"\") AS description," +
+                        "IFNULL(amount,\"\") AS amount, " +
+                        "ifnull(others,\"\") AS others," +
+                        "ifnull(CASE WHEN mous.type_id=1 THEN county.CHMT END,\"\") AS CHMT,  " +
+                        "ifnull(CASE WHEN mous.type_id=1 THEN county.unique_code END,\"\") AS unique_code,   " +
+                        "ifnull(CASE WHEN mous.type_id=2 THEN sub_county.SCHMT END,\"\") AS SCHMT,  " +
+                        "ifnull(CASE WHEN mous.type_id=2 THEN sub_county.unique_code END,\"\") AS sc_unique_code, " +
+                        "ifnull(CASE WHEN mous.type_id=3 THEN facilities.facility_name END,\"\") AS facility_name,  " +
+                        "ifnull(CASE WHEN mous.type_id=3 THEN facilities.unique_code END,\"\") AS fac_unique_code,"+
+                        "advanced_activities.status AS status   " +
+                        "FROM advanced_activities  " +
+                        "LEFT JOIN activities ON advanced_activities.activity_id  = activities.id " +
+                        "LEFT JOIN mous ON activities.mou_id = mous.id  " +
+                        "LEFT JOIN county ON mous.health_id=county.id  " +
+                        "LEFT JOIN sub_county ON mous.health_id=sub_county.id  " +
+                        "LEFT JOIN facilities ON mous.health_id=facilities.id  " +
+                        "WHERE advanced_activities.debit_id=? ORDER BY advanced_activities.id) AS activiti_data";
+                  
+               conn.pst1 = conn.conn.prepareStatement(get_data);
+               conn.pst1.setString(1, debit_id);
             
+               conn.rs1 = conn.pst1.executeQuery();
+               while(conn.rs1.next()){
+                   pos++;
+                purpose+=pos+"."+conn.rs1.getString("unique_code")+" "+conn.rs1.getString(3)+"<br>";   
+               }
             //get paid
             String getpaid="SELECT SUM(amount) FROM credit WHERE debit_id='"+debit_id+"'";
             conn.rs1=conn.st1.executeQuery(getpaid);
