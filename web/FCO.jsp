@@ -3,6 +3,9 @@
     Created on : Oct 3, 2017, 12:40:57 PM
     Author     : GNyabuto
 --%>
+<%if(session.getAttribute("level")==null || session.getAttribute("level").toString().equals("2") ){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -218,7 +221,7 @@
                // input them to the respectie elements
                                               // pop up
                    bootbox.dialog({
-                title: "Edit Advance Details.",
+                title: "<div style=\"color:black; font-weight: 900; text-decoration: underline; \">Edit FCO Details.</div>",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
@@ -313,7 +316,7 @@
            } 
            // pop up
                    bootbox.dialog({
-                title: "Edit Advance Details.",
+                title: "<div style=\"color:black; font-weight: 900; text-decoration: underline; \">Add New FCO.</div>",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
@@ -516,7 +519,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title">FCO Management Module</h5>
+							<h5 class="panel-title" style="color:black; font-weight: 900; text-decoration: underline; ">FCO Management Module</h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>

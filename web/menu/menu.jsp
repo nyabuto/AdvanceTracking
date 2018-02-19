@@ -52,7 +52,7 @@
 								<!-- Main -->
 								<li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
 								<li>
-									<a href="#"><i class="icon-copy"></i> <span>Advances & Expenses</span></a>
+									<a href="#"><i class="icon-lan3"></i> <span>Advances & Expenses</span></a>
 									<ul>
 										<li><a href="Staffs.jsp">Manage Advances</a></li>
                                                                                 <%if(session.getAttribute("approve_expenses")!=null){
@@ -66,7 +66,7 @@
                                                                    if(session.getAttribute("level").toString().equals("1")){
                                                                 %>
 								<li>
-									<a href="#"><i class="icon-copy"></i> <span>Joint Work plans</span></a>
+									<a href="#"><i class="icon-portfolio"></i> <span>Joint Work plans</span></a>
 									<ul>
 										<li><a href="JWP.jsp">Manage JWPs</a></li>
                                                                         </ul>

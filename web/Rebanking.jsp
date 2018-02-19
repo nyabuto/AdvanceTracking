@@ -3,7 +3,9 @@
     Created on : Feb 14, 2018, 10:44:40 AM
     Author     : GNyabuto
 --%>
-
+<%if(session.getAttribute("level")==null){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -582,7 +584,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title"><u>Re-Banking Report</u></h5>
+							<h5 class="panel-title" style="color:black; font-weight: 900; text-decoration: underline; "><u>Re-Banking Report</u></h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>

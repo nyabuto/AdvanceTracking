@@ -87,6 +87,16 @@ String status_id,staff_no,is_finance;
            staff_no = manager.getdatekey();
            status_id = "1";
            
+//           check staff
+            String checkerstaff = "SELECT staff_no FROM staff WHERE phone=?";
+            conn.pst = conn.conn.prepareStatement(checkerstaff);
+            conn.pst.setString(1, phone);
+            conn.rs = conn.pst.executeQuery();
+            if(conn.rs.next()){
+            message="<font color=\"black\">User added successfully. Staff account already exist.</font>";
+               
+            }
+            else{
            String staff_inserter="INSERT INTO staff (fullname,email,phone,status_id,staff_no,is_finance) VALUES(?,?,?,?,?,?)";
                     conn.pst=conn.conn.prepareStatement(staff_inserter);
                     conn.pst.setString(1, fullname);
@@ -97,6 +107,9 @@ String status_id,staff_no,is_finance;
                     conn.pst.setString(6, is_finance);
                     
                     conn.pst.executeUpdate();
+                    message="<font color=\"black\"><b>User added successfully. Staff account for this user also created.</b></font>";
+           
+            }
             }
             }
             else{

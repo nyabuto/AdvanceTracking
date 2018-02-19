@@ -3,6 +3,9 @@
     Created on : Sep 26, 2017, 4:05:51 PM
     Author     : GNyabuto
 --%>
+<%if(session.getAttribute("level")==null){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -506,7 +509,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title">Aphia Plus Staffs</h5>
+							<h5 class="panel-title"><b><u>Staff Advancing and Expensing Module</u></b></h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>

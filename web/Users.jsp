@@ -3,6 +3,9 @@
     Created on : Oct 3, 2017, 11:34:40 AM
     Author     : GNyabuto
 --%>
+<%if(session.getAttribute("level")==null || session.getAttribute("level").toString().equals("2") ){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -343,7 +346,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title">User Management Module</h5>
+							<h5 class="panel-title"><b><u>User Management Module</u></b></h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>

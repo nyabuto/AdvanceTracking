@@ -3,6 +3,9 @@
     Created on : Oct 3, 2017, 12:47:06 PM
     Author     : GNyabuto
 --%>
+<%if(session.getAttribute("level")==null || session.getAttribute("level").toString().equals("2") ){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -230,7 +233,7 @@
             
            // pop up
                    bootbox.dialog({
-                title: "Update GL Code",
+                title: "<div style=\"color:black; font-weight: 900; text-decoration: underline; \">Update GL Code.</div>",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
@@ -342,7 +345,7 @@
            } 
            // pop up
                    bootbox.dialog({
-                title: "New GL Code",
+                title: "<div style=\"color:black; font-weight: 900; text-decoration: underline; \" >New GL Code.<div>",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
@@ -561,7 +564,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title">GL Codes Management Module</h5>
+							<h5 class="panel-title" style="color:black; font-weight: 900; text-decoration: underline; ">GL Codes Management Module</h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>

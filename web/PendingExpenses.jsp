@@ -3,7 +3,9 @@
     Created on : Feb 6, 2018, 9:07:09 PM
     Author     : GNyabuto
 --%>
-
+<%if(session.getAttribute("level")==null || session.getAttribute("approve_expenses")==null || session.getAttribute("approve_expenses").toString().equals("0") ){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">

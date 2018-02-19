@@ -3,6 +3,9 @@
     Created on : Dec 19, 2017, 11:05:07 AM
     Author     : GNyabuto
 --%>
+<%if(session.getAttribute("level")==null || session.getAttribute("level").toString().equals("2") ){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -150,7 +153,7 @@
             // load botbox here
             
                 bootbox.dialog({
-                title: "Update Sub County",
+                title: "<div style=\"color:black; font-weight: 900; text-decoration: underline; \">Update Sub County</div>",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
@@ -351,7 +354,7 @@
            } 
            // pop up
                    bootbox.dialog({
-                title: "New Sub County",
+                title: "<div style=\"color:black; font-weight: 900; text-decoration: underline; \">New Sub County</div>",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" class="form-horizontal">' +
@@ -573,7 +576,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-							<h5 class="panel-title">Sub Counties Management Module</h5>
+							<h5 class="panel-title" style="color:black; font-weight: 900; text-decoration: underline; ">Sub Counties Management Module</h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>

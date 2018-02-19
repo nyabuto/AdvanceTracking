@@ -3,7 +3,9 @@
     Created on : Feb 7, 2018, 5:50:48 PM
     Author     : GNyabuto
 --%>
-
+<%if(session.getAttribute("level")==null){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -327,7 +329,8 @@
                             '2. Ensure you have added borders on the excel data before uploading.<br>'+
                             '3. The order of columns must be as shown above.<br>'+
                             '4. The first column contains headers followed by data. This must be adhered to.<br>'+
-                            '5. These activities belongs to the MoU earlier selected.'+
+                            '5. These activities belongs to the MoU earlier selected.<br>'+
+                            '6. The excel file MUST be closed before it is uploaded to the system.'+
                            '<hr/>'+
                            
                               '<div class="form-group">' +

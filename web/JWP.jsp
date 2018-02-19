@@ -3,7 +3,9 @@
     Created on : Feb 7, 2018, 8:46:47 AM
     Author     : GNyabuto
 --%>
-
+<%if(session.getAttribute("level")==null){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -294,7 +296,7 @@
    
           function new_jwp(){
                 bootbox.dialog({
-                title: "<b>Load Master List</b>",
+                title: "<b>Load MoU Master List</b>",
                 message: '<div class="row">' +
                     '<div class="col-md-12">' +
                         '<form id="new_advance" method="post" enctype="multipart/form-data" class="form-horizontal">' +
@@ -308,7 +310,8 @@
                             '2. Ensure you have added borders on the excel data before uploading.<br>'+
                             '3. Unique codes or MOU names must be the same as they exist in the system.<br>'+
                             '4. The order of columns must be as shown above.<br>'+
-                            '5. The first column contains headers followed by data. This must be adhered to.'+
+                            '5. The first column contains headers followed by data. This must be adhered to.<br>'+
+                            '6. The excel file MUST be closed before it is uploaded to the system.'+
                            '<hr/>'+
                               '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Select Excel file <b style=\"color:red\">*</b> : </label>' +
@@ -427,7 +430,7 @@
           
           function new_all_activities(){
                 bootbox.dialog({
-                title: "<b>Load All activities.</b>",
+                title: "<b><u>Load All activities.</u></b>",
                 message: '<div class="row">' +
                     '<div class="col-md-12">' +
                         '<form id="all_activities" method="post" enctype="multipart/form-data" class="form-horizontal">' +
@@ -441,7 +444,8 @@
                             '2. Ensure you have added borders on the excel data before uploading.<br>'+
                             '3. Unique codes or MOU names must be the same as they exist in the system.<br>'+
                             '4. The order of columns must be as shown above.<br>'+
-                            '5. The first column contains headers followed by data. This must be adhered to.'+
+                            '5. The first column contains headers followed by data. This must be adhered to.<br>'+
+                            '6. The excel file MUST be closed before it is uploaded to the system.'+
                            '<hr/>'+
                               '<div class="form-group">' +
                                 '<label class="col-md-4 control-label">Select Excel file <b style=\"color:red\">*</b> : </label>' +
@@ -649,7 +653,7 @@
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-                                                    <h5 class="panel-title"><b style="color:black;">Manage Joint Work Plans</b></h5>
+                                                    <h5 class="panel-title"><b style="color:black; font-weight: 900; text-decoration: underline; ">Manage Joint Work Plans</b></h5>
 							<div class="heading-elements">
 								<ul class="icons-list">
 			                		<li><a data-action="collapse"></a></li>
@@ -664,7 +668,7 @@
                                             %>
                                             <div style="clear: both">
                                             <div>
-                                                <button type="button" class="btn btn-success btn-raised" onclick="new_jwp();" style="margin-left: 1%; margin-bottom: 1%; float: left;"><i class="icon-plus3 position-left"></i> New Master List</button>
+                                                <button type="button" class="btn btn-success btn-raised" onclick="new_jwp();" style="margin-left: 1%; margin-bottom: 1%; float: left;"><i class="icon-plus3 position-left"></i> New MoU Master List</button>
                                             </div>
                                             <div>
                                                 <button type="button" class="btn btn-success btn-raised" onclick="new_all_activities();" style="margin-left: 10%; margin-bottom: 1%; float: left;"><i class="icon-plus3 position-left"></i> Upload Consolidated Activities</button>

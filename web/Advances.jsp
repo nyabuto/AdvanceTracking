@@ -3,7 +3,9 @@
     Created on : Sep 28, 2017, 3:03:18 PM
     Author     : GNyabuto
 --%>
-
+<%if(session.getAttribute("level")==null){
+    response.sendRedirect("../AdvanceTracking");
+}%>
 <%@page import="java.util.Calendar"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -1344,7 +1346,7 @@ $("#group_purpose").hide();
                                     <!-- Row selector -->
 					<div class="panel panel-flat">
 						<div class="panel-heading">
-                                                    <h5 class="panel-title" id='staff_name' style="text-decoration: underline">Aphia Plus Staffs</h5>
+                                                    <h5 class="panel-title" id='staff_name' style="text-decoration: underline; font-weight: 900;"></h5>
 							<div class="heading-elements">
                                                             
 								<ul class="icons-list">
