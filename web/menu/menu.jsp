@@ -96,6 +96,32 @@
 										<li><a href="Rebanking.jsp">Rebanking Report</a></li>
 									</ul>
 								</li>
+                                                                
+                                                                <%if(session.getAttribute("level")!=null){
+                                                                %>
+								<li>
+									<a href="#"><i class="icon-puzzle3"></i> <span>Feedback Tracker</span>
+                                                                            <%if(session.getAttribute("new_notifications")!=null){
+                                                                            if(session.getAttribute("new_notifications").toString().contains(",1,")){
+                                                                            %>
+                                                                            <span class="label label-danger">New ~ 1</span>
+                                                                            <!--<span class="badge badge-light">1</span>-->
+                                                                        <%}}%>
+                                                                        </a>
+									<ul>
+										<li><a href="feedbacks.jsp">View Feedbacks
+                                                                           <%if(session.getAttribute("new_notifications")!=null){
+                                                                            if(session.getAttribute("new_notifications").toString().contains(",1,")){
+                                                                            %>
+                                                                            <span class="label label-danger">New</span>
+                                                                        <%}}%>
+                                                                        
+                                                                                    </a></li>
+									</ul>
+								</li>
+                                                                <%}%>
+                                                                
+                                                                
                                                                 <li><a href="logout"><i class="icon-lock2"></i> <span>Logout</span></a>
 								</li>
 							</ul>

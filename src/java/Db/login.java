@@ -27,7 +27,8 @@ HttpSession session;
 String id,username,password,fullname,email,phone,pass,level,nextPage,message;
 MessageDigest m;
 int status;
-int advance,expenses,approve_expenses,rebanking;
+int advance,expenses,approve_expenses,rebanking,is_dev;
+String new_notifications;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, NoSuchAlgorithmException {
         session=request.getSession();
@@ -39,11 +40,13 @@ int advance,expenses,approve_expenses,rebanking;
           username=request.getParameter("username").trim();
           pass=request.getParameter("password").trim();
          
+          
+          new_notifications = ",";
           m = MessageDigest.getInstance("MD5");
        m.update(pass.getBytes(), 0, pass.length());
        password = new BigInteger(1, m.digest()).toString(16);
         System.out.println("username : "+username+" password : "+password);  
-        String logger="SELECT id,fullname,phone,email,level,status_id,advance,expenses,approve_expenses,rebanking FROM user WHERE username=? && password=? " ;
+        String logger="SELECT id,fullname,phone,email,level,status_id,advance,expenses,approve_expenses,rebanking,is_dev FROM user WHERE username=? && password=? " ;
         conn.pst=conn.conn.prepareStatement(logger);
         conn.pst.setString(1, username);
         conn.pst.setString(2, password);
@@ -60,7 +63,8 @@ int advance,expenses,approve_expenses,rebanking;
              expenses = conn.rs.getInt(8);
              approve_expenses = conn.rs.getInt(9);
              rebanking = conn.rs.getInt(10);
-             
+             is_dev = conn.rs.getInt(11);
+             System.out.println("is dev : "+is_dev);
              if(status==1){
              session.setAttribute("userid", id);
              session.setAttribute("fullname", fullname);
@@ -73,8 +77,23 @@ int advance,expenses,approve_expenses,rebanking;
              session.setAttribute("expenses", expenses);
              session.setAttribute("approve_expenses", approve_expenses);
              session.setAttribute("rebanking", rebanking);
+             session.setAttribute("is_dev", is_dev);
               
           nextPage="Staffs.jsp";
+          
+          
+          //get new updates on the system
+          String getupdates = "SELECT notifications.id AS id,IFNULL(user_id,'') AS user_id FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id HAVING user_id!=?";
+          conn.pst1 = conn.conn.prepareStatement(getupdates);
+          conn.pst1.setString(1, id);
+          conn.rs1 = conn.pst1.executeQuery();
+          while(conn.rs1.next()){
+            new_notifications+=conn.rs1.getString(1)+",";  
+          }
+                 System.out.println("query : "+conn.pst1);
+          //end of getting new updates
+          session.setAttribute("new_notifications", new_notifications);
+                 System.out.println("new notifications:"+session.getAttribute("new_notifications"));
          }
              else{
              message="Your account is blocked. Contact System Administrator for help.";

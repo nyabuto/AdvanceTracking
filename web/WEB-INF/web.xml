@@ -316,6 +316,22 @@
         <servlet-name>upload_all_activities</servlet-name>
         <servlet-class>uploads.upload_all_activities</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>loadfeedbacks</servlet-name>
+        <servlet-class>FeedbackTracker.loadfeedbacks</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>save_feedback</servlet-name>
+        <servlet-class>FeedbackTracker.save_feedback</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>save_response</servlet-name>
+        <servlet-class>FeedbackTracker.save_response</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>save_viewed_notification</servlet-name>
+        <servlet-class>FeedbackTracker.save_viewed_notification</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>load_fco</servlet-name>
         <url-pattern>/load_fco</url-pattern>
@@ -631,6 +647,22 @@
     <servlet-mapping>
         <servlet-name>upload_all_activities</servlet-name>
         <url-pattern>/upload_all_activities</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>loadfeedbacks</servlet-name>
+        <url-pattern>/loadfeedbacks</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_feedback</servlet-name>
+        <url-pattern>/save_feedback</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_response</servlet-name>
+        <url-pattern>/save_response</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>save_viewed_notification</servlet-name>
+        <url-pattern>/save_viewed_notification</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
