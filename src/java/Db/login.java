@@ -83,7 +83,7 @@ String new_notifications;
           
           
           //get new updates on the system
-          String getupdates = "SELECT notifications.id AS id,IFNULL(user_id,'') AS user_id FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id HAVING user_id!=?";
+          String getupdates = "SELECT DISTINCT(notifications.id) AS id FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id WHERE notifications.id NOT IN(SELECT notifications.id AS id FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id WHERE user_id=?)";
           conn.pst1 = conn.conn.prepareStatement(getupdates);
           conn.pst1.setString(1, id);
           conn.rs1 = conn.pst1.executeQuery();
