@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -27,8 +29,8 @@ HttpSession session;
 String id,username,password,fullname,email,phone,pass,level,nextPage,message;
 MessageDigest m;
 int status;
-int advance,expenses,approve_expenses,rebanking,is_dev;
-String new_notifications;
+int advance,expenses,approve_expenses,rebanking,is_dev,pending_approval;
+String new_notifications,datediff;
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException, NoSuchAlgorithmException {
         session=request.getSession();
@@ -40,7 +42,7 @@ String new_notifications;
           username=request.getParameter("username").trim();
           pass=request.getParameter("password").trim();
          
-          
+          pending_approval=0;
           new_notifications = ",";
           m = MessageDigest.getInstance("MD5");
        m.update(pass.getBytes(), 0, pass.length());
@@ -79,18 +81,54 @@ String new_notifications;
              session.setAttribute("rebanking", rebanking);
              session.setAttribute("is_dev", is_dev);
               
+             if(approve_expenses==1){
+                 String get_details = "SELECT COUNT(credit.credit_id) FROM credit WHERE credit.approved=?";
+                    conn.pst1 = conn.conn.prepareStatement(get_details);
+                    conn.pst1.setInt(1, 0);
+                    conn.rs1 = conn.pst1.executeQuery();
+                    if(conn.rs1.next()){
+                        pending_approval = conn.rs1.getInt(1);
+                        session.setAttribute("pending_approval", pending_approval);
+                    }
+         
+             }
           nextPage="Staffs.jsp";
           
-          
+                 JSONObject obj = new JSONObject();
+                 JSONArray jarray = new JSONArray();
           //get new updates on the system
-          String getupdates = "SELECT DISTINCT(notifications.id) AS id FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id WHERE notifications.id NOT IN(SELECT notifications.id AS id FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id WHERE user_id=?)";
+          String getupdates = "SELECT DISTINCT(notifications.id) AS id,description,url,IFNULL(DATEDIFF(current_timestamp(),notifications.timestamp),0) AS datediff,type FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id WHERE notifications.id NOT IN(SELECT notifications.id AS id FROM notifications LEFT JOIN viewed_notifications on notifications.id=viewed_notifications.notification_id WHERE user_id=?)";
           conn.pst1 = conn.conn.prepareStatement(getupdates);
           conn.pst1.setString(1, id);
           conn.rs1 = conn.pst1.executeQuery();
           while(conn.rs1.next()){
-            new_notifications+=conn.rs1.getString(1)+",";  
+              datediff="";
+              JSONObject ob = new JSONObject();
+              if(conn.rs1.getInt(4)==0){
+                  datediff="today";
+              }
+              else if(conn.rs1.getInt(4)==1){
+                  datediff="1 day ago";
+              }
+              else{
+                  datediff=conn.rs1.getInt(4)+" days ago";
+              }
+            new_notifications+=conn.rs1.getString(1)+",";
+            
+              ob.put("id", conn.rs1.getString(1));
+              ob.put("description", conn.rs1.getString(2));
+              ob.put("url", conn.rs1.getString(3));
+              ob.put("datediff", datediff);
+              ob.put("type", conn.rs1.getString(5));
+              
+            jarray.add(ob);
           }
-                 System.out.println("query : "+conn.pst1);
+          
+          obj.put("data", jarray);
+          session.setAttribute("notis", obj);
+//          System.out.println("obj : "+obj);
+                 
+          System.out.println("query : "+conn.pst1);
           //end of getting new updates
           session.setAttribute("new_notifications", new_notifications);
                  System.out.println("new notifications:"+session.getAttribute("new_notifications"));

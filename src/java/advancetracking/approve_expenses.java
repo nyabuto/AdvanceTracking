@@ -48,6 +48,11 @@ public class approve_expenses extends HttpServlet {
             if(num>0){
                          message="Expenses approved successfully."; 
                          code=1;
+                         if(session.getAttribute("pending_approval")!=null){
+                             int pending = Integer.parseInt(session.getAttribute("pending_approval").toString())-1;
+                             session.setAttribute("pending_approval", pending);
+                         }
+                         
                        }
                        else{
                          message="No change detected."; 

@@ -52,13 +52,18 @@
 								<!-- Main -->
 								<li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
 								<li>
-									<a href="#"><i class="icon-lan3"></i> <span>Advances & Expenses</span></a>
+									<a href="#"><i class="icon-lan3"></i> <span>Advances & Expenses
+<%if(session.getAttribute("new_notifications")!=null){%><span class="label label-danger"><%=session.getAttribute("pending_approval").toString()%></span><%}%>                                                                             
+                                                                            </span></a>
 									<ul>
-										<li><a href="Staffs.jsp">Manage Advances</a></li>
+										<li><a href="Staffs.jsp">Manage Advances                                                                                      
+                                                                                    </a></li>
                                                                                 <%if(session.getAttribute("approve_expenses")!=null){
                                                                                     if(session.getAttribute("approve_expenses").toString().equals("1")){
                                                                                 %>
-										<li><a href="PendingExpenses.jsp">Approve Expenses</a></li>
+										<li><a href="PendingExpenses.jsp">Approve Expenses
+    <%if(session.getAttribute("new_notifications")!=null){%><span class="label label-danger"><%=session.getAttribute("pending_approval").toString()%></span><%}%>  
+                                                                                    </a></li>
                                                                                 <%}}%>
 									</ul>
 								</li>

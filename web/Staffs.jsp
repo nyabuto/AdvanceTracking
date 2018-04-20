@@ -60,6 +60,7 @@
      </script>
         <script type="text/javascript">
           jQuery(document).ready(function(){
+          notis();
           loadstaffs();    
           }); 
           
@@ -386,6 +387,44 @@
            $("#is_finance").select2({ width: 'element' });
            $("#is_finance").selectpicker();  
     }
+    
+    function notis(){
+        var notis ="",id,description,pos=0,output="",url="#",datediff="",type=0;
+        <%if(session.getAttribute("notis")!=null){%>
+        notis =<%=session.getAttribute("notis").toString()%>;
+         var data=notis.data;
+         
+         //loop through to get all notifications
+         for (var i=0; i<data.length;i++){
+            pos=i+1;
+            id=description="";
+            if( data[i].id!=null){id = data[i].id;}
+            if( data[i].description!=null){description = data[i].description;}
+            if( data[i].url!=null){url = data[i].url;}
+            if( data[i].datediff!=null){datediff = data[i].datediff;}
+            if( data[i].type!=null){type = data[i].type;}
+//            alert(type);
+            if(type==1){
+             output+='<li class="media"><div class="media-left"><a href="'+url+'" class="icon-bell2"></a></div><div class="media-body"><a href="'+url+'"></a> '+description+'<div class="media-annotation">'+datediff+'</div></div></li>';
+         }
+         else{
+          output+='<li class="media"><div class="media-left"><a href="#" onclick="message('+id+')" class="icon-bubble8"></a></div><div class="media-body"><a href="'+url+'"></a> '+description+'<div class="media-annotation">'+datediff+'</div></div></li>';   
+        }
+         }
+    //output the values
+    $("#all_notis").html(output);
+    $("#noti_counter").html(pos);
+    
+    ////end of outputting
+         //end of getting notifications
+
+       <%}%>
+               
+    }
+    
+    function message(id){
+        alert(id);
+    }
         </script>
 </head>
 
@@ -416,19 +455,19 @@
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							<i class="icon-bell2"></i>
-							<span class="visible-xs-inline-block position-right">Activity</span>
-							<span class="status-mark border-pink-300"></span>
+							<span class="visible-xs-inline-block position-right">Notifications</span>
+							<span id="noti_counter" class="badge bg-warning-400">3</span>
 						</a>
 
 						<div class="dropdown-menu dropdown-content">
 							<div class="dropdown-content-heading">
-								Activity
+								Notifications
 								<ul class="icons-list">
 									<li><a href="#"><i class="icon-menu7"></i></a></li>
 								</ul>
 							</div>
 
-							<ul class="media-list dropdown-content-body width-350">
+							<ul class="media-list dropdown-content-body width-350" id="all_notis">
 								<li class="media">
 									<div class="media-left">
 										<a href="#" class="btn bg-success-400 btn-rounded btn-icon btn-xs"><i class="icon-mention"></i></a>
@@ -448,7 +487,7 @@
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							<i class="icon-bubble8"></i>
 							<span class="visible-xs-inline-block position-right">Messages</span>
-							<span class="status-mark border-pink-300"></span>
+							<span class="status-mark border-pink-300">6</span>
 						</a>
 						
 						<div class="dropdown-menu dropdown-content width-350">
@@ -463,7 +502,7 @@
 								<li class="media">
 									<div class="media-left">
 										<img src="assets/images/placeholder.jpg" class="img-circle img-sm" alt="">
-										<span class="badge bg-danger-400 media-badge">5</span>
+										<span id="_noti_counter" class="badge bg-danger-400 media-badge">5</span>
 									</div>
 
 									<div class="media-body">
